@@ -1,0 +1,48 @@
+gecoc:
+    - Gestión de contraseñas:
+        * Añadir nueva contraseña
+            - Generación de contraseñas aleatorias
+            - Comprobación de seguridad de una contraseña
+        * Borrado de contraseñas
+        * Gestión de contraseñas en el tiempo
+            - Modificación de contraseñas
+            - Recordatorio de caducidad de contraseñas
+            - Niveles de alerta (verde, naranja, rojo, según el
+              tiempo)
+              
+    - Gestión de servidores (gecod)
+        * Crear cuentas en servidores remotos o locales
+        * Gestionar cuentas en diferentes servidores
+        * Lista de servidores a utilizar
+        * Niveles de confianza (Cifrar n veces antes de enviar)
+
+    - Distribución de contraseñas:
+        * Capacidad de distribuir una contraseña entre diferentes
+        servidores.
+
+gecod:
+    - Gestión de usuarios:
+        * Registro (usuario y contraseña)
+        * Autenticación:
+            El servidor envía un mensaje aleatorio cifrado con el sha
+            de la contraseña al cliente. El cliente debe devolver el
+            mensaje original al serivdor en claro.
+
+    - Sincronización entre servidores:
+        * Sólo se sincronizan los usuarios registrados en ese
+        servidor.
+        * Es necesario que un usuario se haya registrado en un
+        servidor para que el servidor pueda hacer peticiones a otros
+        sobre contraseñas o partes de contraseñas de un usuario.
+        * Sincronización automática
+        * Sincronización por petición
+
+    - Gestión de información distribuida (opcional):
+        * Un servidor puede almacenar tanto una contraseña completa
+        como una parte.
+        * Si un servidor recibe una petición de una contraseña que no
+        tiene almacenada o de la que sólo conoce una parte, debe ser
+        capaz de preguntar a otros servidores por esa contraseña.
+        * Expansión de contraseñas:
+            - Un servidor es capaz de partir una contraseña en
+            pequeñas partes y repartirlas entre otros servidores.

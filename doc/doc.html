@@ -1,0 +1,91 @@
+<strong>gecoc:</strong>
+    <ul>
+    <li>Gestión de contraseñas:
+        <ul>
+        <li>Añadir nueva contraseña
+            <ul>
+            <li>Generación de contraseñas aleatorias
+            </li>
+            <li>Comprobación de seguridad de una contraseña
+            </li>
+            </ul>
+        </li>
+        <li>Borrado de contraseñas </li>
+        <li>Gestión de contraseñas en el tiempo
+            <ul>
+            <li>Modificación de contraseñas </li>
+            <li>Recordatorio de caducidad de contraseñas </li>
+            <li>Niveles de alerta (verde, naranja, rojo, según el
+                  tiempo)
+            </li>
+            </ul>
+        </li>
+        </ul>
+              
+    </li>
+    <li>Gestión de servidores (gecod)
+        <ul>
+        <li>Crear cuentas en servidores remotos o locales </li>
+        <li>Gestionar cuentas en diferentes servidores </li>
+        <li>Lista de servidores a utilizar </li>
+        <li>Niveles de confianza (Cifrar n veces antes de enviar)</li>
+        </ul>
+
+    </li>
+    <li>Distribución de contraseñas:
+    <ul>
+        <li>Capacidad de distribuir una contraseña entre diferentes
+        servidores.</li>
+    </ul>         
+    </ul>
+
+<strong>gecod:</strong>
+    <ul>
+    <li>Gestión de usuarios:
+        <ul>
+        <li>Registro (usuario y contraseña)
+        </li>
+        <li>Autenticación:
+        <p>
+            El servidor envía un mensaje aleatorio cifrado con el sha
+            de la contraseña al cliente. El cliente debe devolver el
+            mensaje original al serivdor en claro.
+        </p>
+        </li>
+        </ul>
+
+    </li>
+    <li>Sincronización entre servidores:
+        <ul>
+        <li>Sólo se sincronizan los usuarios registrados en ese
+        servidor.
+        </li>
+        <li>Es necesario que un usuario se haya registrado en un
+        servidor para que el servidor pueda hacer peticiones a otros
+        sobre contraseñas o partes de contraseñas de un usuario.
+        </li>
+        <li>Sincronización automática
+        </li>
+        <li>Sincronización por petición
+        </li>
+        </ul>
+
+    </li>
+    <li>Gestión de información distribuida (opcional):
+        <ul>
+        <li>Un servidor puede almacenar tanto una contraseña completa
+        como una parte.
+        </li>
+        <li>Si un servidor recibe una petición de una contraseña que no
+        tiene almacenada o de la que sólo conoce una parte, debe ser
+        capaz de preguntar a otros servidores por esa contraseña.
+        </li>
+        <li>Expansión de contraseñas:
+        <ul>
+            <li>Un servidor es capaz de partir una contraseña en
+            pequeñas partes y repartirlas entre otros servidores.
+            </li>
+        </ul>
+        </ul>
+    </li>
+    </ul>

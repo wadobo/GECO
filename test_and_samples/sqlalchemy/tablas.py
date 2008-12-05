@@ -20,7 +20,7 @@ addresses = Table('addresses', metadata,
   Column('email_address', String(50), nullable=False)
 )
 
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import mapper, relation
 class User(object):
     def __init__(self, name, fullname):
         self.name = name
@@ -31,17 +31,20 @@ class User(object):
 
 class Address(object):
     def __init__(self, email_address, user_id):
-        self._username = user_id.name
         self.user_id = user_id.id
         self.email_address = email_address
 
     def __repr__(self):
         return "<Address('%s', '%s')>" % (self.email_address,
-                self._username)
+                self.user_id)
 
 
-mapper(User, users)
+#mapper(User, users)
 mapper(Address, addresses)
+mapper(User, users, properties=dict(
+addresses=relation(Address, backref='users', 
+               cascade='all, delete-orphan')
+))
 
 from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=db, autoflush=True, transactional=True)

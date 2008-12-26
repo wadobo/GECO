@@ -23,6 +23,12 @@ else:
     sha = sha.new
 
 import datetime
+import random
+# 0123456789...ABC....abc
+CHARS = [chr(x) for x in range(48, 48+43)] +\
+        [chr(x) for x in range(97, 97+26)]
+DEFAULT_EXPIRATION = 60 # password default expiration (in days)
+
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -31,7 +37,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(20))
+    name = Column(String(20), unique=True)
     password = Column(String(60))
 
     def __init__(self, name, password):
@@ -47,6 +53,7 @@ class Password(Base):
     name = Column(String(20))
     description = Column(String(255))
     updated = Column(DateTime())
+    expiration = Column(DateTime())
 
     account = Column(String(100))
     password = Column(String(100), nullable=False)
@@ -58,13 +65,18 @@ class Password(Base):
         passive_deletes=False))
 
     def __init__(self, name, password, type='generic',
-            description='', account=''):
+            description='', account='', expiration=None):
         self.name = name
         self.password = password
         self.type = type
         self.description = description
         self.account = account
         self.updated = datetime.datetime.now()
+        if expiration:
+            self.expiration = expiration
+        else:
+            self.expiration = datetime.datetime.now() +\
+                datetime.timedelta(DEFAULT_EXPIRATION)
 
 class Conffile(Base):
     __tablename__ = 'conffiles'
@@ -90,6 +102,27 @@ class Conffile(Base):
         self.rel_path = relpath
         self.description = description
         self.updated = datetime.datetime.now()
+
+class Cookie(Base):
+    __tablename__ = 'cookies'
+
+    # El id es una especie de cookie que se va a envia desde el
+    # frontend al backend de gecod, nunca al cliente. Es una forma de
+    # no guardar la contraseña, ni siquiera el hash de esta
+    id = Column(String(80), primary_key=True)
+    expiration = Column(DateTime())
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    user = relation(User, backref=backref('cookie',
+        uselist=False,
+        order_by=id, cascade='all, delete-orphan',
+        passive_deletes=False))
+
+    def __init__(self):
+        # Un dia de expiración de cookie es mucho?
+        self.id = ''.join([random.choice(CHARS) for _ in range(80)])
+        self.expiration = datetime.datetime.now() +\
+            datetime.timedelta(1)
 
 def connect(database='sqlite:///database.sqlite'):
     db = create_engine(database, echo=False)

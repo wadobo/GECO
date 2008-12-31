@@ -11,6 +11,7 @@
 
 import sys
 from sqlalchemy import *
+from sqlalchemy.exceptions import InvalidRequestError, IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relation, backref, sessionmaker
@@ -24,6 +25,7 @@ else:
 
 import datetime
 import random
+
 # 0123456789...ABC....abc
 CHARS = [chr(x) for x in range(48, 48+43)] +\
         [chr(x) for x in range(97, 97+26)]
@@ -57,6 +59,7 @@ class Password(Base):
 
     account = Column(String(100))
     password = Column(String(100), nullable=False)
+    cypher_method = Column(String(20))
 
     user_id = Column(Integer, ForeignKey('users.id'))
 
@@ -65,12 +68,14 @@ class Password(Base):
         passive_deletes=False))
 
     def __init__(self, name, password, type='generic',
-            description='', account='', expiration=None):
+            description='', account='', expiration=None,
+            cypher_method=''):
         self.name = name
         self.password = password
         self.type = type
         self.description = description
         self.account = account
+        self.cypher_method = cypher_method
         self.updated = datetime.datetime.now()
         if expiration:
             self.expiration = expiration

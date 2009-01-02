@@ -77,4 +77,7 @@ def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())
 
 if __name__ == '__main__':
-    start_server()
+    try:
+        start_server()
+    except KeyboardInterrupt:
+        print "Closing"

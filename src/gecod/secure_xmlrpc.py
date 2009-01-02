@@ -35,7 +35,7 @@ class SecureXMLRPCServer(BaseHTTPServer.HTTPServer, SimpleXMLRPCServer.SimpleXML
         self.logRequests = logRequests
 
         SimpleXMLRPCServer.SimpleXMLRPCDispatcher.__init__(self,
-                False, None)
+                True, None)
         SocketServer.BaseServer.__init__(self, server_address, HandlerClass)
         ctx = SSL.Context(SSL.SSLv23_METHOD)
         ctx.use_privatekey_file (KEYFILE)

@@ -25,10 +25,10 @@ else:
 
 import datetime
 import random
+import string
 
 # 0123456789...ABC....abc
-CHARS = [chr(x) for x in range(48, 48+43)] +\
-        [chr(x) for x in range(97, 97+26)]
+CHARS = string.letters + string.digits + '.:;,!?{}[]<>=-_()+'
 DEFAULT_EXPIRATION = 60 # password default expiration (in days)
 
 

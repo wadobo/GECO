@@ -56,7 +56,15 @@ class frontend:
         '''
 
         p = backend.get_passwords_by(cookie, **args)
-        return p
+        return [i for i in p]
+    
+    def get_all_passwords(self, cookie):
+        '''
+        Return all passwords of user
+        '''
+
+        p = backend.get_all_passwords(cookie)
+        return [i for i in p]
 
 def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())

@@ -52,6 +52,10 @@ def session_decorator(function):
 
     return new_funct
 
+def generator_filtered(filter, seed):
+    for s in seed:
+        yield filter(s)
+
 class Password:
     def __init__(self, password):
         self.type = password.type
@@ -175,6 +179,26 @@ def get_password(cookie, name='', from_db=False):
         return Password(password)
 
 @session_decorator
+def get_all_passwords(cookie, from_db=False):
+    '''
+    Return a generator (iterable) of passwords with all passwords
+    '''
+    user = user_by_cookie(cookie, session)
+    try:
+        password = session.query(db.Password)\
+                .filter(db.Password.user_id == user.id)
+
+        password = password.all()
+
+    except db.InvalidRequestError:
+        raise NotFoundError("Some error has happened")
+
+    if from_db:
+        return password
+    else:
+        return generator_filtered(Password, password)
+
+@session_decorator
 def get_passwords_by(cookie, from_db=False, **kwargs):
     '''
     Return a generator (iterable) of passwords by attributes of user
@@ -209,8 +233,7 @@ def get_passwords_by(cookie, from_db=False, **kwargs):
     if from_db:
         return password
     else:
-        all = [Password(i) for i in password]
-        return all
+        return generator_filtered(Password, password)
 
 @session_decorator
 def set_password(cookie, name, password, **kwargs):

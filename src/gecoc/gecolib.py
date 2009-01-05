@@ -4,6 +4,7 @@
 import random
 import string
 
+
 LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
                     string.uppercase,
                     string.digits,
@@ -34,7 +35,8 @@ def get_server_object(method='xmlrpc', **kwargs):
     if method == 'xmlrpc':
         import xmlrpclib
         # example xmlrpc server: 'https://localhost:443'
-        server = xmlrpclib.Server(kwargs['xmlrpc_server'])
+        server = xmlrpclib.Server(kwargs['xmlrpc_server'],
+                allow_none=1)
         return server
 
 GSO = get_server_object
@@ -117,4 +119,33 @@ def strength(password):
                 break
 
     return ((strength + 20) / 40.0)
+
+##################################################
+# Algoritmos para cifrar y descifrar contraseñas #
+##################################################
+
+from Crypto.Cipher import AES
+import base64
+
+def mult(cad, length=16):
+    n = len(cad)
+    n = length - (n % length)
+    return cad + chr(0)*n
+
+def AESencrypt(cad, password):
+    c = AES.new(mult(password))
+    cifrado = c.encrypt(mult(cad))
+    return base64.b64encode(cifrado)
+
+def AESdecrypt(cad, password):
+    c = AES.new(mult(password))
+    cad = base64.b64decode(cad)
+    descifrado = c.decrypt(cad)
+    return strip(descifrado)
+
+def strip(cad):
+    index = cad.find(chr(0))
+    to_ret = cad[0:index] if index > 0 else cad
+    return to_ret
+
 

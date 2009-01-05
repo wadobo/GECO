@@ -34,10 +34,12 @@ class frontend:
     def check_user_name(self, name):
         return backend.check_user_name(name)
 
-    def set_password(self, cooke, name, password, args):
+    def set_password(self, cookie, name, password, args):
         '''
         args is a dict with possible keys:
             type, description, account, expiration
+
+            expiration must be an integer (days)
         '''
 
         backend.set_password(cookie, name, password, **args)

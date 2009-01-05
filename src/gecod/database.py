@@ -68,7 +68,7 @@ class Password(Base):
         passive_deletes=False))
 
     def __init__(self, name, password, type='generic',
-            description='', account='', expiration=None,
+            description='', account='', expiration=DEFAULT_EXPIRATION,
             cypher_method=''):
         self.name = name
         self.password = password
@@ -77,11 +77,10 @@ class Password(Base):
         self.account = account
         self.cypher_method = cypher_method
         self.updated = datetime.datetime.now()
-        if expiration:
-            self.expiration = expiration
-        else:
-            self.expiration = datetime.datetime.now() +\
-                datetime.timedelta(DEFAULT_EXPIRATION)
+        default = expiration if expiration else DEFAULT_EXPIRATION
+
+        self.expiration = datetime.datetime.now() +\
+            datetime.timedelta(default)
 
 class Conffile(Base):
     __tablename__ = 'conffiles'

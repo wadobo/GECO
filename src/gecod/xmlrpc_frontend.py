@@ -5,25 +5,11 @@
 Provides a xmlrpc frontend to gecod backend
 '''
 
-import time
-
 import backend
 import secure_xmlrpc as sxmlrpc
 
 HOST = 'localhost'
 PORT = 4343
-
-class Password:
-    def __init__(self, password):
-        self.type = password.type
-        self.name = password.name
-        self.description = password.description
-        self.account = password.account
-        self.password = password.password
-        self.cypher_method = password.cypher_method
-
-        self.updated = time.mktime(password.updated.timetuple())
-        self.expiration = time.mktime(password.expiration.timetuple())
 
 class frontend:
     def __init__(self):
@@ -61,7 +47,7 @@ class frontend:
         
     def get_password(self, cookie, name):
         p = backend.get_password(cookie, name)
-        return Password(p)
+        return p
 
     def get_passwords(self, cookie, args):
         '''
@@ -70,8 +56,7 @@ class frontend:
         '''
 
         p = backend.get_passwords_by(cookie, **args)
-        all = [Password(i) for i in p]
-        return all
+        return p
 
 def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())

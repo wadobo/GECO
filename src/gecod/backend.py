@@ -18,7 +18,7 @@ it. Gecod-backend provides an abstraction layer over gecod-database.
 import sys
 import database as db
 import datetime
-
+import time
 
 class NotImplementedError(Exception):
     pass
@@ -51,6 +51,18 @@ def session_decorator(function):
         return result
 
     return new_funct
+
+class Password:
+    def __init__(self, password):
+        self.type = password.type
+        self.name = password.name
+        self.description = password.description
+        self.account = password.account
+        self.password = password.password
+        self.cypher_method = password.cypher_method
+
+        self.updated = time.mktime(password.updated.timetuple())
+        self.expiration = time.mktime(password.expiration.timetuple())
 
 def user_by_cookie(cookie, session=None):
     '''
@@ -141,27 +153,34 @@ def logout(cookie):
     except db.InvalidRequestError:
         pass
 
-def get_password(cookie, name=''):
+def get_password(cookie, name='', from_db=False):
     '''
     Return the password by name of user designed by cookie.
+
+    If from_db is True return a sqlalchemy object
 
     Can Raise BadCookieError, NotFoundError
     '''
     try:
-        password = get_passwords_by(cookie, name=name).first()
+        password = get_passwords_by(cookie, name=name, from_db=True).first()
     except db.InvalidRequestError:
         raise NotFoundError("Can't found password by name %s" % name)
 
     if not password:
         raise NotFoundError("Can't found password by name %s" % name)
 
-    return password
+    if from_db:
+        return password
+    else:
+        return Password(password)
 
 @session_decorator
-def get_passwords_by(cookie, **kwargs):
+def get_passwords_by(cookie, from_db=False, **kwargs):
     '''
     Return a generator (iterable) of passwords by attributes of user
     by cookie.
+
+    If from_db is True return a sqlalchemy object
 
     permited attributes:
     name, type, updated, expiration, account
@@ -187,7 +206,11 @@ def get_passwords_by(cookie, **kwargs):
     except db.InvalidRequestError:
         raise NotFoundError("Can't found password by name %s" % name)
 
-    return password
+    if from_db:
+        return password
+    else:
+        all = [Password(i) for i in password]
+        return all
 
 @session_decorator
 def set_password(cookie, name, password, **kwargs):
@@ -217,7 +240,7 @@ def del_password(cookie, name):
     Delete a password by name
     '''
 
-    password = get_password(cookie, name=name)
+    password = get_password(cookie, name=name, from_db=True)
     session.delete(password)
     session.commit()
 

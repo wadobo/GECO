@@ -43,7 +43,7 @@ def testbackend():
 
     b.del_password(c, 'nuevo')
     p = b.get_passwords_by(c, name='nuevo')
-    assert not list(p)
+    assert not p
 
     b.unregister(c)
     assert not b.check_user_name('dani2')

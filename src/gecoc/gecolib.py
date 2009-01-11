@@ -10,6 +10,53 @@ LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
                     string.digits,
                     '.:;,!?{}[]<>=-_()+#@$%&')
 
+
+class GecoClient:
+    def __init__(self, server, name=''):
+        self.server = server
+        self.cookie = ''
+        self.name = ''
+        self._name = name
+
+    def auth(self, user, password):
+        self.cookie = self.server.auth(user, password)
+        if self.cookie:
+            self.name = self._name
+
+    def logout(self):
+        self.server.logout(self.cookie)
+        self.cookie = ''
+        self.name = ''
+
+    def register(self, user, password):
+        self.server.register(user, password)
+
+    def check_user_name(self, name):
+        return self.server.check_user_name(name)
+
+    def set_password(self, name, password, master, args):
+        method = cypher_methods[args.get('cypher_method', '')]
+        password = method.encrypt(password, master)
+        self.server.set_password(self.cookie, name, password, args)
+
+    def get_password(self, name, master):
+        p = self.server.get_password(self.cookie, name)
+        method = cypher_methods[p.get('cypher_method', '')]
+        p['password'] = method.decrypt(p['password'], master)
+        return p
+    
+    def decrypt_password(self, p, master):
+        method = cypher_methods[p.get('cypher_method', '')]
+        return method.decrypt(p['password'], master)
+
+    def cookied(self, f):
+        def new_funct(*args, **kwargs):
+            return f(self.cookie, *args, **kwargs)
+        return new_funct
+
+    def __getattr__(self, attr):
+        return self.cookied(self.server.__getattr__(attr))
+
 def get_server_object(method='xmlrpc', **kwargs):
     '''
     Return an object with methods to interact with the server.
@@ -22,7 +69,7 @@ def get_server_object(method='xmlrpc', **kwargs):
         def register(self, user, password)
         def unregister(self, cookie)
         def check_user_name(self, name) -> bool
-        def set_password(self, cooke, name, password, args)
+        def set_password(self, cookie, name, password, args)
         def del_password(self, cookie, name)
         def get_password(self, cookie, name) -> password
         def get_passwords(self, cookie, args) -> [password]
@@ -37,7 +84,8 @@ def get_server_object(method='xmlrpc', **kwargs):
         # example xmlrpc server: 'https://localhost:443'
         server = xmlrpclib.Server(kwargs['xmlrpc_server'],
                 allow_none=1)
-        return server
+
+        return GecoClient(server, name=kwargs['xmlrpc_server'])
 
 GSO = get_server_object
 
@@ -129,46 +177,44 @@ import base64
 
 import hashlib
 
-aes = slowaes.AESModeOfOperation()
-
-def encrypt(msg, key):
-    ckey, iv = key_and_iv(key)
-    mode, orig_len, ciph = aes.encrypt(msg, aes.modeOfOperation["CBC"],
-            ckey, aes.aes.keySize["SIZE_128"], iv)
-    return ciph
-
-def decrypt(msg, key):
-    ckey, iv = key_and_iv(key)
-    decr = aes.decrypt(msg, 256, aes.modeOfOperation["CBC"], ckey,
-            aes.aes.keySize["SIZE_128"], iv)
-    return strip(decr)
-
-def key_and_iv(key):
-    '''
-    Return a 32 size number key and a 16 size iv from a string key
-    '''
-    hkey = map(ord, hashlib.sha256(key).digest())
-    iv = map(ord, hashlib.md5(key).digest())
-    
-    return hkey, iv
-
+# Some crypt utils
 def mult(cad, length=16):
     n = len(cad)
     n = length - (n % length)
     return cad + chr(0)*n
 
-def AESencrypt(cad, password):
-    c = AES.new(mult(password))
-    cifrado = c.encrypt(mult(cad))
-    return base64.b64encode(cifrado)
-
-def AESdecrypt(cad, password):
-    c = AES.new(mult(password))
-    cad = base64.b64decode(cad)
-    descifrado = c.decrypt(cad)
-    return strip(descifrado)
-
 def strip(cad):
     index = cad.find(chr(0))
     to_ret = cad[0:index] if index > 0 else cad
     return to_ret
+
+class AES:
+    ''' SlowAES method '''
+    def __init__(self):
+        self.aes = slowaes.AESModeOfOperation()
+    def encrypt(self, msg, key):
+        ckey, iv = self.key_and_iv(key)
+        mode, orig_len, ciph = self.aes.encrypt(msg, self.aes.modeOfOperation["CBC"],
+                ckey, self.aes.aes.keySize["SIZE_128"], iv)
+        return '#'.join(map(str, ciph))
+
+    def decrypt(self, msg, key):
+        msg = map(int, msg.split('#'))
+        ckey, iv = self.key_and_iv(key)
+        decr = self.aes.decrypt(msg, 256, self.aes.modeOfOperation["CBC"], ckey,
+                self.aes.aes.keySize["SIZE_128"], iv)
+        return strip(decr)
+
+    def key_and_iv(self, key):
+        '''
+        Return a 32 size number key and a 16 size iv from a string key
+        '''
+        hkey = map(ord, hashlib.sha256(key).digest())
+        iv = map(ord, hashlib.md5(key).digest())
+        
+        return hkey, iv
+
+cypher_methods = {
+        'AES': AES(),
+        '': AES(),
+        }

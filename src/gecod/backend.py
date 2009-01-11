@@ -20,6 +20,8 @@ import database as db
 import datetime
 import time
 
+DATABASE = 'sqlite:///database.sqlite'
+
 class NotImplementedError(Exception):
     pass
 
@@ -42,7 +44,7 @@ def session_decorator(function):
     database.connect() or backend.db.connect()
     '''
     def new_funct(*args, **kwargs):
-        session = db.connect()
+        session = db.connect(DATABASE)
         function.__globals__['session'] = session
         try:
             result = function(*args, **kwargs)
@@ -78,7 +80,7 @@ def user_by_cookie(cookie, session=None):
 
     close_it = False
     if not session:
-        session = db.connect()
+        session = db.connect(DATABASE)
     
     try:
         user = session.query(db.User).\

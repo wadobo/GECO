@@ -9,146 +9,237 @@ Terminal GECO client
 import gecolib
 import sys
 import os
-import getopt
 import types
+import datetime
 import getpass
+import threading
 
-def _parse_user_hostname(args, options='u:h:'):
-    username = os.environ['USER']
-    hostname = 'https://localhost:4343'
+TIMEOUT = 10.0 * 60 # 10 minutos
+debug = False
 
-    opts, others = getopt.getopt(args, options)
-    for opt, value in opts:
-        if opt == '-u':
-            username = value
-        elif opt == '-h':
-            hostname = value
-    
-    if not username:
-        username = os.environ['USER']
-
-    return username, hostname
-
-def list(args):
-    ''' Lista todas las contraseñas
-        opciones:
-        -u username
-        -h host (https://localhost:4343)
+def login(server='https://localhost:4343'):
+    ''' Autentica contra un servidor 
+        login https://localhost:4343
     '''
-    
-    username, hostname = _parse_user_hostname(args)
+    global gso
+    unix_user = os.environ.get('USER', '')
+    user = raw_input('usuario [' + unix_user + ']: ')
+    if not user:
+        user = unix_user
     password = getpass.getpass()
-    try:
-        server = gecolib.get_server_object(xmlrpc_server=hostname)
-        cookie = server.auth(username, password)
-        passwords = server.get_all_passwords(cookie)
-        server.logout(cookie)
-    except:
-        print "No se ha podido autenticar %s, %s" % (username,
-                hostname)
-        sys.exit()
+    gso = gecolib.GSO(xmlrpc_server=server)
+    gso.auth(user, password)
+
+def logout():
+    ''' Cierra la sesión con el servidor '''
+    global gso
+    gso.logout()
+
+def list():
+    ''' Lista todas las contraseñas '''
+
+    global gso
+    passwords = gso.get_all_passwords()
                 
+    formatted = '%-10s | %-20s | %-10s | %-24s'
+    header = formatted % ('NAME', 'ACCOUNT',
+                'TYPE', 'EXPIRATION')
+    print header
+    print '='*len(header)
     for p in passwords:
-        print '%-10s %-20s %-10s' % (p['name'], p['account'],
-                p['type'])
+        name = p.get('name', 'NONAME')
+        account = p.get('account', '--')
+        type = p.get('type', '--')
+        expiration = p.get('expiration')
+        expiration = datetime.datetime.fromtimestamp(expiration).ctime()
+        
+        print formatted % (name, account,
+                type, expiration)
 
-def pwd(args):
+def get(name=''):
     ''' Devuelve una contraseña en concreto
-        opciones:
-        -u username
-        -h host (https://localhost:4343)
-        -n name
+        get [nombre] 
     '''
 
-    options = 'u:h:n:'
-    username, hostname = _parse_user_hostname(args, options)
-    password = getpass.getpass()
+    global gso
+    if not name:
+        name = raw_input('nombre del password: ')
 
-    passname = ''
-    opts, others = getopt.getopt(args, options)
-    for opt, value in opts:
-        if opt == '-n':
-            passname = value
+    master_password = _get_master()
+    password = gso.get_password(name, master_password)
+    print password['password']
 
-    try:
-        server = gecolib.get_server_object(xmlrpc_server=hostname)
-        cookie = server.auth(username, password)
-    except:
-        print "No se ha podido autenticar %s, %s" % (username,
-                hostname)
-        sys.exit()
-
-    try:
-        password = server.get_password(cookie, passname)
-        server.logout(cookie)
-    except:
-        print "Password no encontrado %s" % passname
-        sys.exit()
-
-    print "'%s'" % password['password']
-
-def setpwd(args):
-    ''' Almacena un password en el servidor
-        opciones:
-        -u username
-        -h host (https://localhost:4343)
-        -n name
-
-        opcionales:
-        -r random password
-        -p password
-        -t tipo (generic, web, email, unix)
-        -d descripcion
-        -a cuenta
-        -x tiempo de expiración en días (60 por defecto)
+def getcp(name=''):
+    ''' Devuelve una contraseña en concreto en el portapapeles (solo funciona con GTK)
+        getcp [nombre] 
     '''
 
-    options = 'u:h:n:t:d:a:x:p:r'
-    username, hostname = _parse_user_hostname(args, options)
-    password = getpass.getpass()
+    global gso
+    if not name:
+        name = raw_input('nombre del password: ')
 
-    passname = ''
-    key_args = {}
-    opts, others = getopt.getopt(args, options)
-    for opt, value in opts:
-        if opt == '-n':
-            passname = value
-        elif opt == '-t':
-            key_args['type'] = value
-        elif opt == '-d':
-            key_args['description'] = value
-        elif opt == '-a':
-            key_args['account'] = value
-        elif opt == '-x':
-            key_args['expired'] = int(value)
-        elif opt == '-p':
-            real_password = value
-        elif opt == '-r':
-            real_password = gecolib.generate()
+    master_password = _get_master()
+    password = gso.get_password(name, master_password)
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
 
-    try:
-        server = gecolib.get_server_object(xmlrpc_server=hostname)
-        cookie = server.auth(username, password)
-    except:
-        print "No se ha podido autenticar %s, %s" % (username,
-                hostname)
-        sys.exit()
+    # get the clipboard
+    clipboard = gtk.clipboard_get()
+    clipboard.set_text(password['password'])
+    clipboard.store()
 
-    server.set_password(cookie, passname, real_password, key_args)
+def new(name=''):
+    ''' Almacena un password en el servidor 
+        new [nombre] 
+    '''
+    # TODO dejar poner el tiempo de expiracion
 
-    server.logout(cookie)
+    while not name:
+        name = raw_input('Nombre para esta contraseña: ')
+    args = dict(type='generic',
+            description='',
+            account='')
+    _ask(args)
 
-def help(args):
+    print ""
+    print "Selecciona el modo de introducción de contraseña:"
+    print "[1] Aleatoria de 11 caracteres con mayusculas minusculas y números"
+    print " 2  Generación aleatoria personalizada"
+    print " 3  Introducción manual"
+    mode = raw_input("modo?: ")
+        
+    if mode in ['', '1']:
+        password = gecolib.generate()
+    elif mode == '2':
+        size = _input('Número de caracteres [11]: ', 11, int)
+        lower = _input('Utilizar minusculas? [Y/n]: ', True, bool)
+        upper = _input('Utilizar mayusculas? [Y/n]: ', True, bool)
+        digits = _input('Utilizar digitos? [Y/n]: ', True, bool)
+        punctuation = _input('Utilizar signos de puntuación? [y/N]: ', False, bool)
+        
+        while True:
+            password = gecolib.generate(size, lower, upper, digits,
+                    punctuation)
+            print password, 'seguridad: ', gecolib.strength(password)
+            if _input('Usar este password? [Y/n]: ', True, bool):
+                break;
+    elif mode == '3':
+        password = getpass.getpass('Introduce la contraseña: ')
+        password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
+
+        while password != password2:
+            print "No coinciden, intentalo de nuevo"
+            password = getpass.getpass('Introduce la contraseña: ')
+            password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
+
+
+    master = _get_master()
+    gso.set_password(name, password, master, args)
+
+def register(name=''):
+    ''' Registra un usuario nuevo en el servidor 
+        register [usuario]
+    '''
+    global gso 
+
+    if not gso.check_user_name(name):
+        print "Este nombre no está disponible"
+        name = ''
+    while not name:
+        name = raw_input('Nombre de usuario: ')
+        if not gso.check_user_name(name):
+            print "Este nombre no está disponible"
+            name = ''
+    password = getpass.getpass('Contraseña de usuario '
+                               '(Esta tienes que recordarla): ')
+    password2 = getpass.getpass('Repitela: ')
+    while password != password2:
+        print "No coinciden las contraseñas, intentalo otra vez"
+        password = getpass.getpass('Contraseña de usuario '
+                                   '(Esta tienes que recordarla): ')
+        password2 = getpass.getpass('Repitela: ')
+    gso.register(name, password)
+
+def unregister():
+    ''' Elimina una cuenta de usuario del servidor '''
+    gso.unregister()
+
+def rm(name=''):
+    ''' Borra una contraseña del servidor
+        rm [nombre] 
+    '''
+
+    global gso
+    if not name:
+        name = raw_input('nombre del password: ')
+
+    gso.del_password(name)
+
+def help(*args):
     ''' Muestra esta ayuda '''
-    print help_str
+    if args:
+        try:
+            print callable_functions[args[0]].__doc__
+        except:
+            print "No encuentro el comando"
+    else:
+        print help_str
+
+def quit():
+    ''' Salir '''
+    pass
+
+def forget():
+    ''' Olvida la contraseña maestra '''
+    global THREAD
+    if THREAD:
+        THREAD.cancel()
+    _forget()
+
+def _ask(args):
+    for arg, value in args.items():
+        new_value = raw_input(arg + ' [' + value + ']: ')
+        if not new_value:
+            new_value = value
+        args[arg] = new_value
+
+def _forget():
+    global master
+    del master
+    master = ''
+    print "Se me olvidó la contraseña maestra"
+
+def _input(prompt, default='', parser=str):
+    message = raw_input(prompt)
+    if not message:
+        return default
+    else:
+        if parser == bool:
+            if message in 'NOno':
+                message = ''
+        return parser(message)
+
+def _get_master():
+    global master
+    global THREAD
+    if not master:
+        master_password = getpass.getpass('Contraseña maestra: ')
+        answer = _input('recordar contraseña? (10 min) [Y/n]', True,
+                bool)
+        if answer:
+            master = master_password
+            THREAD = threading.Timer(TIMEOUT, _forget)
+            THREAD.start()
+
+    else:
+        master_password = master
+    return master_password
 
 # Muestra todas las funciones como opciones
-help_str = '''
-Modo de empleo:
-    %s opciones
-
-opciones:
-''' % sys.argv[0]
+help_str = ''' Ayuda de terminal-geco
+comandos:
+''' 
 
 functions = [v for v in globals().values()\
         if type(v) == types.FunctionType\
@@ -162,12 +253,35 @@ for function in functions:
             {'opt': function.__name__,
              'desc': function.__doc__}
 
-if __name__ == '__main__':
-    args = sys.argv[1:]
 
-    if len(args) < 1:
-        help([])
-    elif not args[0] in function_names:
-        help([])
-    else:
-        callable_functions[args[0]](args[1:])
+if __name__ == '__main__':
+    quit = False
+    gso = gecolib.GecoClient(server=None)
+    master = ''
+    args = ''
+    THREAD = None
+    history = []
+    while not quit:
+        history.append(args)
+        prompt = 'geco [%s]> ' % gso.name
+        try:
+            args = raw_input(prompt)
+        except:
+            quit = True
+            print "bye"
+            continue
+        args = args.split(' ')
+        if args[0] == 'quit':
+            quit = True
+
+        elif not args[0] in function_names:
+            help()
+        else:
+            try:
+                callable_functions[args[0]](*args[1:])
+            except Exception, inst:
+                if debug:
+                    raise inst
+                print "Error al ejecutar '%s'" % ' '.join(args)
+
+    forget()

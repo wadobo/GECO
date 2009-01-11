@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <title>HTML AES test</title>
+        <script type="text/javascript" src="sha256.js"></script>
+        <script type="text/javascript" src="md5.js"></script>
+        <script type="text/javascript" src="aes.js"></script>
+        <script type="text/javascript">
+
+            function array_of_bytes(key){
+                var retkey = new Array();
+                for (var i=0; i<key.length; i+=2){
+                    retkey[i/2] = parseInt(key.charAt(i) +
+                            key.charAt(i+1), 16);
+                }
+                return retkey;
+            }
+
+            function array_of_bytes2(key){
+                var retkey = [];
+                for (var i=0; i<key.length; i++){
+                    retkey.push(key.charCodeAt(i));
+                }
+		while (retkey.length % 16){
+			retkey.push(0);
+		}
+                return retkey;
+            }
+
+            function array_to_string(key){
+                var retkey = '';
+                for (var i=0; i<key.length; i++){
+                    value = String.fromCharCode(key[i]);
+		    if(key[i] == 0)
+			    break;
+		    retkey += value;
+                }
+                return retkey;
+            }
+
+            function getkey(key){
+                var hexkey = SHA256(key);
+                return array_of_bytes(hexkey);
+            }
+            function getiv(key){
+                var hexkey = hex_md5(key);
+                return array_of_bytes(hexkey);
+            }
+
+            function encrypt(){
+                var key = document.getElementById('clave').value;
+                var clear = document.getElementById('claro').value;
+                var cifrado = document.getElementById('cifrado');
+                var realkey = getkey(key);
+                var realiv = getiv(key);
+                
+                var value = slowAES.encrypt(array_of_bytes2(clear), slowAES.modeOfOperation.CBC, realkey,
+                        16, realiv);
+                cifrado.value = value.cipher;
+            };
+
+            function decrypt(){
+                var key = document.getElementById('clave').value;
+                var clear = document.getElementById('claro');
+                var cifrado = document.getElementById('cifrado').value.split(',');
+                var realkey = getkey(key);
+                var realiv = getiv(key);
+                
+                var value = slowAES.decrypt(cifrado, 256, slowAES.modeOfOperation.CBC, realkey,
+                        16, realiv);
+                clear.value = array_to_string(value);
+            };
+        </script>
+    </head>
+    <body>
+        claro:
+        <input id="claro" type="text"/>
+        clave:
+        <input id="clave" type="text"/>
+        cifrado:
+        <input id="cifrado" type="text"/>
+        <input id="cifrar" type="button" value="cifrar"
+        onclick="encrypt();"/>
+        <input id="descifrar" type="button" value="descifrar"
+        onclick="decrypt();"/>
+    </body>
+</html>
+

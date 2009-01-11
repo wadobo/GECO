@@ -124,8 +124,33 @@ def strength(password):
 # Algoritmos para cifrar y descifrar contraseñas #
 ##################################################
 
-from Crypto.Cipher import AES
+import slowaes
 import base64
+
+import hashlib
+
+aes = slowaes.AESModeOfOperation()
+
+def encrypt(msg, key):
+    ckey, iv = key_and_iv(key)
+    mode, orig_len, ciph = aes.encrypt(msg, aes.modeOfOperation["CBC"],
+            ckey, aes.aes.keySize["SIZE_128"], iv)
+    return ciph
+
+def decrypt(msg, key):
+    ckey, iv = key_and_iv(key)
+    decr = aes.decrypt(msg, 256, aes.modeOfOperation["CBC"], ckey,
+            aes.aes.keySize["SIZE_128"], iv)
+    return strip(decr)
+
+def key_and_iv(key):
+    '''
+    Return a 32 size number key and a 16 size iv from a string key
+    '''
+    hkey = map(ord, hashlib.sha256(key).digest())
+    iv = map(ord, hashlib.md5(key).digest())
+    
+    return hkey, iv
 
 def mult(cad, length=16):
     n = len(cad)
@@ -147,5 +172,3 @@ def strip(cad):
     index = cad.find(chr(0))
     to_ret = cad[0:index] if index > 0 else cad
     return to_ret
-
-

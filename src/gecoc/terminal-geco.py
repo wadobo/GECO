@@ -15,7 +15,7 @@ import getpass
 import threading
 
 TIMEOUT = 10.0 * 60 # 10 minutos
-debug = False
+debug = True
 
 def login(server='https://localhost:4343'):
     ''' Autentica contra un servidor 
@@ -29,6 +29,21 @@ def login(server='https://localhost:4343'):
     password = getpass.getpass()
     gso = gecolib.GSO(xmlrpc_server=server)
     gso.auth(user, password)
+
+def change_password():
+    ''' Cambia la contraseña del usuario en el servidor '''
+    
+    global gso
+
+    password = getpass.getpass('Introduce la nueva contraseña: ')
+    password2 = getpass.getpass('Introducela de nuevo: ')
+
+    while password != password2:
+        print "No coinciden, intentalo de nuevo"
+        password = getpass.getpass('Introduce la nueva contraseña: ')
+        password2 = getpass.getpass('Introducela de nuevo: ')
+    
+    gso.change_password(password)
 
 def logout():
     ''' Cierra la sesión con el servidor '''

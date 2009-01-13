@@ -31,6 +31,9 @@ class frontend:
     def unregister(self, cookie):
         backend.unregister(cookie)
 
+    def change_password(self, cookie, new_password):
+        backend.change_password(cookie, new_password)
+
     def check_user_name(self, name):
         return backend.check_user_name(name)
 

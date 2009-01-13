@@ -45,9 +45,11 @@ def session_decorator(function):
     '''
     def new_funct(*args, **kwargs):
         session = db.connect(DATABASE)
+        print "open"
         try:
             result = function(*args, session=session, **kwargs)
         finally:
+            print "close"
             session.close()
         return result
 
@@ -264,6 +266,7 @@ def del_password(cookie, name, session=None):
     Delete a password by name
     '''
 
+    # No utilizar llamadas a otras funciones si vas a modificar
     password = get_password(cookie, name=name, from_db=True)
     session.delete(password)
     session.commit()
@@ -303,3 +306,14 @@ def unregister(cookie, session=None):
     user = user_by_cookie(cookie, session)
     session.delete(user)
     session.commit()
+
+@session_decorator
+def change_password(cookie, new_password, session=None):
+    '''
+    Changes the user password
+    '''
+
+    user = user_by_cookie(cookie, session)
+    user.set_password(new_password)
+    session.commit()
+

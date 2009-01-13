@@ -42,9 +42,12 @@ class User(Base):
     name = Column(String(20), unique=True)
     password = Column(String(60))
 
+    def set_password(self, password):
+        self.password = sha(password).hexdigest()
+
     def __init__(self, name, password):
         self.name = name
-        self.password = sha(password).hexdigest()
+        self.set_password(password)
 
 class Password(Base):
     __tablename__ = 'passwords'

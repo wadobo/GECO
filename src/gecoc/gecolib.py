@@ -72,6 +72,7 @@ def get_server_object(method='xmlrpc', **kwargs):
         def logout(self, cookie)
         def register(self, user, password)
         def unregister(self, cookie)
+        def change_password(self, cookie, new_password)
         def check_user_name(self, name) -> bool
         def set_password(self, cookie, name, password, args)
         def del_password(self, cookie, name)

@@ -137,11 +137,12 @@ def new(name=''):
     master = _get_master()
     gso.set_password(name, password, master, args)
 
-def register(name=''):
+def register(server, name=''):
     ''' Registra un usuario nuevo en el servidor 
-        register [usuario]
+        register server [usuario]
     '''
     global gso 
+    gso = gecolib.GecoClient(server=server)
 
     if not gso.check_user_name(name):
         print "Este nombre no está disponible"

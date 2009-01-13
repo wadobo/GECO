@@ -54,6 +54,10 @@ class GecoClient:
             return f(self.cookie, *args, **kwargs)
         return new_funct
 
+    def __repr__(self):
+        auth = '< Authenticated >' if self.cookie else ''
+        return '< GecoClient %s %s >' % (self.name, auth)
+
     def __getattr__(self, attr):
         return self.cookied(self.server.__getattr__(attr))
 

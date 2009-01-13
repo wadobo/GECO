@@ -45,9 +45,8 @@ def session_decorator(function):
     '''
     def new_funct(*args, **kwargs):
         session = db.connect(DATABASE)
-        function.__globals__['session'] = session
         try:
-            result = function(*args, **kwargs)
+            result = function(*args, session=session, **kwargs)
         finally:
             session.close()
         return result
@@ -117,7 +116,7 @@ def auth(name, method, **kwargs):
                 method)
 
 @session_decorator
-def auth_by_password(name, password):
+def auth_by_password(name, password, session=None):
     '''
     Authenticate an user by name and password.
     If user exists and password is correct, return a cookie
@@ -181,7 +180,7 @@ def get_password(cookie, name='', from_db=False):
         return Password(password)
 
 @session_decorator
-def get_all_passwords(cookie, from_db=False):
+def get_all_passwords(cookie, session=None, from_db=False):
     '''
     Return a generator (iterable) of passwords with all passwords
     '''
@@ -201,7 +200,7 @@ def get_all_passwords(cookie, from_db=False):
         return generator_filtered(Password, password)
 
 @session_decorator
-def get_passwords_by(cookie, from_db=False, **kwargs):
+def get_passwords_by(cookie, session=None, from_db=False, **kwargs):
     '''
     Return a generator (iterable) of passwords by attributes of user
     by cookie.
@@ -238,7 +237,7 @@ def get_passwords_by(cookie, from_db=False, **kwargs):
         return generator_filtered(Password, password)
 
 @session_decorator
-def set_password(cookie, name, password, **kwargs):
+def set_password(cookie, name, password, session=None, **kwargs):
     '''
     Add a password to an user by cookie
 
@@ -260,7 +259,7 @@ def set_password(cookie, name, password, **kwargs):
     session.commit()
 
 @session_decorator
-def del_password(cookie, name):
+def del_password(cookie, name, session=None):
     '''
     Delete a password by name
     '''
@@ -270,7 +269,7 @@ def del_password(cookie, name):
     session.commit()
 
 @session_decorator
-def register(name, password):
+def register(name, password, session=None):
     '''
     Register a new user in GECO
     
@@ -285,7 +284,7 @@ def register(name, password):
         raise RegisteredUserError('User %s is registered' % name)
 
 @session_decorator
-def check_user_name(name):
+def check_user_name(name, session=None):
     '''
     Return True if name is a username registered
     '''
@@ -296,7 +295,7 @@ def check_user_name(name):
     return bool(names)
 
 @session_decorator
-def unregister(cookie):
+def unregister(cookie, session=None):
     '''
     deletes a user
     '''

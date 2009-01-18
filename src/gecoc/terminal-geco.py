@@ -45,6 +45,28 @@ def change_password():
     
     gso.change_password(password)
 
+def change(name=''):
+    ''' Cambia una contraseña 
+        change name
+    '''
+
+    global gso
+    if not name:
+        name = raw_input('nombre del password: ')
+    newp = _ask_for_password()
+
+    master = _get_master()
+    password = gso.get_password(name, master)
+
+    # Copying old attributes
+    args = {}
+    for arg in password:
+        if arg in ['type', 'description', 'account']:
+            args[arg] = password[arg]
+
+    rm(name)
+    gso.set_password(name, newp, master, args)
+
 def logout():
     ''' Cierra la sesión con el servidor '''
     global gso
@@ -56,7 +78,8 @@ def list():
     global gso
     passwords = gso.get_all_passwords()
                 
-    formatted = '%-10s | %-20s | %-10s | %-24s'
+    today = datetime.datetime.now()
+    formatted = '%-22s | %-14s | %-8s | %-24s'
     header = formatted % ('NAME', 'ACCOUNT',
                 'TYPE', 'EXPIRATION')
     print header
@@ -66,7 +89,11 @@ def list():
         account = p.get('account', '--')
         type = p.get('type', '--')
         expiration = p.get('expiration')
-        expiration = datetime.datetime.fromtimestamp(expiration).ctime()
+        expiration = datetime.datetime.fromtimestamp(expiration)
+        if expiration < today:
+            expiration = "EXPIRED (%s)" % (today - expiration).days
+        else:
+            expiration = expiration.ctime()
         
         print formatted % (name, account,
                 type, expiration)
@@ -117,37 +144,7 @@ def new(name=''):
             account='')
     _ask(args)
 
-    print ""
-    print "Selecciona el modo de introducción de contraseña:"
-    print "[1] Aleatoria de 11 caracteres con mayusculas minusculas y números"
-    print " 2  Generación aleatoria personalizada"
-    print " 3  Introducción manual"
-    mode = raw_input("modo?: ")
-        
-    if mode in ['', '1']:
-        password = gecolib.generate()
-    elif mode == '2':
-        size = _input('Número de caracteres [11]: ', 11, int)
-        lower = _input('Utilizar minusculas? [Y/n]: ', True, bool)
-        upper = _input('Utilizar mayusculas? [Y/n]: ', True, bool)
-        digits = _input('Utilizar digitos? [Y/n]: ', True, bool)
-        punctuation = _input('Utilizar signos de puntuación? [y/N]: ', False, bool)
-        
-        while True:
-            password = gecolib.generate(size, lower, upper, digits,
-                    punctuation)
-            print password, 'seguridad: ', gecolib.strength(password)
-            if _input('Usar este password? [Y/n]: ', True, bool):
-                break;
-    elif mode == '3':
-        password = getpass.getpass('Introduce la contraseña: ')
-        password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
-
-        while password != password2:
-            print "No coinciden, intentalo de nuevo"
-            password = getpass.getpass('Introduce la contraseña: ')
-            password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
-
+    password = _ask_for_password()
 
     master = _get_master()
     gso.set_password(name, password, master, args)
@@ -252,6 +249,41 @@ def _get_master():
         master_password = master
     return master_password
 
+
+def _ask_for_password():
+    print ""
+    print "Selecciona el modo de introducción de contraseña:"
+    print "[1] Aleatoria de 11 caracteres con mayusculas minusculas y números"
+    print " 2  Generación aleatoria personalizada"
+    print " 3  Introducción manual"
+    mode = raw_input("modo?: ")
+        
+    if mode in ['', '1']:
+        password = gecolib.generate()
+    elif mode == '2':
+        size = _input('Número de caracteres [11]: ', 11, int)
+        lower = _input('Utilizar minusculas? [Y/n]: ', True, bool)
+        upper = _input('Utilizar mayusculas? [Y/n]: ', True, bool)
+        digits = _input('Utilizar digitos? [Y/n]: ', True, bool)
+        punctuation = _input('Utilizar signos de puntuación? [y/N]: ', False, bool)
+        
+        while True:
+            password = gecolib.generate(size, lower, upper, digits,
+                    punctuation)
+            print password, 'seguridad: ', gecolib.strength(password)
+            if _input('Usar este password? [Y/n]: ', True, bool):
+                break;
+    elif mode == '3':
+        password = getpass.getpass('Introduce la contraseña: ')
+        password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
+
+        while password != password2:
+            print "No coinciden, intentalo de nuevo"
+            password = getpass.getpass('Introduce la contraseña: ')
+            password2 = getpass.getpass('Introduce la contraseña de nuevo: ')
+
+    return password
+
 # Muestra todas las funciones como opciones
 help_str = ''' Ayuda de terminal-geco
 comandos:
@@ -294,7 +326,11 @@ if __name__ == '__main__':
             help()
         else:
             try:
-                callable_functions[args[0]](*args[1:])
+                fargs = ' '.join(args[1:])
+                if fargs:
+                    callable_functions[args[0]](fargs)
+                else:
+                    callable_functions[args[0]]()
             except Exception, inst:
                 if debug:
                     raise inst

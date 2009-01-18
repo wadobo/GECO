@@ -55,7 +55,7 @@ class Password(Base):
     id = Column(Integer, primary_key=True)
     # types = ['generic', 'web', 'email', 'unix']
     type = Column(String(20))
-    name = Column(String(20))
+    name = Column(String(20), unique=True)
     description = Column(String(255))
     updated = Column(DateTime())
     expiration = Column(DateTime())
@@ -82,6 +82,14 @@ class Password(Base):
         self.updated = datetime.datetime.now()
         default = expiration if expiration else DEFAULT_EXPIRATION
 
+        self.expiration = datetime.datetime.now() +\
+            datetime.timedelta(default)
+
+    def set_password(self, password, expiration=DEFAULT_EXPIRATION,
+            cypher_method=''):
+        self.password = password
+        self.cypher_method = cypher_method
+        default = expiration if expiration else DEFAULT_EXPIRATION
         self.expiration = datetime.datetime.now() +\
             datetime.timedelta(default)
 

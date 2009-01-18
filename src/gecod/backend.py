@@ -44,13 +44,16 @@ def session_decorator(function):
     database.connect() or backend.db.connect()
     '''
     def new_funct(*args, **kwargs):
-        session = db.connect(DATABASE)
-        print "open"
-        try:
-            result = function(*args, session=session, **kwargs)
-        finally:
-            print "close"
-            session.close()
+        s = kwargs.get('session', '')
+        if not s:
+            session = db.connect(DATABASE)
+            try:
+                result = function(*args, session=session, **kwargs)
+            finally:
+                session.close()
+        else:
+            result = function(*args, **kwargs)
+
         return result
 
     return new_funct
@@ -266,8 +269,11 @@ def del_password(cookie, name, session=None):
     Delete a password by name
     '''
 
-    # No utilizar llamadas a otras funciones si vas a modificar
-    password = get_password(cookie, name=name, from_db=True)
+    try:
+        password = get_passwords_by(cookie, name=name,
+                session=session, from_db=True).first()
+    except db.InvalidRequestError:
+        raise NotFoundError("Can't found password by name %s" % name)
     session.delete(password)
     session.commit()
 

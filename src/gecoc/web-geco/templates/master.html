@@ -1,0 +1,13 @@
+$def with (css, title, body)
+
+<html>
+    <head>
+        <title>$title</title>
+        $for style in css:
+            <link rel="stylesheet" type="text/css" href="/static/css/$(style).css"/>
+    </head>
+    <body>
+        $:body
+    </body>
+</html>
+

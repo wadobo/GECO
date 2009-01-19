@@ -154,7 +154,7 @@ def register(server, name=''):
         register server [usuario]
     '''
     global gso 
-    gso = gecolib.GecoClient(server=server)
+    gso = gecolib.GSO(xmlrpc_server=server)
 
     if not gso.check_user_name(name):
         print "Este nombre no está disponible"

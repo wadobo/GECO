@@ -4,59 +4,38 @@
 import web
 from web import form
 
+web.config.debug = False
+
 urls = (
-        '/logout', 'logout',
-        '/login', 'login',
+        '/logout', 'login.logout',
+        '/login', 'login.login',
+        '/register', 'login.register',
         '/(.*)', 'index'
         )
 
 app = web.application(urls, globals())
 session = web.session.Session(app, web.session.DiskStore('sessions'))
 
-vname = form.regexp("\w*$", 'must be alphanumeric and _')
-vpass = form.regexp(r".{3,20}", 'must be between 3 and 20 characters')
-
-lform = form.Form(
-    form.Textbox("username", vname, description="Username"),
-    form.Password("password", vpass, description="Password"),
-    form.Button("submit", type="submit", description="Login"),
-)
-
-render = web.template.render('templates')
+web.ses = session
 
 class index:
+    render = web.template.render('templates')
     def GET(self, args):
         username = session.get('username', '')
         if username:
-            return 'ok'
+            e = session.get('errors', '')
+            m = session.get('msgs', '')
+            session.errors = ''
+            session.msgs = ''
+
+            return self.render.master(title='GECO Web Client',
+                    css=['style'],
+                    body=self.render.index(username=username),
+                    errors=e, msgs=m)
         else:
             raise web.seeother('/login')
 
-class login:
-    def GET(self):
-        f = lform()
-        return render.master(title='GECO Web Client',
-                css=['style'],
-                body=render.login(f))
 
-    def POST(self):
-        f = lform()
-        if not f.validates():
-            raise seeother('/login')
-
-        values = web.input()
-        name = values['username']
-        pwd = values['password']
-
-        session.username = name
-
-        raise web.seeother('/index')
-
-class logout:
-    def GET(self):
-        username = session.get('username', '')
-        session.username = ''
-        raise web.seeother('/index')
 
 if __name__ == '__main__':
     app.run()

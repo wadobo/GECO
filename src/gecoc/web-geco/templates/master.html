@@ -1,4 +1,4 @@
-$def with (css, title, body)
+$def with (css, title, body, errors='', msgs='')
 
 <html>
     <head>
@@ -7,7 +7,38 @@ $def with (css, title, body)
             <link rel="stylesheet" type="text/css" href="/static/css/$(style).css"/>
     </head>
     <body>
+        <div id="header"></div>
+        $if msgs:
+            <div id="messages">
+                <div class="floating">
+                    <img src="/static/images/alert.png"/>
+                </div>
+                <ul>
+                    $for msg in msgs:
+                    <li>$:msg</li>
+                </ul>
+            </div>
+        $if errors:
+            <div id="error">
+                <div class="floating">
+                    <img src="/static/images/error.png"/>
+                </div>
+                <ul>
+                    $for error in errors:
+                    <li>$:error</li>
+                </ul>
+            </div>
         $:body
+        <div id="fotter">
+            <p>
+                Powered by <a href="http://python.org">Python</a> and 
+                <a href="http://webpy.org">web.py</a>
+            </p>
+            <a href="http://danigm.net">
+                <img id="danigm" src="/static/images/poweredby.png"
+                alt="powered by danigm"/>
+            </a>
+        </div>
     </body>
 </html>
 

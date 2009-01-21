@@ -11,14 +11,104 @@ button {
     border: 1px solid #550000;
 }
 
-#login {
+#main, #fotter {
     color: black;
     background-color: white;
     margin: 0 auto 0 auto;
-    padding: 5em;
     border: 1px solid #550000;
+    width: 600px;
+    padding: 5em;
+}
+
+#main{
+    background-image: url("/static/images/background.png");
+    background-repeat: no-repeat;
+    background-position: bottom right;
+}
+
+th{
+    text-align: right;
+}
+
+#login {
+    padding-bottom: 3em;
+    border-bottom: 1px dotted gray;
+}
+
+#register {
+    padding-top: 2em;
+}
+
+fieldset {
+    border: 1px solid #b10000;
+}
+legend {
+    color: #b10000;
+}
+
+#error {
+    margin: 2em auto 2em auto;
+    padding-right: 10em;
+    border: 2px dashed #5e0000;
+    font-weight: bold;
+    color: #5e0000;
+    background-color: white;
+    min-height: 40px;
     width: 600px;
 }
 
-table {
+#messages {
+    margin: 2em auto 2em auto;
+    padding-right: 10em;
+    border: 2px dashed green;
+    color: green;
+    background-color: white;
+    min-height: 40px;
+    width: 600px;
+}
+
+.floating {
+    float: left;
+    padding: 5px;
+    padding-right: 32px;
+}
+
+.imaged {
+    min-height: 34px;
+    min-width: 120px;
+    border: none;
+    cursor:pointer;
+}
+
+#acc {
+    background-image: url('/static/images/accbutton.png');
+}
+
+#reg {
+    background-image: url('/static/images/regbutton.png');
+}
+
+#header {
+    margin: 0 auto 0 auto;
+    background-image: url('/static/images/logo.png');
+    background-repeat: no-repeat;
+    background-position: left;
+    min-height: 200px;
+    margin-bottom: 2em;
+}
+
+#fotter {
+    min-height: 10px;
+    margin-top: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+}
+
+img {
+    border: none;
+}
+
+#quit {
+    float: right;
 }

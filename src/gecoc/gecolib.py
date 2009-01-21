@@ -10,13 +10,28 @@ LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
                     string.digits,
                     '.:;,!?{}[]<>=-_()+#@$%&')
 
+#################################
+#                               #
+# TODO                          #
+# * Change master password      #
+# * Change password attributes  #
+#                               #
+#################################
 
 class GecoClient:
-    def __init__(self, server, name=''):
+    '''
+    Provides a simple object to interact with a GECO server.
+    '''
+
+    def __init__(self, server, name='', cookie=''):
         self.server = server
         self.cookie = ''
         self.name = ''
         self._name = name
+
+        if cookie:
+            self.cookie = cookie
+            self.name = self._name
 
     def auth(self, user, password):
         self.cookie = self.server.auth(user, password)
@@ -90,7 +105,11 @@ def get_server_object(method='xmlrpc', **kwargs):
         server = xmlrpclib.Server(kwargs['xmlrpc_server'],
                 allow_none=1)
 
-        return GecoClient(server, name=kwargs['xmlrpc_server'])
+        if kwargs.get('cookie', ''):
+            return GecoClient(server, name=kwargs['xmlrpc_server'],
+                    cookie=kwargs['cookie'])
+        else:
+            return GecoClient(server, name=kwargs['xmlrpc_server'])
 
 GSO = get_server_object
 

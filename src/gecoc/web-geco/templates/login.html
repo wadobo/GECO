@@ -1,9 +1,28 @@
-$def with (form)
+$def with (form_login=None, form_reg=None)
 
-<h1>Login</h1>
-<div id="login">
-    <form method="POST">
-        $:form.render()
-    </form>
+
+<div id="main">
+    $if form_login:
+        <div id="login">
+            <fieldset>
+                <legend>Acceso</legend>
+                Acceder a GECO
+                <form action="/login" method="POST">
+                    $:form_login.render()
+                    <button type="submit" id="acc" class="imaged"></button>
+                </form>
+            </fieldset>
+        </div>
+
+    $if form_reg:
+        <div id="register">
+            <fieldset>
+                <legend>Registro</legend>
+                Si aún no tienes usuario, crea una cuenta
+                <form action="/register" method="POST">
+                    $:form_reg.render()
+                    <button type="submit" id="reg" class="imaged"></button>
+                </form>
+            </fieldset>
+        </div>
 </div>
-

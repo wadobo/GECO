@@ -156,13 +156,13 @@ def register(server, name=''):
     global gso 
     gso = gecolib.GSO(xmlrpc_server=server)
 
-    if not gso.check_user_name(name):
-        print "Este nombre no está disponible"
+    if gso.check_user_name(name):
+        print "%s no está disponible" % name
         name = ''
     while not name:
         name = raw_input('Nombre de usuario: ')
-        if not gso.check_user_name(name):
-            print "Este nombre no está disponible"
+        if gso.check_user_name(name):
+            print "%s no está disponible" % name
             name = ''
     password = getpass.getpass('Contraseña de usuario '
                                '(Esta tienes que recordarla): ')

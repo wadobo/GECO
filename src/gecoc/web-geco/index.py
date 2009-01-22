@@ -12,7 +12,7 @@ urls = (
         '/login', 'login.login',
         '/register', 'login.register',
         '/list', 'list.list',
-        '/getpwd/(.*)', 'ajax.getpwd'
+        '/getpwd/(.*)', 'ajax.getpwd',
         '/(.*)', 'index',
         )
 

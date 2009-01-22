@@ -1,5 +1,35 @@
-$def with (username='')
+$def with (username='', pwdlist=[])
 
 <div id="main">
     <div id="quit">Hola: $username <a href="/logout">Salir</a></div>
+    <div id="list">
+        <table cellspacing="0px">
+            <tr>
+                <th>name</th>
+                <th>account</th>
+                <th>type</th>
+                <th>expiration</th>
+            </tr>
+            $for password in pwdlist:
+                <tr class="$loop.parity pwd">
+                    <td class="pwdname">${password.get('name', 'NONAME')}</td>
+                    <td class="pwdpwd">${password['password']}</td>
+                    <td class="pwdacc">${password.get('account', '--')}</td>
+                    <td class="pwdtype">${password.get('type', '--')}</td>
+                    <td class="pwdexp">${password.get('expiration')}
+                        (${password.get('days')} días)</td>
+                </tr>
+        </table>
+    </div>
 </div>
+
+<div class="input">
+    <img src="/static/images/error.png" class="close" alt="close"/>
+    <div id="master">
+        <label for="master">Master password:</label>
+        <input id="masterpwd" name="master" type="password"/>
+        <br/><button type="submit" id="rec" class="imaged"></button>
+    </div>
+</div>
+
+<div id="overlay"></div>

@@ -18,7 +18,7 @@ $def with (form_login=None, form_reg=None)
         <div id="register">
             <fieldset>
                 <legend>Registro</legend>
-                Si aún no tienes usuario, crea una cuenta
+                <p> Si aún no tienes usuario, crea una cuenta</p>
                 <form action="/register" method="POST">
                     $:form_reg.render()
                     <button type="submit" id="reg" class="imaged"></button>

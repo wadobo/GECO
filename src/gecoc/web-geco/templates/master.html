@@ -1,8 +1,11 @@
-$def with (css, title, body, errors='', msgs='')
+$def with (css, title, body, js=[], errors='', msgs='')
 
 <html>
     <head>
         <title>$title</title>
+        $for j in js:
+            <script src="/static/js/$(j).js" type="text/javascript"></script>
+
         $for style in css:
             <link rel="stylesheet" type="text/css" href="/static/css/$(style).css"/>
     </head>

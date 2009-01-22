@@ -5,13 +5,14 @@
 This controller implements:
     /login
     /logout
+    /register
 '''
 
+import random
 import web
 from web import form
 
 import gecoc.gecolib as gecolib
-SERVER = 'https://danigm.net:10000'
 
 session = web.ses
 
@@ -23,26 +24,33 @@ form_login = form.Form(
     form.Password("password", vpass, description="Contraseña"),
 )
 
-form_reg = form.Form(
-    form.Textbox("username", vname, description="Usuario"),
-    form.Password("password", vpass, description="Contraseña"),
-    form.Password("password2", description="Confirmación de contraseña"),
-    validators = [
-        form.Validator("Las contraseñas no coinciden",
-            lambda i: i.password == i.password2)]
-)
+def generate_reg_form(op1, op2):
+    form_reg = form.Form(
+        form.Textbox("username", vname, description="Usuario"),
+        form.Password("password", vpass, description="Contraseña"),
+        form.Password("password2", description="Confirmación de contraseña"),
+        form.Textbox("captcha", description="captcha %s + %s = " % (op1, op2)),
+        validators = [
+            form.Validator("Las contraseñas no coinciden",
+                lambda i: i.password == i.password2),
+            form.Validator("No sabes sumar? Usa la calculadora si eso...",
+                lambda i: int(i.captcha) == op1 + op2),
+            ])
+    return form_reg
+
+rform = None
 
 class login:
     render = web.template.render('templates')
 
     def GET(self):
+        global rform
         lform = form_login()
-        rform = form_reg()
+        rform = generate_reg_form(random.randint(1,10),
+                random.randint(1,10))
 
-        e = session.get('errors', '')
-        m = session.get('msgs', '')
-        session.errors = ''
-        session.msgs = ''
+        e = session.pop('errors', '')
+        m = session.pop('msgs', '')
 
         return self.render.master(title='GECO Web Client',
                 css=['style'],
@@ -60,7 +68,7 @@ class login:
         name = values['username']
         pwd = values['password']
 
-        gso = gecolib.GSO(xmlrpc_server=SERVER)
+        gso = gecolib.GSO(xmlrpc_server=web.SERVER)
         gso.auth(name, pwd)
         
         if gso.name:
@@ -83,7 +91,9 @@ class logout:
 class register:
     render = web.template.render('templates')
     def POST(self):
-        rform = form_reg()
+        global rform
+        if not rform:
+            raise web.seeother('/login')
         if not rform.validates():
             return self.render.master(title='GECO Web Client',
                     css=['style'],
@@ -91,7 +101,7 @@ class register:
         else:
             gso = session.get('gso', '')
             if not gso:
-                gso = gecolib.GSO(xmlrpc_server=SERVER)
+                gso = gecolib.GSO(xmlrpc_server=web.SERVER)
 
             values = web.input()
             name = values['username']

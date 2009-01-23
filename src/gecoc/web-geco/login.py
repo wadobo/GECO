@@ -38,16 +38,15 @@ def generate_reg_form(op1, op2):
             ])
     return form_reg
 
-rform = None
-
 class login:
     render = web.template.render('templates')
 
     def GET(self):
-        global rform
         lform = form_login()
-        rform = generate_reg_form(random.randint(1,10),
-                random.randint(1,10))
+        op1 = random.randint(1,10) 
+        op2 = random.randint(1,10)
+        rform = generate_reg_form(op1, op2)
+        session.rform = (op1, op2)
 
         e = session.pop('errors', '')
         m = session.pop('msgs', '')
@@ -91,7 +90,7 @@ class logout:
 class register:
     render = web.template.render('templates')
     def POST(self):
-        global rform
+        rform = generate_reg_form(*session.rform)
         if not rform:
             raise web.seeother('/login')
         if not rform.validates():

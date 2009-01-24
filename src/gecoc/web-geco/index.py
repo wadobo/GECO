@@ -3,6 +3,7 @@
 
 import web
 from web import form
+from utils import authenticated
 
 web.config.debug = False
 web.SERVER = 'https://danigm.net:10000'
@@ -22,13 +23,9 @@ session = web.session.Session(app, web.session.DiskStore('sessions'))
 web.ses = session
 
 class index:
-    render = web.template.render('templates')
+    @authenticated
     def GET(self, args):
-        username = session.get('username', '')
-        if username:
-            raise web.seeother('/list')
-        else:
-            raise web.seeother('/login')
+        raise web.seeother('/list')
 
 if __name__ == '__main__':
     app.run()

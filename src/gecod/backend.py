@@ -152,7 +152,7 @@ def auth_by_password(name, password, session=None):
         return None
 
 @session_decorator
-def logout(cookie):
+def logout(cookie, session=None):
     '''
     Deletes the cookie from database. 
     '''

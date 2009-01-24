@@ -11,6 +11,7 @@ This controller implements:
 import random
 import web
 from web import form
+from utils import authenticated, templated, flash
 
 import gecoc.gecolib as gecolib
 
@@ -41,6 +42,7 @@ def generate_reg_form(op1, op2):
 class login:
     render = web.template.render('templates')
 
+    @templated(css='style', title='GECO Web Client')
     def GET(self):
         lform = form_login()
         op1 = random.randint(1,10) 
@@ -48,20 +50,13 @@ class login:
         rform = generate_reg_form(op1, op2)
         session.rform = (op1, op2)
 
-        e = session.pop('errors', '')
-        m = session.pop('msgs', '')
+        return self.render.login(lform, rform)
 
-        return self.render.master(title='GECO Web Client',
-                css=['style'],
-                body=self.render.login(lform, rform),
-                errors=e, msgs=m)
-
+    @templated(css='style', title='GECO Web Client')
     def POST(self):
         lform = form_login()
         if not lform.validates():
-            return self.render.master(title='GECO Web Client',
-                    css=['style'],
-                    body=self.render.login(form_login=lform))
+            return self.render.login(form_login=lform)
 
         values = web.input()
         name = values['username']
@@ -74,29 +69,34 @@ class login:
             session.username = name
             session.gso = gso.cookie
         else:
-            session.errors = ["Usuario o contraseña incorrectos"]
+            flash("Usuario o contraseña incorrectos", "error")
             raise web.seeother('/login')
 
         raise web.seeother('/index')
 
 class logout:
+    @authenticated
     def GET(self):
         username = session.get('username', '')
         session.username = ''
+        cookie = session.get('gso', '')
+        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso.logout()
         session.gso = ''
-        session.msgs = ["Usuario desautenticado"]
+        flash("Usuario desautenticado")
         raise web.seeother('/index')
 
 class register:
     render = web.template.render('templates')
+
+    @templated(css='style', title='GECO Web Client')
     def POST(self):
         rform = generate_reg_form(*session.rform)
         if not rform:
             raise web.seeother('/login')
+
         if not rform.validates():
-            return self.render.master(title='GECO Web Client',
-                    css=['style'],
-                    body=self.render.login(form_reg=rform))
+            return self.render.login(form_reg=rform)
         else:
             gso = session.get('gso', '')
             if not gso:
@@ -105,14 +105,13 @@ class register:
             values = web.input()
             name = values['username']
             pwd = values['password']
+
             if gso.check_user_name(name):
                 errors = [u"%s no está disponible" % name]
-                return self.render.master(title='GECO Web Client',
-                    css=['style'],
-                    body=self.render.login(form_reg=rform),
-                    errors=errors)
+                flash(errors, 'error')
+                return self.render.login(form_reg=rform)
             else:
                 gso.register(name, pwd)
 
-            session.msgs = [u"Registrado con exito %s" % name]
+            flash([u"Registrado con exito %s" % name])
             raise web.seeother("/login")

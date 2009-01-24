@@ -12,8 +12,8 @@ def authenticated(function):
     return new_function
 
 def templated(css='', js='', title=''):
-    css = css.split(' ')
-    js = js.split(' ')
+    css = css.split(' ') if css else []
+    js = js.split(' ') if js else []
     render = web.template.render('templates')
     def new_deco(function):
         def new_function(*args, **kwargs):

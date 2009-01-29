@@ -144,6 +144,9 @@ def auth_by_password(name, password, session=None):
 
     if db_user.password == password_hash:
         # si el usuario ya tiene una cookie, devolver esta
+        if db_user.cookie and\
+                db_user.cookie.expiration > datetime.datetime.now():
+            return db_user.cookie.id
         cookie = db.Cookie()
         db_user.cookie = cookie
         session.commit()

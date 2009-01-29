@@ -61,7 +61,7 @@ class Password(Base):
     expiration = Column(DateTime())
 
     account = Column(String(100))
-    password = Column(String(100), nullable=False)
+    password = Column(String(1000), nullable=False)
     cypher_method = Column(String(20))
 
     user_id = Column(Integer, ForeignKey('users.id'))

@@ -54,7 +54,7 @@ master = getpass.getpass('Contraseña maestra: ')
 dom = minidom.parseString(xmldata)
 for password in dom.getElementsByTagName("entry"):
     type = password.attributes['type'].value
-    name = password.getElementsByTagName('name')[0].firstChild.nodeValue
+    name = password.getElementsByTagName('name')[0].firstChild.nodeValue.replace(' ', '_')
     description = password.getElementsByTagName('description')[0].firstChild
     description = description.nodeValue if description else ''
     fields = password.getElementsByTagName('field')

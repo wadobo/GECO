@@ -187,3 +187,7 @@ img {
     cursor:pointer;
     float: right;
 }
+
+#counter {
+    margin-left: 1em;
+}

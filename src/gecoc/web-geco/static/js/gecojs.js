@@ -6,6 +6,13 @@ $(document).ready(function() {
     link_to_forget();
     setTimeout(link_to_forget, 2 * 1000);
 
+    $("tr").hover(function(){
+        $(this).addClass("selected");
+    },
+    function(){
+        $(this).removeClass("selected");
+    });
+
     $(".pwdname").click(function(){
         pwd = $(this).next().html();
         show_passwd();

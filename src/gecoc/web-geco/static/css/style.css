@@ -155,6 +155,10 @@ img {
     cursor:pointer;
 }
 
+a.selected, .selected {
+    background: #ff9600;
+}
+
 #overlay {
     display: none;
     position: fixed;

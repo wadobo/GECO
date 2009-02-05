@@ -1,0 +1,24 @@
+$def with (form_new=None)
+
+<div id="main">
+        <div id="new">
+            <fieldset>
+                <legend>Nueva Contraseña</legend>
+                <form action="/new" method="POST">
+                    $:form_new.render()
+                    <button type="submit" id="ok" class="imaged"></button>
+                </form>
+            </fieldset>
+        </div>
+</div>
+
+<div class="input">
+    <img src="/static/images/error.png" class="close" alt="close"/>
+    <div id="master">
+        <label for="master">Master password:</label>
+        <input id="masterpwd" name="master" type="password"/>
+        <br/><button type="submit" id="rec" class="imaged"></button>
+    </div>
+</div>
+
+<div id="overlay"></div>

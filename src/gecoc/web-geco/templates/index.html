@@ -3,6 +3,7 @@ $def with (username='', pwdlist=[])
 <div id="main">
     <div id="quit">Hola: $username <a href="/logout">Salir</a></div>
     <div id="forget"><a href="">Olvidar contraseña maestra</a></div>
+    <a href="/new">Nueva contraseña</a>
     <div id="list">
         <div id="passshow">
             <input id="clear"/><button id="freeze">detener</button><span id="counter"></span>
@@ -13,6 +14,8 @@ $def with (username='', pwdlist=[])
                 <th>account</th>
                 <th>type</th>
                 <th>expiration</th>
+                <th></th>
+                <th></th>
             </tr>
             $for password in pwdlist:
                 <tr class="$loop.parity pwd">
@@ -22,6 +25,18 @@ $def with (username='', pwdlist=[])
                     <td class="pwdtype">${password.get('type', '--')}</td>
                     <td class="pwdexp">${password.get('expiration')}
                         (${password.get('days')} días)</td>
+                    <td class="pwdedit">
+                        <a href="/edit/${password.get('name', 'NONAME')}">
+                            <img src="/static/images/edit.png"
+                            alt="edit" title="edit"/>
+                        </a>
+                    </td>
+                    <td class="pwddel">
+                        <a href="/delete/${password.get('name', 'NONAME')}">
+                            <img src="/static/images/trash.png"
+                            alt="delete" title="delete"/>
+                        </a>
+                    </td>
                 </tr>
         </table>
     </div>

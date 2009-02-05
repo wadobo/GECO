@@ -4,10 +4,7 @@ body{
     padding: 2em;
 }
 
-input {
-    border: 1px solid #550000;
-}
-button {
+input, textarea, button {
     border: 1px solid #550000;
 }
 
@@ -85,6 +82,10 @@ legend {
 
 #acc {
     background-image: url('/static/images/accbutton.png');
+}
+
+#ok {
+    background-image: url('/static/images/okbutton.png');
 }
 
 #rec {

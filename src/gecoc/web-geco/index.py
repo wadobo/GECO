@@ -13,6 +13,8 @@ urls = (
         '/login', 'login.login',
         '/register', 'login.register',
         '/list', 'list.list',
+        '/delete/(.*)', 'delete.delete',
+        '/new/?', 'new_password.new_password',
         '/getpwd/(.*)', 'ajax.getpwd',
         '/(.*)', 'index',
         )

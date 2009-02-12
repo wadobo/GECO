@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import base64
 import web
 
 def authenticated(function):
@@ -18,9 +19,8 @@ def templated(css='', js='', title=''):
     render = web.template.render('templates')
     def new_deco(function):
         def new_function(*args, **kwargs):
-            session = web.ses
-            e = session.pop('errors', '')
-            m = session.pop('msgs', '')
+            e = get_err()
+            m = get_msg()
 
             body = function(*args, **kwargs)
 
@@ -38,15 +38,31 @@ def flash(msg, t='msg'):
     t could be msg or error
     '''
 
+    enc = base64.b64encode
+
     session = web.ses
 
     if t == 'msg':
         if type(msg) == type([]):
-            session.msgs = msg
+            session.msgs = map(enc, msg)
         else:
-            session.msgs = [str(msg)]
+            session.msgs = [enc(str(msg))]
     else:
         if type(msg) == type([]):
-            session.errors = msg
+            session.errors = map(enc, msg)
         else:
-            session.errors = [str(msg)]
+            session.errors = [enc(str(msg))]
+
+def get_msg():
+    dec = base64.b64decode
+
+    session = web.ses
+    m = session.pop('msgs', '')
+    return map(dec, m)
+
+def get_err():
+    dec = base64.b64decode
+
+    session = web.ses
+    e = session.pop('errors', '')
+    return map(dec, e)

@@ -11,7 +11,7 @@ class list:
     render = web.template.render('templates')
     @authenticated
     @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs',
+            js='aes jquery-1.3.1.min md5 sha256 gecojs masterkey list',
             title='GECO Web Client')
     def GET(self):
         username = session.get('username', '')

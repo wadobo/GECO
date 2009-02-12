@@ -54,6 +54,9 @@ class GecoClient:
         password = method.encrypt(password, master)
         self.server.set_password(self.cookie, name, password, args)
 
+    def set_raw_password(self, name, password, args):
+        self.server.set_password(self.cookie, name, password, args)
+
     def get_password(self, name, master):
         p = self.server.get_password(self.cookie, name)
         method = cypher_methods[p.get('cypher_method', '')]

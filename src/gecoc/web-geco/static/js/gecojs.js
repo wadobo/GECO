@@ -1,99 +1,3 @@
-var mimasterpwd = "";
-var pwd = "";
-var timeout = 0;
-
-$(document).ready(function() {
-    link_to_forget();
-    setTimeout(link_to_forget, 2 * 1000);
-
-    $("tr").hover(function(){
-        $(this).addClass("selected");
-    },
-    function(){
-        $(this).removeClass("selected");
-    });
-
-    $(".pwdname").click(function(){
-        pwd = $(this).next().html();
-        show_passwd();
-    });
-    $(".close").click(function(){
-        $(".input").fadeOut(300);
-        $("#overlay").fadeOut(300);
-    });
-
-    $("#rec").click(function(){
-        mimasterpwd = $("#masterpwd").attr("value");
-        $("#masterpwd").attr("value", "");
-        $(".input").fadeOut(300);
-        $("#overlay").fadeOut(300);
-        setTimeout(forget, 10 * 60 * 1000);
-        really_show();
-    });
-    $("#forget").click(function(){
-        forget();
-    });
-    $("#freeze").click(function(){
-        if(timeout != 0){
-            clearTimeout(timeout);
-            timeout = 0;
-            $(this).html("continuar");
-        }
-        else{
-            n = parseInt($("#counter").html());
-            timeout = setTimeout('pass_delete('+(n-1)+')', 1 * 1000);
-            $(this).html("detener");
-        }
-        $("#clear").focus();
-        $("#clear").select();
-    });
-});
-
-function link_to_forget(){
-    if(mimasterpwd != "")
-        $("#forget").show();
-    else
-        $("#forget").hide();
-    setTimeout(link_to_forget, 2 * 1000);
-}
-
-function show_passwd(){
-    if(mimasterpwd == ""){
-        $(".input").fadeIn(300);
-        $("#masterpwd").select();
-        $("#overlay").fadeIn(300);
-    }
-    else {
-        really_show();
-    }
-}
-
-function pass_delete(n){
-    $("#counter").html(n);
-    if(n > 0)
-        timeout = setTimeout('pass_delete('+(n-1)+')', 1 * 1000);
-    else{
-        $("#clear").attr("value", "");
-        $("#counter").hide();
-    }
-}
-
-function really_show(){
-    var pass = decrypt(mimasterpwd, pwd);
-    $("#clear").attr("value", pass);
-    $("#clear").focus();
-    $("#clear").select();
-    $("#counter").show();
-    timeout = setTimeout('pass_delete(5)', 1 * 1000);
-    
-    pass = "";
-}
-
-function forget(){
-    mimasterpwd = "";
-    pwd = "";
-}
-
 function array_of_bytes(key){
     var retkey = new Array();
     for (var i=0; i<key.length; i+=2){
@@ -140,7 +44,8 @@ function encrypt(key, clear){
 
     var value = slowAES.encrypt(array_of_bytes2(clear), slowAES.modeOfOperation.CBC, realkey,
             16, realiv);
-    return value.cipher;
+    c = value.cipher.join("#");
+    return c
 };
 
 function decrypt(key, cypher){
@@ -151,3 +56,30 @@ function decrypt(key, cypher){
     var value = slowAES.decrypt(realcypher, 256, slowAES.modeOfOperation.CBC, realkey, 16, realiv);
     return array_to_string(value);
 };
+
+function getRandomNum(lbound, ubound) {
+    return (Math.floor(Math.random() * (ubound - lbound)) + lbound);
+}
+function getRandomChar(number, lower, upper, other) {
+    var numberChars = "0123456789";
+    var lowerChars = "abcdefghijklmnopqrstuvwxyz";
+    var upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var otherChars = "`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ";
+    var charSet = "";
+    if (number == true)
+        charSet += numberChars;
+    if (lower == true)
+        charSet += lowerChars;
+    if (upper == true)
+        charSet += upperChars;
+    if (other == true)
+        charSet += otherChars;
+    return charSet.charAt(getRandomNum(0, charSet.length));
+}
+function generate(length, Lower, Upper, Number, Other) {
+    var rc = "";
+    for (var idx = 0; idx < length; ++idx) {
+        rc = rc + getRandomChar(Number, Lower, Upper, Other);
+    }
+    return rc;
+}

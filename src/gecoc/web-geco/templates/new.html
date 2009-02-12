@@ -1,4 +1,4 @@
-$def with (form_new=None)
+$def with (username="", form_new=None)
 
 <div id="main">
         <div id="new">
@@ -6,8 +6,39 @@ $def with (form_new=None)
                 <legend>Nueva Contraseña</legend>
                 <form action="/new" method="POST">
                     $:form_new.render()
-                    <button type="submit" id="ok" class="imaged"></button>
+                    <button type="submit" class="imaged ok"></button>
                 </form>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>Generación Manual</legend>
+                <table><tr>
+                    <td> <label for"password">Contraseña: <input type="password" id="password" name="password"/></label></td>
+                    <td><label for"password2">Confirmación: <input type="password" id="password2" name="password2"/></label></td>
+                </tr></table>
+                <br/>
+                <span style="color:green" id="result">--</span> 
+                <span style="color:red" id="same"></span> 
+                <br/>
+                <a href="" onClick="return set_pass();">cifrar</a>
+            </fieldset>
+
+            <fieldset>
+                <legend>Generación Automática</legend>
+                <label for"Lower">minúsculas <input type="checkbox" id="low" name="Lower" checked="checked"/></label>
+                <label for"Upper">mayúsculas <input type="checkbox" id="up" name="Upper" checked="checked"/></label>
+                <label for"Number">dígitos <input type="checkbox" id="digits" name="Number" checked="checked"/></label>
+                <label for"Punctuation">Otros signos <input type="checkbox" id="punct" name="Punctuation"/></label>
+                <br/>
+                <label for"length">Longitud <input type="text" id="length" name="length" value="11" size="3"/></label>
+                <span id="show_pass" style="display:none;">
+                    <label for"gen">generada: <input type="text" id="gen" name="gen"/></label>
+                    <a href="" onclick="return hide()">ocultar</a>
+                </span>
+                <span id="noshow"> <a href="" onclick="return show()">mostrar</a> </span>
+                <br/>
+                <a href="" onClick="return generate_pass();">Generar</a>
             </fieldset>
         </div>
 </div>
@@ -22,3 +53,5 @@ $def with (form_new=None)
 </div>
 
 <div id="overlay"></div>
+
+<input style="display:none;" name="username" id="username" value="$username"/>

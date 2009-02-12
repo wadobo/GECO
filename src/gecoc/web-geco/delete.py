@@ -15,6 +15,6 @@ class delete:
         gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
 
         gso.del_password(name)
-        flash("Password '%s' borrado" % name)
+        flash("Contraseña '%s' borrada" % str(name))
         raise web.seeother('/list')
 

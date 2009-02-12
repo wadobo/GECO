@@ -8,6 +8,8 @@ input, textarea, button {
     border: 1px solid #550000;
 }
 
+textarea{ width: 100% }
+
 #main, #fotter {
     color: black;
     background-color: white;
@@ -84,7 +86,7 @@ legend {
     background-image: url('/static/images/accbutton.png');
 }
 
-#ok {
+.ok {
     background-image: url('/static/images/okbutton.png');
 }
 

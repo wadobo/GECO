@@ -23,7 +23,13 @@ $def with (username='', pwdlist=[])
                     <td class="pwdpwd">${password['password']}</td>
                     <td class="pwdacc">${password.get('account', '--')}</td>
                     <td class="pwdtype">${password.get('type', '--')}</td>
-                    <td class="pwdexp">${password.get('expiration')}
+                    <td class="pwdexp">
+                        $if password.get('days') > 20:
+                            <img src="/static/images/green.png"/>
+                        $if  20 > password.get('days') > 7:
+                            <img src="/static/images/yellow.png"/>
+                        $if password.get('days') < 7:
+                            <img src="/static/images/red.png"/>
                         (${password.get('days')} días)</td>
                     <td class="pwdedit">
                         <a href="/edit/${password.get('name', 'NONAME')}">

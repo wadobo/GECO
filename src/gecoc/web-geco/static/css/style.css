@@ -156,6 +156,17 @@ img {
     text-decoration: underline;
     cursor:pointer;
 }
+.pwddesc {
+    display: none;
+    border: 1px solid black;
+    color: white;
+    background-color: #444444; 
+}
+.showdesc {
+    color: blue;
+    text-decoration: underline;
+    cursor:pointer;
+}
 
 a.selected, .selected {
     background: #ff9600;

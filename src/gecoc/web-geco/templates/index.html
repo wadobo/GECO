@@ -10,6 +10,7 @@ $def with (username='', pwdlist=[])
         </div>
         <table cellspacing="0px">
             <tr>
+                <th></th>
                 <th>name</th>
                 <th>account</th>
                 <th>type</th>
@@ -19,6 +20,10 @@ $def with (username='', pwdlist=[])
             </tr>
             $for password in pwdlist:
                 <tr class="$loop.parity pwd">
+                    $if password['description'] != '':
+                        <td class="showdesc">+</td>
+                    $else:
+                        <td></td>
                     <td class="pwdname">${password.get('name', 'NONAME')}</td>
                     <td class="pwdpwd">${password['password']}</td>
                     <td class="pwdacc">${password.get('account', '--')}</td>
@@ -44,6 +49,12 @@ $def with (username='', pwdlist=[])
                         </a>
                     </td>
                 </tr>
+                $if password['description'] != '':
+                    <tr class="pwddesc">
+                        <td colspan="8">
+                            ${password.get('description', '--')}
+                        </td>
+                    </tr>
         </table>
     </div>
 </div>

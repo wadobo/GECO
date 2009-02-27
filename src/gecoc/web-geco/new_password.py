@@ -10,8 +10,8 @@ vdesc = form.regexp(r".{0,255}", 'Debe estar entre 0 y 255 caracteres')
 number = form.regexp("\d+$", 'Un número, son días')
 
 new_form = form.Form(
-    form.Textbox("name", vname, description="Nombre"),
-    form.Textbox("account", vname, description="Cuenta"),
+    form.Textbox("name", description="Nombre"),
+    form.Textbox("account", description="Cuenta"),
     form.Textbox("type", vname, description="Tipo", value="website"),
     form.Textbox("expiration", number, description="Expiración",
         value="60"),

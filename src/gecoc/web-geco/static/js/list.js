@@ -17,6 +17,19 @@ $(document).ready(function() {
         show_passwd();
     });
 
+    $(".showdesc").click(function(){
+        text = $(this).html();
+        if (text == "+")
+            $(this).html("-");
+        else
+            $(this).html("+");
+        desc = $(this).parent().next();
+        if (text == "+")
+            desc.fadeIn();
+        else
+            desc.fadeOut();
+            });
+
     $("#freeze").click(function(){
         if(timeout != 0){
             clearTimeout(timeout);

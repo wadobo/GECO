@@ -19,6 +19,10 @@ class list:
         gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
 
         pwdlist = gso.get_all_passwords()
+        def cmp(x, y):
+            if x['name'] > y['name']: return 1
+            else: return -1
+        pwdlist.sort(cmp)
         # Cambiando el formato de la fecha
         for pwd in pwdlist:
             exp = pwd['expiration']

@@ -10,6 +10,7 @@ class delete:
     render = web.template.render('templates')
     @authenticated
     def GET(self, name):
+        # TODO preguntar
         username = session.get('username', '')
         cookie = session.get('gso', '')
         gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)

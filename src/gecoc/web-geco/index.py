@@ -15,6 +15,7 @@ urls = (
         '/list', 'list.list',
         '/delete/(.*)', 'delete.delete',
         '/new/?', 'new_password.new_password',
+        '/edit/(.*)', 'edit.edit',
         '/getpwd/(.*)', 'ajax.getpwd',
         '/(.*)', 'index',
         )
@@ -25,6 +26,7 @@ session = web.session.Session(app, web.session.DiskStore('sessions'))
 web.ses = session
 
 class index:
+    # Cuidado, que authenticated redirige a /login
     @authenticated
     def GET(self, args):
         raise web.seeother('/list')

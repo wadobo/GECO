@@ -57,10 +57,11 @@ class GecoClient:
     def set_raw_password(self, name, password, args):
         self.server.set_password(self.cookie, name, password, args)
 
-    def get_password(self, name, master):
+    def get_password(self, name, master=None):
         p = self.server.get_password(self.cookie, name)
         method = cypher_methods[p.get('cypher_method', '')]
-        p['password'] = method.decrypt(p['password'], master)
+        if master is not None:
+            p['password'] = method.decrypt(p['password'], master)
         return p
     
     def decrypt_password(self, p, master):

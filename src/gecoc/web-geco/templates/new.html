@@ -1,10 +1,10 @@
-$def with (username="", form_new=None)
+$def with (username="", form_new=None, title="Nueva Contraseña")
 
 <div id="main">
         <div id="new">
             <fieldset>
-                <legend>Nueva Contraseña</legend>
-                <form action="/new" method="POST">
+                <legend>$title</legend>
+                <form action="" method="POST">
                     $:form_new.render()
                     <button type="submit" class="imaged ok"></button>
                 </form>

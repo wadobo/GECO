@@ -148,3 +148,6 @@ def connect(database='sqlite:///database.sqlite'):
 def create(database='sqlite:///database.sqlite'):
     db = create_engine(database, echo=False)
     metadata.create_all(db)
+
+if __name__ == '__main__':
+    create()

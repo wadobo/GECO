@@ -98,9 +98,7 @@ class register:
         if not rform.validates():
             return self.render.login(form_reg=rform)
         else:
-            gso = session.get('gso', '')
-            if not gso:
-                gso = gecolib.GSO(xmlrpc_server=web.SERVER)
+            gso = gecolib.GSO(xmlrpc_server=web.SERVER)
 
             values = web.input()
             name = values['username']

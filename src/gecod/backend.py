@@ -48,7 +48,8 @@ def session_decorator(function):
         if not s:
             session = db.connect(DATABASE)
             try:
-                result = function(*args, session=session, **kwargs)
+                kwargs['session'] = session
+                result = function(*args, **kwargs)
             finally:
                 session.close()
         else:

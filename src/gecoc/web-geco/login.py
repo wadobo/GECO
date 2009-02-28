@@ -27,13 +27,13 @@ form_login = form.Form(
 
 def generate_reg_form(op1, op2):
     form_reg = form.Form(
-        form.Textbox("username", vname, description="Usuario"),
-        form.Password("password", vpass, description="Contraseña"),
+        form.Textbox("rusername", vname, description="Usuario"),
+        form.Password("rpassword", vpass, description="Contraseña"),
         form.Password("password2", description="Confirmación de contraseña"),
         form.Textbox("captcha", description="captcha %s + %s = " % (op1, op2)),
         validators = [
             form.Validator("Las contraseñas no coinciden",
-                lambda i: i.password == i.password2),
+                lambda i: i.rpassword == i.password2),
             form.Validator("No sabes sumar? Usa la calculadora si eso...",
                 lambda i: int(i.captcha) == op1 + op2),
             ])
@@ -42,7 +42,9 @@ def generate_reg_form(op1, op2):
 class login:
     render = web.template.render('templates')
 
-    @templated(css='style', title='GECO Web Client')
+    @templated(css='style',
+            js='jquery-1.3.1.min login',
+            title='GECO Web Client')
     def GET(self):
         lform = form_login()
         op1 = random.randint(1,10) 
@@ -52,7 +54,9 @@ class login:
 
         return self.render.login(lform, rform)
 
-    @templated(css='style', title='GECO Web Client')
+    @templated(css='style', 
+            js='jquery-1.3.1.min login',
+            title='GECO Web Client')
     def POST(self):
         lform = form_login()
         if not lform.validates():
@@ -101,8 +105,8 @@ class register:
             gso = gecolib.GSO(xmlrpc_server=web.SERVER)
 
             values = web.input()
-            name = values['username']
-            pwd = values['password']
+            name = values['rusername']
+            pwd = values['rpassword']
 
             if gso.check_user_name(name):
                 errors = [u"%s no está disponible" % name]

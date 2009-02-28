@@ -1,5 +1,7 @@
 body{
-    background-color: #b10000;
+    background-image: url("/static/images/red-bg.png");
+    background-repeat: repeat-x;
+    background-color: #620000;
     color: white;
     padding: 2em;
 }

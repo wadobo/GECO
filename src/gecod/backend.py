@@ -88,7 +88,13 @@ class Password:
         u = self.updated
         e = self.expiration
 
-        return "|".join(map(str, (n,t,d,a,p,c,u,e)))
+        def fix_encoding(cad):
+            try:
+                return str(cad)
+            except:
+                return cad.encode("utf-8")
+
+        return "|".join(map(fix_encoding, (n,t,d,a,p,c,u,e)))
 
 
 def user_by_cookie(cookie, session=None):

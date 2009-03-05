@@ -79,8 +79,17 @@ class Password:
         self.expiration = time.mktime(password.expiration.timetuple())
     
     def __str__(self):
-        return u"%(name)s|%(type)s|%(description)s|%(account)s|"\
-                "%(password)s|%(cypher_method)s|%(updated)s|%(expiration)s" % self.__dict__
+        n = self.name
+        t = self.type
+        d = self.description
+        a = self.account
+        p = self.password
+        c = self.cypher_method
+        u = self.updated
+        e = self.expiration
+
+        return "|".join(map(str, (n,t,d,a,p,c,u,e)))
+
 
 def user_by_cookie(cookie, session=None):
     '''
@@ -220,7 +229,7 @@ def export(cookie):
     Returns a string with all passwords 
     '''
 
-    return "\n".join([unicode(p).replace('\n', '\\n')\
+    return "\n".join([str(p).replace('\n', '\\n')\
             for p in get_all_passwords(cookie)])
 
 @session_decorator

@@ -71,6 +71,21 @@ class frontend:
         p = backend.get_all_passwords(cookie)
         return [i for i in p]
 
+    def export(self, cookie):
+        '''
+        Returns a string with all passwords
+        ready to import
+        '''
+
+        return backend.export(cookie)
+
+    def restore(self, cookie, data):
+        '''
+        Restore data from a backup doit with export
+        '''
+
+        backend.restore(cookie, data)
+
 def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())
 

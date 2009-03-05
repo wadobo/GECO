@@ -55,7 +55,7 @@ class Password(Base):
     id = Column(Integer, primary_key=True)
     # types = ['generic', 'web', 'email', 'unix']
     type = Column(String(20))
-    name = Column(String(50), unique=True)
+    name = Column(String(50))
     description = Column(String(255))
     updated = Column(DateTime())
     expiration = Column(DateTime())

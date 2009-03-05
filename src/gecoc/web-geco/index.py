@@ -7,6 +7,7 @@ from utils import authenticated
 
 web.config.debug = False
 web.SERVER = 'https://danigm.net:10000'
+#web.SERVER = 'https://localhost:4343'
 
 urls = (
         '/logout', 'login.logout',

@@ -45,6 +45,29 @@ def change_password():
     
     gso.change_password(password)
 
+def export(dest='/tmp/mypasswords'):
+    ''' Exporta todas las contraseñas a un fichero 
+        export dest
+    '''
+
+    import codecs
+    global gso
+    destfile = codecs.open(dest, mode='w', encoding='utf-8')
+    exported = gso.export()
+    destfile.write(exported)
+    destfile.close()
+    print "exportado a %s" % dest
+
+def restore(source="/tmp/mypasswords"):
+    ''' Importa todas las contraseñas de un fichero 
+        restore fichero
+    '''
+    import codecs
+    global gso
+    data = codecs.open(source, encoding='utf-8').read()
+    gso.restore(data)
+    print "importado con exito"
+
 def change(name=''):
     ''' Cambia una contraseña 
         change name

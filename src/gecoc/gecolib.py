@@ -98,7 +98,8 @@ def get_server_object(method='xmlrpc', **kwargs):
         def get_password(self, cookie, name) -> password
         def get_passwords(self, cookie, args) -> [password]
         def get_all_passwords(self, cookie) -> [password]
-
+        def export(self, cookie) -> str
+        def restore(self, cookie, data)
         ...
     '''
     # TODO implementar funcionalidad de ficheros de configuración

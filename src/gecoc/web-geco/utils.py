@@ -13,6 +13,19 @@ def authenticated(function):
 
     return new_function
 
+def error_handler(function):
+    def new_function(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except Exception, e:
+            if type(e) == type(web.seeother('')):
+                raise e
+            else:
+                flash(faultString, 'error')
+                raise web.seeother('/error')
+
+    return new_function
+
 def templated(css='', js='', title=''):
     css = css.split(' ') if css else []
     js = js.split(' ') if js else []

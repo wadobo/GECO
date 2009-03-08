@@ -1,0 +1,37 @@
+$def with (username="", server="", change=None, delete=None)
+
+<div id="main">
+        <p>
+        Cuenta de usuario $username en el servidor GECO $server
+        </p>
+        <div id="options">
+            <fieldset>
+                <legend>Cambiar contraseña de usuario</legend>
+                <form action="" method="POST">
+                    $:change.render()
+                    <button name="change" type="submit" class="imaged ok"></button>
+                </form>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>Borrar cuenta de usuario</legend>
+                Se borrarán todas las contraseñas almacenadas, y esta acción es irrecuperable.
+                <form action="" method="POST">
+                    $:delete.render()
+                    <button name="delete" type="submit" class="imaged ok"></button>
+                </form>
+            </fieldset>
+
+            <fieldset>
+                <legend>Importación / Exportación</legend>
+                    <a href="/export">Exportar contraseñas</a>
+                <form method="POST" enctype="multipart/form-data" action="">
+                    <label for="myfile"> Importar</label>
+                        <input type="file" name="myfile" />
+                    <br/>
+                    <button name="restore" type="submit" class="imaged ok"></button>
+                </form>
+            </fieldset>
+        </div>
+</div>

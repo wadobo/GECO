@@ -30,6 +30,7 @@ class edit:
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+            menu=web.menu_user,
             title='GECO Web Client - New')
     def GET(self, name):
         session = web.ses
@@ -39,10 +40,11 @@ class edit:
         myedit_form = edit_form(password)
         return self.render.new(web.ses.username, myedit_form(),
                 title="Editar Contraseña")
-
+    
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+            menu=web.menu_user,
             title='GECO Web Client - New')
     def POST(self, name):
         session = web.ses

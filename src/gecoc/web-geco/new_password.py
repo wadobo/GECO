@@ -24,6 +24,7 @@ class new_password:
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+            menu=web.menu_user,
             title='GECO Web Client - New')
     def GET(self):
         return self.render.new(web.ses.username, new_form())
@@ -31,6 +32,7 @@ class new_password:
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+            menu=web.menu_user,
             title='GECO Web Client - New')
     def POST(self):
         nform = new_form()

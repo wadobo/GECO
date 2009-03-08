@@ -2,7 +2,7 @@
 import web
 from web import form
 
-from utils import authenticated, templated, flash, error_handler
+from utils import authenticated, templated, flash
 import gecoc.gecolib as gecolib
 
 vpass = form.regexp(r".{3,20}", 'Debe estar entre 3 y 20 caracteres')
@@ -32,6 +32,7 @@ class options:
     render = web.template.render('templates')
     @authenticated
     @templated(css='style',
+            menu=web.menu_user,
             title='GECO Web Client - Options')
     def GET(self):
         session = web.ses
@@ -40,9 +41,9 @@ class options:
         return self.render.options(web.ses.username, web.SERVER, change_pass(),
                 delete())
 
-    @error_handler
     @authenticated
     @templated(css='style',
+            menu=web.menu_user,
             title='GECO Web Client - Options')
     def POST(self):
         session = web.ses

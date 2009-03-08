@@ -1,4 +1,4 @@
-$def with (css, title, body, js=[], errors='', msgs='')
+$def with (css, title, body, js=[], errors='', msgs='', menu=[])
 
 <html>
     <head>
@@ -31,7 +31,17 @@ $def with (css, title, body, js=[], errors='', msgs='')
                     <li>$:error</li>
                 </ul>
             </div>
+        
+        $if menu:
+            <div id="menu">
+                $for i in menu:
+                    <a href="${i[1]}">${i[0]}</a>
+                    $if not loop.last:
+                        | 
+            </div>
+
         $:body
+
         <div id="fotter">
             <p>
                 Powered by <a href="http://python.org">Python</a> and 

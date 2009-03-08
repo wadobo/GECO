@@ -9,6 +9,12 @@ web.config.debug = False
 web.SERVER = 'https://danigm.net:10000'
 #web.SERVER = 'https://localhost:4343'
 
+web.menu_user = (
+        ('Listado', '/list'),
+        ('Añadir', '/new'),
+        ('Opciones', '/options'),
+        )
+
 urls = (
         '/error', 'error',
         '/logout', 'login.logout',
@@ -27,6 +33,16 @@ urls = (
 app = web.application(urls, globals())
 session = web.session.Session(app, web.session.DiskStore('sessions'))
 
+def internalerror():
+    render = web.template.render('templates')
+    body = render.error()
+    templated = render.master(css=['style'],
+            title='GECO Web Client - ERROR',
+            body=body, menu=(('Salir', '/logout'),))
+    return web.internalerror(templated)
+
+app.internalerror = internalerror
+
 web.ses = session
 
 class index:
@@ -40,6 +56,6 @@ class error:
     def GET(self, *args):
         render = web.template.render('templates')
         return render.error()
-
+    
 if __name__ == '__main__':
     app.run()

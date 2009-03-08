@@ -210,3 +210,14 @@ a.selected, .selected {
 #counter {
     margin-left: 1em;
 }
+
+#menu {
+    margin: 2em auto 2em auto;
+    padding-left: 3em;
+    padding-right: 7em;
+    border: 1px solid black;
+    font-weight: bold;
+    color: #5e0000;
+    background-color: white;
+    width: 600px;
+}

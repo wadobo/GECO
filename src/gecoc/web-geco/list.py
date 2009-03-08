@@ -12,6 +12,7 @@ class list:
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs masterkey list',
+            menu=web.menu_user,
             title='GECO Web Client')
     def GET(self):
         username = session.get('username', '')

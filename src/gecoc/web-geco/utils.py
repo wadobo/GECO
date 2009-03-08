@@ -13,20 +13,24 @@ def authenticated(function):
 
     return new_function
 
-def error_handler(function):
+def error(function):
     def new_function(*args, **kwargs):
         try:
             return function(*args, **kwargs)
         except Exception, e:
             if type(e) == type(web.seeother('')):
-                raise e
+                raise
             else:
-                flash(faultString, 'error')
+                try:
+                    flash(e.faultString, 'error')
+                except:
+                    flash(str(e), 'error')
+
                 raise web.seeother('/error')
 
     return new_function
 
-def templated(css='', js='', title=''):
+def templated(css='', js='', title='', menu=[]):
     css = css.split(' ') if css else []
     js = js.split(' ') if js else []
     render = web.template.render('templates')
@@ -38,7 +42,7 @@ def templated(css='', js='', title=''):
             body = function(*args, **kwargs)
 
             templated = render.master(title=title, css=css,
-                    js=js, body=body, errors=e, msgs=m)
+                    js=js, body=body, errors=e, msgs=m, menu=menu)
             return templated
         
         return new_function

@@ -1,0 +1,129 @@
+##########################################################
+#                                                        #
+#      GECO (Gestor de Contraseñas)                      #
+#      Autor: Daniel García Moreno (danigm)              #
+#             <dani@danigm.net>                          #
+#      fecha: Tue, 10 Mar 2009 20:20:12 +0100            #
+#                                                        #
+##########################################################
+
+# Introducción:
+--------------------------------------------------
+
+GECO es un gestor de contraseñas distribuido capaz de sincronizar
+difernetes servidores, con diferentes interfaces de comunicación con el
+usuario. Presentanto tanto una interfaz de escritorio en GTK como una
+interfaz web desarrollada con python y webpy. Todas las contraseñas se
+cifran en cliente con una contraseña maestra que nunca es almacenada.
+
+# Dependencias:
+--------------------------------------------------
+
+- servidor:
+    sqlalchemy, pyopenssl
+
+- clientes:
+    pygtk?
+
+# Instalación:
+--------------------------------------------------
+
+De momento no existe ningún instalable, tan solo hay que descargar el
+código, ya sea de la forja o a través de este enlace
+bzr.danigm.net/geco/tgz
+
+La aplicación consta de dos partes independientes, el servidor y los
+diferentes clientes:
+
+- servidor:
+-----------
+    Una vez descargado el código se puede acceder a la parte del
+    servidor en src/gecod.
+    Lo primero que hay que hacer es generar un certificado en el
+    directorio certs, o añadir uno como key.pem y cert.pem. Dentro del
+    directorio certs existe un script que lo genera automáticamente:
+
+        $sh generate-pem.sh
+
+    Por otra parte el servidor tira de una base de datos que hay que
+    configurar en el fichero backend.py cambiando la variable DATABASE
+    por una sqlalchemy válida. Por defecto se puede dejar la que tiene
+    y se usará sqlite.
+
+    Para crear la base de datos ejecuta el script database.py:
+
+        $python database.py
+
+    Si has especificado otro tipo de base de datos tendrás que crearla
+    cambiando el fichero database.py, en la última línea, añadiendo la
+    cadena como argumento a la función create y después ejecutando el
+    script.
+
+    Para lanzar el servidor hay que ejecutar el script
+    xmlrpc_frontend.py que ofrece la interfaz xmlrpc por el puerto
+    4343 por defecto. Se puede configurar en el fichero
+    xmlrpc_fontend.py:
+
+        $python xmlrpc_frontend.py 
+        Serving HTTPS on 127.0.0.1 port 4343
+
+- cliente:
+-----------
+    No es necesario montar un servidor para probar los clientes, yo
+    tengo uno montado de pruebas en https://danigm.net:10000
+
+    Los clientes se encuentran dentro del directorio src/gecoc/
+
+    De momento hay dos clientes diferentes, el cliente de terminal y
+    el cliente web.
+
+    gecolib es un módulo python que ofrece una forma simple de acceder
+    al frontend xmlrpc que nos da el servidor. Tan solo hay que
+    instanciar el objecto gecolib.GSO. Más info pydoc gecolib.
+
+    El cliente de terminal es muy simple, se ejecuta con "python
+    terminal-geco.py" y ofrece una interfaz interactiva para
+    registrarse en un servidor, añadir contraseñas, etc. Si quieres
+    conectarte a un servidor local la ruta por defecto es
+    https://localhost:4343
+
+    El cliente web se encuentra en src/gecoc/web-geco. Antes de
+    lanzarlo es necesario crear un enlace a gecoc ya que hace uso de
+    gecolib:
+        
+        $cd src/gecoc/web-geco
+        $ln -s ../../gecoc
+
+    Para especificar a qué servidor se conecta el cliente web hay que
+    modificar el fichero index.py y cambiar la variable web.SERVER.
+    Por defecto está puesta a 'https://danigm.net:10000' y para hacer
+    las pruebas con un servidor local lanzado por defecto habría que
+    cambiar esa ruta por 'https://localhost:4343'.
+
+    Una vez creado el enlace, se puede lanzar el cliente web
+    ejecutando el script index.py:
+
+        $python index.py
+
+    Podemos usar el cliente web entrando en la ruta
+    http://localhost:8080.
+
+    También tengo un cliente web de pruebas en http://geco.danigm.net
+    que se puede utilizar sin ningún problema.
+
+# Promoción:
+--------------------------------------------------
+
+Para promocionar el proyecto he creado el blog y he ido añadiendo
+pequeños tutoriales enseñando la base de diferentes tecnologías que se usan
+en él.
+
+Al inicio del proyecto también envié un correo a la lista de correo
+python-es para dar a conocer lo que quería hacer y por si alguien quería
+colaborar.
+
+Para dar mayor difusión además de la forja de rediris he creado el proyecto
+en launchpad.net.
+
+Además estoy dandole difusión a través de twitter/sweetter con cada commit
+que hago.

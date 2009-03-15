@@ -164,12 +164,14 @@ def strength(password):
     # bad passwords tests (-20 or -15)
     bad_passwords = ('', 'qwerty', 'asdfg', 'zxcvb')
     if password.lower() in bad_passwords:
-        return -20
+        strength = -20
+        return ((strength + 20) / 40.0)
     ord_pass = [ord(i) for i in password]
     inverted_pass = ord_pass[:]
     inverted_pass.reverse()
     if is_sorted(ord_pass) or is_sorted(inverted_pass):
-        return -15
+        strength = -15
+        return ((strength + 20) / 40.0)
 
     # repeated chars test
     repeated = 1

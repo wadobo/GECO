@@ -12,7 +12,7 @@ from gecoc import gecolib
 
 __version__ = '0.1'
 IMG = 'glade'
-SECONDS = 10
+SECONDS = 600
 
 def remove_text(button):
     alignment = button.get_children()[0]
@@ -65,7 +65,7 @@ class TrayIcon(gtk.StatusIcon):
         self.hide = self.gladefile.get_widget('hide')
         remove_text(self.hide)
         self.hide.set_relief(gtk.RELIEF_NONE)
-        self.hide.connect('clicked', self.on_click)
+        self.hide.connect('clicked', self.hide_win)
 
         self.forget_button = self.gladefile.get_widget('forget')
         self.forget_button.connect('clicked', self.forget)
@@ -73,7 +73,11 @@ class TrayIcon(gtk.StatusIcon):
         self.passwords = self.gladefile.get_widget('passwords')
         self.viewport = self.gladefile.get_widget('viewport1')
 
-        self.search = self.gladefile.get_widget('search')
+        cipher = self.gladefile.get_widget('cipher')
+        cipher.connect('clicked', self.cipher)
+
+        generate = self.gladefile.get_widget('generate')
+        generate.connect('clicked', self.generate)
 
         # TODO conffile
         server = 'https://localhost:4343'
@@ -83,6 +87,9 @@ class TrayIcon(gtk.StatusIcon):
 
         self.master = ''
 
+        self.statusbar = self.gladefile.get_widget('statusbar')
+        self.statusbar.push(0, server)
+
         self.get_passwords()
 
     def forget(self, *args):
@@ -90,6 +97,8 @@ class TrayIcon(gtk.StatusIcon):
         self.unlocked(False)
 
     def get_master(self):
+        self.hide_win()
+
         if self.master:
             return self.master
         else:
@@ -112,8 +121,29 @@ class TrayIcon(gtk.StatusIcon):
                 master_input.set_text('')
                 self.unlocked(True)
                 gobject.timeout_add(SECONDS * 1000, self.forget)
-            master_dialog.hide()
+            master_dialog.destroy()
             return self.master
+
+    def find(self):
+        dialog = \
+                gtk.MessageDialog(buttons=gtk.BUTTONS_OK_CANCEL,
+                message_format="Contraseña maestra")
+
+        master_input = gtk.Entry()
+        master_input.set_visibility(False)
+        master_input.show()
+        master_input.set_activates_default(True)
+
+        dialog.vbox.pack_start(master_input, False, True)
+
+        dialog.set_default_response(gtk.RESPONSE_OK)
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self.master = master_input.get_text()
+            master_input.set_text('')
+
+        dialog.destroy()
 
     def get_passwords(self):
         self.passwords.destroy()
@@ -122,6 +152,11 @@ class TrayIcon(gtk.StatusIcon):
         self.viewport.add(self.passwords)
 
         passwords = self.gso.get_all_passwords()
+        def cmp(x, y):
+            if x['name'] > y['name']: return 1
+            else: return -1
+        passwords.sort(cmp)
+
         for p in passwords:
             self.add_new(p)
 
@@ -132,14 +167,17 @@ class TrayIcon(gtk.StatusIcon):
             password = self.gso.get_password(p['name'], master_password)
             clipboard.set_text(password['password'])
             clipboard.store()
-            self.on_click()
+            self.hide_win()
 
         vbox = self.passwords
         hbox = gtk.HBox()
 
+        # PASSWORD 
         button = gtk.Button(p['name'])
         button.set_relief(gtk.RELIEF_NONE)
         button.connect('clicked', clicked, p)
+        tooltip = '\t<b>%s</b>:\n\t%s' % (p['account'], p['description'])
+        button.set_tooltip_markup(tooltip)
         hbox.add(button)
         
         exp = p['expiration']
@@ -159,7 +197,7 @@ class TrayIcon(gtk.StatusIcon):
         # EDIT
         edit = gtk.Button(stock=gtk.STOCK_EDIT)
         edit.set_relief(gtk.RELIEF_NONE)
-        edit.connect('clicked', clicked, p)
+        edit.connect('clicked', self.on_add, p)
         remove_text(edit)
         hbox.pack_start(edit, False)
 
@@ -193,8 +231,102 @@ class TrayIcon(gtk.StatusIcon):
     def on_config(self, data):
         pass
 
-    def on_add(self, data):
-        pass
+    def on_add(self, data, p=None):
+        # hide window
+        self.hide_win()
+
+        self.new_form = self.gladefile.get_widget('new')
+        self.new_form.show()
+        name = self.gladefile.get_widget('name')
+        account = self.gladefile.get_widget('account')
+        type = self.gladefile.get_widget('type')
+        exp = self.gladefile.get_widget('expiration')
+        desc = self.gladefile.get_widget('desc')
+        password = self.gladefile.get_widget('password')
+
+        if p:
+            # EDIT, not new
+            name.set_text(p['name'])
+            name.editable = False
+            account.set_text(p['account'])
+            type.set_text(p['type'])
+            e = p['expiration']
+            expdate = datetime.datetime.fromtimestamp(float(e))
+            days = (expdate - datetime.datetime.now()).days
+            exp.set_text(str(days))
+            desc.get_buffer().set_text(p['description'])
+            password.set_text(p['password'])
+
+        response = self.new_form.run()
+
+        if response:
+            args = {}
+            args['account'] = account.get_text()
+            buff = desc.get_buffer()
+            args['description'] = buff.get_text(buff.get_start_iter(),
+                    buff.get_end_iter())
+            args['type'] = type.get_text()
+            args['expiration'] = int(exp.get_text())
+
+            try:
+                if p:
+                    self.gso.del_password(name.get_text())
+                self.gso.set_raw_password(name.get_text(), password.get_text(), args)
+            except:
+                # TODO sacar un mensaje de error
+                pass
+
+            self.get_passwords()
+
+        self.new_form.hide()
+
+    def generate(self, button):
+        master = self.get_master()
+        length = self.gladefile.get_widget('length').get_text()
+        length = int(length)
+        lower = self.gladefile.get_widget('low').get_active()
+        upper = self.gladefile.get_widget('up').get_active()
+        digits = self.gladefile.get_widget('digits').get_active()
+        other = self.gladefile.get_widget('other').get_active()
+
+        clear = self.gladefile.get_widget('clear')
+
+        new_pass = gecolib.generate(length, lower, upper, digits,
+                other)
+
+        clear.set_text(new_pass)
+        self.strength(new_pass)
+        self.cipher_pass(new_pass)
+
+    def strength(self, password):
+        bar = self.gladefile.get_widget('strength')
+        strength = gecolib.strength(password)
+
+        text_strength = ('Mala', 'Buena', 'Fuerte', 'Perfecta')
+        index = int(strength * (len(text_strength)-1))
+        text_strength = text_strength[index]
+        bar.set_text(text_strength)
+        bar.set_fraction(strength)
+
+    def cipher_pass(self, new_pass):
+        master = self.get_master()
+        password = self.gladefile.get_widget('password')
+
+        aes = gecolib.AES()
+        cipher = aes.encrypt(new_pass, master)
+        password.set_text(cipher)
+
+    def cipher(self, button):
+        p1 = self.gladefile.get_widget('p1').get_text()
+        p2 = self.gladefile.get_widget('p2').get_text()
+        self.strength(p1)
+
+        if p1 == p2:
+            self.cipher_pass(p1)
+        else:
+            bar = self.gladefile.get_widget('strength')
+            bar.set_text("Las contraseñas no coinciden")
+            bar.set_fraction(0)
 
     def on_click(self, data=None):
         if self.win_visible:
@@ -205,7 +337,11 @@ class TrayIcon(gtk.StatusIcon):
             x, y = self.get_mouse()
             self.win.move(x,y)
             self.win.show()
-            self.search.grab_focus()
+
+    def hide_win(self, *args):
+        if self.win_visible:
+            self.win_visible = False
+            self.win.hide()
     
     def unlocked(self, boolean):
         if not boolean:
@@ -230,6 +366,8 @@ class TrayIcon(gtk.StatusIcon):
         return x, y
 
     def delete(self, button, p):
+        # hide window
+        self.hide_win()
         name = p['name']
         message = '¿Estás seguro de que quieres eliminar la contraseña "%s"?' % name
         dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_YES_NO,

@@ -79,6 +79,8 @@ class TrayIcon(gtk.StatusIcon):
         generate = self.gladefile.get_widget('generate')
         generate.connect('clicked', self.generate)
 
+        self.new_form = self.gladefile.get_widget('new')
+
         # TODO conffile
         server = 'https://localhost:4343'
         user, password = 'dani', '123'
@@ -235,7 +237,6 @@ class TrayIcon(gtk.StatusIcon):
         # hide window
         self.hide_win()
 
-        self.new_form = self.gladefile.get_widget('new')
         self.new_form.show()
         name = self.gladefile.get_widget('name')
         account = self.gladefile.get_widget('account')

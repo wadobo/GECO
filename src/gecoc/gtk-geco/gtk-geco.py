@@ -81,7 +81,15 @@ class TrayIcon(gtk.StatusIcon):
 
         self.new_form = self.gladefile.get_widget('new')
 
+        self.pref_form = self.gladefile.get_widget('prefs')
+        prefs = self.gladefile.get_widget('prefs_button')
+        prefs.connect('clicked', self.on_config)
+
+        filechooser = self.gladefile.get_widget('file_exp_button')
+        filechooser.connect('clicked', self.chooser)
+
         # TODO conffile
+        # TODO conectar en un thread
         server = 'https://localhost:4343'
         user, password = 'dani', '123'
         self.gso = gecolib.GSO(xmlrpc_server=server)
@@ -93,6 +101,16 @@ class TrayIcon(gtk.StatusIcon):
         self.statusbar.push(0, server)
 
         self.get_passwords()
+
+    def chooser(self, widget, *args):
+        exp = self.gladefile.get_widget('file_exp')
+        dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                buttons=('Cancelar', 0, 'Seleccionar', 1))
+        response = dialog.run()
+        if response == 1:
+            filename = dialog.get_filename()
+            exp.set_text(filename)
+        dialog.destroy()
 
     def forget(self, *args):
         self.master = ''
@@ -125,27 +143,6 @@ class TrayIcon(gtk.StatusIcon):
                 gobject.timeout_add(SECONDS * 1000, self.forget)
             master_dialog.destroy()
             return self.master
-
-    def find(self):
-        dialog = \
-                gtk.MessageDialog(buttons=gtk.BUTTONS_OK_CANCEL,
-                message_format="Contraseña maestra")
-
-        master_input = gtk.Entry()
-        master_input.set_visibility(False)
-        master_input.show()
-        master_input.set_activates_default(True)
-
-        dialog.vbox.pack_start(master_input, False, True)
-
-        dialog.set_default_response(gtk.RESPONSE_OK)
-
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            self.master = master_input.get_text()
-            master_input.set_text('')
-
-        dialog.destroy()
 
     def get_passwords(self):
         self.passwords.destroy()
@@ -231,7 +228,12 @@ class TrayIcon(gtk.StatusIcon):
         dialog.destroy()
 
     def on_config(self, data):
-        pass
+        # hide window
+        self.hide_win()
+        dialog = self.pref_form
+        response = dialog.run()
+
+        dialog.hide()
 
     def on_add(self, data, p=None):
         # hide window
@@ -260,7 +262,7 @@ class TrayIcon(gtk.StatusIcon):
 
         response = self.new_form.run()
 
-        if response:
+        if response == 1:
             args = {}
             args['account'] = account.get_text()
             buff = desc.get_buffer()

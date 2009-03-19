@@ -159,6 +159,10 @@ class TrayIcon(gtk.StatusIcon):
         # TODO conectar en un thread
         if not server:
             server, user, password = self.get_opts()
+            if not server:
+                self.message('No encuentro el fichero de configuración, o está erroneo.\n'\
+                        'Configúralo en Preferencias', type='info')
+                return
         try:
             self.gso = gecolib.GSO(xmlrpc_server=server)
             self.gso.auth(user, password)

@@ -3,7 +3,7 @@
 #      GECO (Gestor de Contraseñas)                      #
 #      Autor: Daniel García Moreno (danigm)              #
 #             <dani@danigm.net>                          #
-#      fecha: Tue, 10 Mar 2009 20:20:12 +0100            #
+#      fecha: Thu, 19 Mar 2009 21:01:38 +0100            #
 #                                                        #
 ##########################################################
 
@@ -23,7 +23,7 @@ cifran en cliente con una contraseña maestra que nunca es almacenada.
     sqlalchemy, pyopenssl
 
 - clientes:
-    pygtk?
+    pygtk
 
 # Instalación:
 --------------------------------------------------
@@ -70,16 +70,19 @@ diferentes clientes:
 - cliente:
 -----------
     No es necesario montar un servidor para probar los clientes, yo
-    tengo uno montado de pruebas en https://danigm.net:10000
+    tengo uno montado de pruebas en https://danigm.net:8080
 
     Los clientes se encuentran dentro del directorio src/gecoc/
 
-    De momento hay dos clientes diferentes, el cliente de terminal y
-    el cliente web.
+    De momento hay tres clientes diferentes, el cliente de terminal,
+    el cliente gtk y el cliente web.
 
     gecolib es un módulo python que ofrece una forma simple de acceder
     al frontend xmlrpc que nos da el servidor. Tan solo hay que
     instanciar el objecto gecolib.GSO. Más info pydoc gecolib.
+
+    # terminal-geco
+    ---------------
 
     El cliente de terminal es muy simple, se ejecuta con "python
     terminal-geco.py" y ofrece una interfaz interactiva para
@@ -87,6 +90,36 @@ diferentes clientes:
     conectarte a un servidor local la ruta por defecto es
     https://localhost:4343
 
+    # gtk-geco
+    ----------
+        
+    El cliente gtk se encuentra en src/gecoc/gtk-geco. Para lanzarlo
+    tan solo hay que entrar en el directorio y ejecutar el comando
+    desde allí:
+        
+        $cd src/gecoc/gtk-geco
+        $python gtk-geco.py
+
+    Esto hará que aparezca un icono de sistema. Pulsando con el botón
+    derecho aparece un menú, en configuración se debe especificar el
+    servidor, el usuario y la contraseña del mismo. Desde esta misma
+    ventana también es posible crear una cuenta en un servidor.
+
+    Una vez configurada la cuenta, al pulsar sobre el icono aparecerá
+    la lista de contraseñas. Se pueden añadir desde el menú anterior,
+    pulsando sobre Add...
+
+    Si se le da a Guardar la configuración se creará un fichero
+    cifrado, geco.conf, el cual se usará la próxima vez que lances
+    gtk-geco para conectarse, pidiendo tan solo la contraseña maestra.
+
+    Las contraseñas se copian al portapapeles al pulsar sobre su
+    nombre. Pedirá la contraseña maestra si no la ha pedido antes o si
+    la ha olvidado.
+
+    # web-geco
+    ----------
+     
     El cliente web se encuentra en src/gecoc/web-geco. Antes de
     lanzarlo es necesario crear un enlace a gecoc ya que hace uso de
     gecolib:
@@ -96,7 +129,7 @@ diferentes clientes:
 
     Para especificar a qué servidor se conecta el cliente web hay que
     modificar el fichero index.py y cambiar la variable web.SERVER.
-    Por defecto está puesta a 'https://danigm.net:10000' y para hacer
+    Por defecto está puesta a 'https://danigm.net:8080' y para hacer
     las pruebas con un servidor local lanzado por defecto habría que
     cambiar esa ruta por 'https://localhost:4343'.
 

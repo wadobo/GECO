@@ -13,6 +13,7 @@ from gecoc import gecolib
 __version__ = '0.1'
 IMG = 'glade'
 SECONDS = 600
+CONFFILE = 'geco.conf'
 
 def remove_text(button):
     alignment = button.get_children()[0]
@@ -61,6 +62,8 @@ class TrayIcon(gtk.StatusIcon):
         self.win.show_all()
         self.win.hide()
         self.win_visible = False
+        filename = os.path.join(IMG, 'lock.png')
+        self.win.set_icon_from_file(filename)
 
         self.hide = self.gladefile.get_widget('hide')
         remove_text(self.hide)
@@ -91,19 +94,118 @@ class TrayIcon(gtk.StatusIcon):
         imp = self.gladefile.get_widget('import')
         imp.connect('clicked', self.import_file)
 
-        # TODO conffile
-        # TODO conectar en un thread
-        server = 'https://localhost:4343'
-        user, password = 'danigm', '123'
-        self.gso = gecolib.GSO(xmlrpc_server=server)
-        self.gso.auth(user, password)
+        save = self.gladefile.get_widget('save_conf')
+        save.connect('clicked', self.save_conf)
 
+        register = self.gladefile.get_widget('register')
+        register.connect('clicked', self.register)
+
+        del_user = self.gladefile.get_widget('del_user')
+        del_user.connect('clicked', self.del_user)
+
+        refresh = self.gladefile.get_widget('refresh')
+        refresh.connect('clicked', self.get_passwords)
+        
         self.master = ''
+        self.auth()
+
+    def __get_config_form(self):
+        server = self.gladefile.get_widget('pref_server').get_text()
+        user = self.gladefile.get_widget('pref_user').get_text()
+        password = self.gladefile.get_widget('pref_pass').get_text()
+        
+        return server, user, password
+
+    def __set_config_form(self):
+        server = self.gladefile.get_widget('pref_server')
+        user = self.gladefile.get_widget('pref_user')
+        password = self.gladefile.get_widget('pref_pass')
+
+        s, u, p = self.get_opts()
+
+        server.set_text(s)
+        user.set_text(u)
+        password.set_text(p)
+    
+    def message(self, msg="ERROR no se por qué :(", type='err'):
+        type = gtk.MESSAGE_ERROR if type == 'err' else gtk.MESSAGE_INFO
+        dialog = gtk.MessageDialog(type=type,
+                buttons=gtk.BUTTONS_CLOSE,
+                message_format=msg)
+        dialog.run()
+        dialog.destroy()
+
+    def get_opts(self):
+        if os.path.exists(CONFFILE):
+            f = open(CONFFILE)
+            to_read = f.read()
+            f.close()
+
+            master = self.get_master()
+            aes = gecolib.AES()
+            to_read = aes.decrypt(to_read, master)
+
+            all = [i for i in to_read.split('\n') if i]
+            values = {}
+            for opt in all:
+                key, value = map(str.strip, opt.split('='))
+                values[key] = value
+            
+            return values['server'], values['user'], values['passwd']
+        else:
+            return '', '', ''
+
+    def auth(self, server='', user='', password=''):
+        # TODO conectar en un thread
+        if not server:
+            server, user, password = self.get_opts()
+        try:
+            self.gso = gecolib.GSO(xmlrpc_server=server)
+            self.gso.auth(user, password)
+        except Exception, e:
+            self.message('Error en el login: %s' % str(e))
+            return
 
         self.statusbar = self.gladefile.get_widget('statusbar')
         self.statusbar.push(0, server)
-
         self.get_passwords()
+
+    def del_user(self, widget, *args):
+        server, user, passwd = self.__get_config_form()
+        gso = gecolib.GSO(xmlrpc_server=server)
+        gso.auth(uer, passwd)
+
+        try:
+            gso.unregister()
+            self.message('Cuenta borrada', type='info')
+        except Exception, e:
+            self.message('Error al borrar la cuenta: %s' % str(e))
+
+    def register(self, widget, *args):
+        server, user, passwd = self.__get_config_form()
+        gso = gecolib.GSO(xmlrpc_server=server)
+        gso.auth(uer, passwd)
+
+        try:
+            gso.register(user, passwd)
+            self.message('Registrado con éxito', type='info')
+        except Exception, e:
+            self.message('Error en el registro: %s' % str(e))
+
+    def save_conf(self, widget, *args):
+        server, user, passwd = self.__get_config_form()
+        f = open(CONFFILE, 'w')
+        to_save = 'server = %s\n'\
+                'user = %s\n'\
+                'passwd = %s\n' % (server, user, passwd)
+
+        master = self.get_master()
+        aes = gecolib.AES()
+        to_save = aes.encrypt(to_save, master)
+
+        f.write(to_save)
+        f.close()
+        self.auth(server, user, passwd)
 
     def export_file(self, widget, *args):
         dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -111,8 +213,12 @@ class TrayIcon(gtk.StatusIcon):
         response = dialog.run()
         if response == 1:
             filename = dialog.get_filename()
-            out = open(filename, 'w')
-            out.write(self.gso.export())
+            try:
+                out = open(filename, 'w')
+                out.write(self.gso.export())
+                self.message('Exportación realizada con éxito', type='info')
+            except Exception, e:
+                self.message('No se ha podido exportar: %s' % str(e))
 
         dialog.destroy()
 
@@ -122,10 +228,15 @@ class TrayIcon(gtk.StatusIcon):
         response = dialog.run()
         if response == 1:
             filename = dialog.get_filename()
-            inp = open(filename).read()
-            self.gso.restore(inp)
+            try:
+                inp = open(filename).read()
+                self.gso.restore(inp)
+                self.message('Importación realizada con éxito', type='info')
+            except Exception, e:
+                self.message('No se ha podido importar: %s' % str(e))
 
         dialog.destroy()
+        self.get_passwords()
 
     def forget(self, *args):
         self.master = ''
@@ -159,13 +270,18 @@ class TrayIcon(gtk.StatusIcon):
             master_dialog.destroy()
             return self.master
 
-    def get_passwords(self):
+    def get_passwords(self, *args):
         self.passwords.destroy()
         self.passwords = gtk.VBox()
         self.passwords.show()
         self.viewport.add(self.passwords)
 
-        passwords = self.gso.get_all_passwords()
+        try:
+            passwords = self.gso.get_all_passwords()
+        except Exception, e:
+            self.message('Error obteniendo contraseñas: %s' % str(e))
+            return
+
         def cmp(x, y):
             if x['name'] > y['name']: return 1
             else: return -1
@@ -246,10 +362,19 @@ class TrayIcon(gtk.StatusIcon):
     def on_config(self, data):
         # hide window
         self.hide_win()
+
+        server, user, passwd = self.__get_config_form()
+        if not user:
+            self.__set_config_form()
+
         dialog = self.pref_form
         response = dialog.run()
 
         dialog.hide()
+        # Refresh
+        server, user, passwd = self.__get_config_form()
+        self.auth(server, user, passwd)
+        self.get_passwords()
 
     def on_add(self, data, p=None):
         # hide window
@@ -291,9 +416,8 @@ class TrayIcon(gtk.StatusIcon):
                 if p:
                     self.gso.del_password(name.get_text())
                 self.gso.set_raw_password(name.get_text(), password.get_text(), args)
-            except:
-                # TODO sacar un mensaje de error
-                pass
+            except Exception, e:
+                self.message('Error: %s' % str(e))
 
             self.get_passwords()
 

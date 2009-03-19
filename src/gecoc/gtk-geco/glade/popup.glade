@@ -1,20 +1,19 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
+<!--Generated with glade3 3.4.5 on Thu Mar 19 14:41:33 2009 -->
 <glade-interface>
-  <!-- interface-requires gtk+ 2.16 -->
-  <!-- interface-naming-policy project-wide -->
-  <!-- interface-local-resource-path /home/danigm/Documentos/Projects/geco/src/gecoc/gtk-geco/glade -->
   <widget class="GtkWindow" id="popup">
     <property name="width_request">300</property>
     <property name="height_request">400</property>
     <property name="can_focus">True</property>
     <property name="has_focus">True</property>
     <property name="receives_default">True</property>
-    <property name="type">popup</property>
-    <property name="window_position">mouse</property>
+    <property name="type">GTK_WINDOW_POPUP</property>
+    <property name="window_position">GTK_WIN_POS_MOUSE</property>
     <property name="default_width">300</property>
     <property name="default_height">400</property>
     <property name="destroy_with_parent">True</property>
-    <property name="type_hint">popup-menu</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_POPUP_MENU</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="urgency_hint">True</property>
@@ -26,16 +25,16 @@
             <property name="visible">True</property>
             <child>
               <widget class="GtkButton" id="prefs_button">
-                <property name="label" translatable="yes">gtk-preferences</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-preferences</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -50,10 +49,11 @@
             </child>
             <child>
               <widget class="GtkButton" id="forget">
-                <property name="label" translatable="yes">Olvidar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">Olvidar</property>
+                <property name="response_id">0</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -62,11 +62,12 @@
             </child>
             <child>
               <widget class="GtkButton" id="hide">
-                <property name="label" translatable="yes">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-close</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -76,19 +77,18 @@
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="position">0</property>
           </packing>
         </child>
         <child>
           <widget class="GtkScrolledWindow" id="scrolledwindow1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">automatic</property>
-            <property name="vscrollbar_policy">automatic</property>
+            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
             <child>
               <widget class="GtkViewport" id="viewport1">
                 <property name="visible">True</property>
-                <property name="resize_mode">queue</property>
+                <property name="resize_mode">GTK_RESIZE_QUEUE</property>
                 <child>
                   <widget class="GtkVBox" id="passwords">
                     <property name="visible">True</property>
@@ -109,18 +109,18 @@
   </widget>
   <widget class="GtkDialog" id="new">
     <property name="border_width">5</property>
-    <property name="window_position">center</property>
-    <property name="type_hint">normal</property>
+    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox1">
+          <widget class="GtkVBox" id="vbox2">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkHBox" id="hbox1">
+              <widget class="GtkHBox" id="hbox2">
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkLabel" id="label1">
@@ -128,9 +128,6 @@
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Nombre:</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkEntry" id="name">
@@ -146,11 +143,10 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHBox" id="hbox2">
+              <widget class="GtkHBox" id="hbox3">
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkLabel" id="label2">
@@ -158,9 +154,6 @@
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Cuenta:</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkEntry" id="account">
@@ -188,9 +181,6 @@
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Tipo:</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkEntry" id="type">
@@ -216,11 +206,8 @@
                   <widget class="GtkLabel" id="label4">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">Expiraci&#xF3;n:</property>
+                    <property name="label" translatable="yes">Expiración:</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkEntry" id="expiration">
@@ -243,7 +230,7 @@
               <widget class="GtkLabel" id="label6">
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">Descripci&#xF3;n:</property>
+                <property name="label" translatable="yes">Descripción:</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -251,19 +238,19 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkScrolledWindow" id="scrolledwindow1">
+              <widget class="GtkScrolledWindow" id="scrolledwindow2">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
-                <property name="shadow_type">in</property>
+                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <property name="shadow_type">GTK_SHADOW_IN</property>
                 <child>
                   <widget class="GtkTextView" id="desc">
                     <property name="height_request">50</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="border_width">1</property>
-                    <property name="wrap_mode">word</property>
+                    <property name="wrap_mode">GTK_WRAP_WORD</property>
                   </widget>
                 </child>
               </widget>
@@ -280,11 +267,8 @@
                   <widget class="GtkLabel" id="label7">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">Contrase&#xF1;a cifrada:</property>
+                    <property name="label" translatable="yes">Contraseña cifrada:</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkEntry" id="password">
@@ -327,11 +311,8 @@
                           <widget class="GtkLabel" id="label10">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Contrase&#xF1;a:</property>
+                            <property name="label" translatable="yes">Contraseña:</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkEntry" id="p1">
@@ -348,7 +329,6 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -358,11 +338,8 @@
                           <widget class="GtkLabel" id="label11">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Confirmaci&#xF3;n:</property>
+                            <property name="label" translatable="yes">Confirmación:</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkEntry" id="p2">
@@ -384,10 +361,11 @@
                     </child>
                     <child>
                       <widget class="GtkButton" id="cipher">
-                        <property name="label" translatable="yes">Cifrar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">Cifrar</property>
+                        <property name="response_id">0</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -401,7 +379,7 @@
                   <widget class="GtkLabel" id="label8">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Generaci&#xF3;n Manual&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Generación Manual&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </widget>
                   <packing>
@@ -430,9 +408,6 @@
                             <property name="xalign">0</property>
                             <property name="label" translatable="yes">Longitud:</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkEntry" id="length">
@@ -449,7 +424,6 @@
                       </widget>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -457,23 +431,20 @@
                         <property name="visible">True</property>
                         <child>
                           <widget class="GtkCheckButton" id="low">
-                            <property name="label" translatable="yes">min&#xFA;sculas</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">minúsculas</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="up">
-                            <property name="label" translatable="yes">may&#xFA;sculas</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">mayúsculas</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                           </widget>
@@ -483,10 +454,10 @@
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="digits">
-                            <property name="label" translatable="yes">d&#xED;gitos</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">dígitos</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                           </widget>
@@ -496,10 +467,10 @@
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="other">
-                            <property name="label" translatable="yes">Otros signos</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">Otros signos</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                           </widget>
                           <packing>
@@ -513,10 +484,11 @@
                     </child>
                     <child>
                       <widget class="GtkButton" id="generate">
-                        <property name="label" translatable="yes">Generar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">Generar</property>
+                        <property name="response_id">0</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -538,7 +510,7 @@
                           <widget class="GtkLabel" id="label13">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">ver contrase&#xF1;a</property>
+                            <property name="label" translatable="yes">ver contraseña</property>
                           </widget>
                           <packing>
                             <property name="type">label_item</property>
@@ -555,7 +527,7 @@
                   <widget class="GtkLabel" id="label9">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Generaci&#xF3;n Autom&#xE1;tica&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Generación Automática&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </widget>
                   <packing>
@@ -571,7 +543,7 @@
             <child>
               <widget class="GtkProgressBar" id="strength">
                 <property name="visible">True</property>
-                <property name="text" translatable="yes">Fortaleza de contrase&#xF1;a</property>
+                <property name="text" translatable="yes">Fortaleza de contraseña</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -586,27 +558,25 @@
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="button1">
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button2">
-                <property name="label" translatable="yes">gtk-ok</property>
-                <property name="response_id">1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">1</property>
               </widget>
               <packing>
                 <property name="position">1</property>
@@ -615,8 +585,7 @@
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -625,7 +594,7 @@
   <widget class="GtkDialog" id="prefs">
     <property name="border_width">5</property>
     <property name="default_width">420</property>
-    <property name="type_hint">normal</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
@@ -636,10 +605,10 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
-              <widget class="GtkVBox" id="vbox1">
+              <widget class="GtkVBox" id="vbox4">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkHBox" id="hbox3">
+                  <widget class="GtkHBox" id="hbox6">
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkLabel" id="label5">
@@ -648,9 +617,6 @@
                         <property name="xpad">5</property>
                         <property name="label" translatable="yes">Servidor:</property>
                       </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkEntry" id="pref_server">
@@ -667,22 +633,18 @@
                   </widget>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHBox" id="hbox2">
+                  <widget class="GtkHBox" id="hbox8">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkLabel" id="label4">
+                      <widget class="GtkLabel" id="label14">
                         <property name="visible">True</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
                         <property name="label" translatable="yes">Usuario:</property>
                       </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkEntry" id="pref_user">
@@ -702,18 +664,15 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHBox" id="hbox1">
+                  <widget class="GtkHBox" id="hbox9">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkLabel" id="label2">
+                      <widget class="GtkLabel" id="label15">
                         <property name="visible">True</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Contrase&#xF1;a:</property>
+                        <property name="label" translatable="yes">Contraseña:</property>
                       </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkEntry" id="pref_pass">
@@ -733,30 +692,30 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkExpander" id="expander1">
+                  <widget class="GtkExpander" id="expander4">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <widget class="GtkVBox" id="vbox2">
+                      <widget class="GtkVBox" id="vbox5">
                         <property name="visible">True</property>
                         <child>
-                          <widget class="GtkHBox" id="hbox5">
+                          <widget class="GtkHBox" id="hbox14">
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkButton" id="register">
-                                <property name="label" translatable="yes">Registrar</property>
                                 <property name="width_request">90</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <property name="label" translatable="yes">Registrar</property>
+                                <property name="response_id">0</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="label6">
+                              <widget class="GtkLabel" id="label16">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
                                 <property name="xpad">5</property>
@@ -768,33 +727,30 @@ el servidor</property>
                               </packing>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
-                          <widget class="GtkHBox" id="hbox6">
+                          <widget class="GtkHBox" id="hbox15">
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkButton" id="del_user">
-                                <property name="label" translatable="yes">Borrar</property>
                                 <property name="width_request">90</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <property name="label" translatable="yes">Borrar</property>
+                                <property name="response_id">0</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="label7">
+                              <widget class="GtkLabel" id="label17">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
                                 <property name="xpad">5</property>
                                 <property name="label" translatable="yes">Borra la cuenta de usuario y todas
-las contrase&#xF1;as que tengas en ella.</property>
+las contraseñas que tengas en ella.</property>
                               </widget>
                               <packing>
                                 <property name="position">1</property>
@@ -808,7 +764,7 @@ las contrase&#xF1;as que tengas en ella.</property>
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label1">
+                      <widget class="GtkLabel" id="label18">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Registrar / borrar usuario</property>
                       </widget>
@@ -830,65 +786,23 @@ las contrase&#xF1;as que tengas en ella.</property>
                 <property name="label" translatable="yes">Cuenta</property>
               </widget>
               <packing>
-                <property name="tab_fill">False</property>
                 <property name="type">tab</property>
+                <property name="tab_fill">False</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkVBox" id="vbox3">
+              <widget class="GtkVBox" id="vbox6">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkHBox" id="hbox7">
+                  <widget class="GtkHBox" id="hbox19">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkLabel" id="label8">
-                        <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Exportar:</property>
-                      </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkEntry" id="file_exp">
-                        <property name="width_request">220</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                      </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkButton" id="file_exp_button">
-                        <property name="label" translatable="yes">gtk-open</property>
+                      <widget class="GtkButton" id="import">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
-                        <property name="use_stock">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHBox" id="hbox9">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkButton" id="export">
-                        <property name="label" translatable="yes">Exportar</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">Importar</property>
+                        <property name="response_id">0</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -897,46 +811,62 @@ las contrase&#xF1;as que tengas en ella.</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label10">
+                      <widget class="GtkLabel" id="label22">
                         <property name="visible">True</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Genera un fichero con todas las contrase&#xF1;as.
-Se puede utilizar como backup o para sincronizar
-con otro servidor.</property>
+                        <property name="label" translatable="yes">A partir de un fichero generado por un cliente
+geco, restaura todas las contraseñas. Si una
+contraseña existe, deja la más reciente.</property>
                       </widget>
                       <packing>
-                        <property name="pack_type">end</property>
-                        <property name="position">0</property>
+                        <property name="pack_type">GTK_PACK_END</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkHSeparator" id="hseparator2">
+                    <property name="visible">True</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="padding">15</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHBox" id="hbox10">
+                  <widget class="GtkHBox" id="hbox17">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkLabel" id="label11">
+                      <widget class="GtkButton" id="export">
                         <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Importar:</property>
-                      </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkFileChooserButton" id="filechooser_imp">
-                        <property name="width_request">220</property>
-                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">Exportar</property>
+                        <property name="response_id">0</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label20">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Genera un fichero con todas las contraseñas.
+Se puede utilizar como backup o para sincronizar
+con otro servidor.</property>
+                      </widget>
+                      <packing>
+                        <property name="pack_type">GTK_PACK_END</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
@@ -944,42 +874,6 @@ con otro servidor.</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="position">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHBox" id="hbox11">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkButton" id="import">
-                        <property name="label" translatable="yes">Importar</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                      </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label12">
-                        <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">A partir de un fichero generado por un cliente
-geco, restaura todas las contrase&#xF1;as. Si una
-contrase&#xF1;a existe, deja la m&#xE1;s reciente.</property>
-                      </widget>
-                      <packing>
-                        <property name="pack_type">end</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="position">3</property>
                   </packing>
                 </child>
               </widget>
@@ -993,9 +887,9 @@ contrase&#xF1;a existe, deja la m&#xE1;s reciente.</property>
                 <property name="label" translatable="yes">Exportar/Importar</property>
               </widget>
               <packing>
+                <property name="type">tab</property>
                 <property name="position">1</property>
                 <property name="tab_fill">False</property>
-                <property name="type">tab</property>
               </packing>
             </child>
             <child>
@@ -1015,26 +909,25 @@ contrase&#xF1;a existe, deja la m&#xE1;s reciente.</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area2">
             <property name="visible">True</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="button5">
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button6">
-                <property name="label" translatable="yes">gtk-apply</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-apply</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
               <packing>
                 <property name="position">1</property>
@@ -1043,8 +936,7 @@ contrase&#xF1;a existe, deja la m&#xE1;s reciente.</property>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>

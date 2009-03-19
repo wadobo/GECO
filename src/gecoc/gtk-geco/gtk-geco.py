@@ -85,13 +85,16 @@ class TrayIcon(gtk.StatusIcon):
         prefs = self.gladefile.get_widget('prefs_button')
         prefs.connect('clicked', self.on_config)
 
-        filechooser = self.gladefile.get_widget('file_exp_button')
-        filechooser.connect('clicked', self.chooser)
+        exp = self.gladefile.get_widget('export')
+        exp.connect('clicked', self.export_file)
+
+        imp = self.gladefile.get_widget('import')
+        imp.connect('clicked', self.import_file)
 
         # TODO conffile
         # TODO conectar en un thread
         server = 'https://localhost:4343'
-        user, password = 'dani', '123'
+        user, password = 'danigm', '123'
         self.gso = gecolib.GSO(xmlrpc_server=server)
         self.gso.auth(user, password)
 
@@ -102,14 +105,26 @@ class TrayIcon(gtk.StatusIcon):
 
         self.get_passwords()
 
-    def chooser(self, widget, *args):
-        exp = self.gladefile.get_widget('file_exp')
+    def export_file(self, widget, *args):
         dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
                 buttons=('Cancelar', 0, 'Seleccionar', 1))
         response = dialog.run()
         if response == 1:
             filename = dialog.get_filename()
-            exp.set_text(filename)
+            out = open(filename, 'w')
+            out.write(self.gso.export())
+
+        dialog.destroy()
+
+    def import_file(self, widget, *args):
+        dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                buttons=('Cancelar', 0, 'Seleccionar', 1))
+        response = dialog.run()
+        if response == 1:
+            filename = dialog.get_filename()
+            inp = open(filename).read()
+            self.gso.restore(inp)
+
         dialog.destroy()
 
     def forget(self, *args):
@@ -177,6 +192,7 @@ class TrayIcon(gtk.StatusIcon):
         button.connect('clicked', clicked, p)
         tooltip = '\t<b>%s</b>:\n\t%s' % (p['account'], p['description'])
         button.set_tooltip_markup(tooltip)
+        button.set_alignment(0, 0.5)
         hbox.add(button)
         
         exp = p['expiration']
@@ -209,7 +225,7 @@ class TrayIcon(gtk.StatusIcon):
 
         hbox.show_all()
 
-        vbox.add(hbox)
+        vbox.pack_start(hbox, False, False)
 
     def on_quit(self,widget):
         sys.exit()

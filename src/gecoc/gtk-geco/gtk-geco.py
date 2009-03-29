@@ -5,7 +5,9 @@
 
 import os,sys
 import gtk
-import gtk.glade
+gtk.gdk.threads_init()
+import threading
+
 import gobject
 import datetime
 from gecoc import gecolib
@@ -57,69 +59,74 @@ class TrayIcon(gtk.StatusIcon):
         self.connect('activate', self.on_click)
 
         popupfile = os.path.join(IMG, 'popup.glade')
-        self.gladefile = gtk.glade.XML(popupfile)
-        self.win = self.gladefile.get_widget('popup')
+        self.builder = gtk.Builder()
+        self.builder.add_from_file(popupfile)
+        self.win = self.builder.get_object('popup')
         self.win.show_all()
         self.win.hide()
         self.win_visible = False
         filename = os.path.join(IMG, 'lock.png')
         self.win.set_icon_from_file(filename)
 
-        self.hide = self.gladefile.get_widget('hide')
+        self.hide = self.builder.get_object('hide')
         remove_text(self.hide)
-        self.hide.set_relief(gtk.RELIEF_NONE)
         self.hide.connect('clicked', self.hide_win)
 
-        self.forget_button = self.gladefile.get_widget('forget')
+        self.forget_button = self.builder.get_object('forget')
         self.forget_button.connect('clicked', self.forget)
 
-        self.passwords = self.gladefile.get_widget('passwords')
-        self.viewport = self.gladefile.get_widget('viewport1')
+        self.passwords = self.builder.get_object('passwords')
+        self.viewport = self.builder.get_object('viewport1')
 
-        cipher = self.gladefile.get_widget('cipher')
+        cipher = self.builder.get_object('cipher')
         cipher.connect('clicked', self.cipher)
 
-        generate = self.gladefile.get_widget('generate')
+        generate = self.builder.get_object('generate')
         generate.connect('clicked', self.generate)
 
-        self.new_form = self.gladefile.get_widget('new')
+        self.new_form = self.builder.get_object('new')
 
-        self.pref_form = self.gladefile.get_widget('prefs')
-        prefs = self.gladefile.get_widget('prefs_button')
+        self.pref_form = self.builder.get_object('prefs')
+        prefs = self.builder.get_object('prefs_button')
         prefs.connect('clicked', self.on_config)
 
-        exp = self.gladefile.get_widget('export')
+        exp = self.builder.get_object('export')
         exp.connect('clicked', self.export_file)
 
-        imp = self.gladefile.get_widget('import')
+        imp = self.builder.get_object('import')
         imp.connect('clicked', self.import_file)
 
-        save = self.gladefile.get_widget('save_conf')
+        save = self.builder.get_object('save_conf')
         save.connect('clicked', self.save_conf)
 
-        register = self.gladefile.get_widget('register')
+        register = self.builder.get_object('register')
         register.connect('clicked', self.register)
 
-        del_user = self.gladefile.get_widget('del_user')
+        del_user = self.builder.get_object('del_user')
         del_user.connect('clicked', self.del_user)
 
-        refresh = self.gladefile.get_widget('refresh')
+        refresh = self.builder.get_object('refresh')
+        remove_text(refresh)
         refresh.connect('clicked', self.get_passwords)
+
+        add_button = self.builder.get_object('add_button')
+        remove_text(add_button)
+        add_button.connect('clicked', self.on_add)
         
         self.master = ''
         self.auth()
 
     def __get_config_form(self):
-        server = self.gladefile.get_widget('pref_server').get_text()
-        user = self.gladefile.get_widget('pref_user').get_text()
-        password = self.gladefile.get_widget('pref_pass').get_text()
+        server = self.builder.get_object('pref_server').get_text()
+        user = self.builder.get_object('pref_user').get_text()
+        password = self.builder.get_object('pref_pass').get_text()
         
         return server, user, password
 
     def __set_config_form(self):
-        server = self.gladefile.get_widget('pref_server')
-        user = self.gladefile.get_widget('pref_user')
-        password = self.gladefile.get_widget('pref_pass')
+        server = self.builder.get_object('pref_server')
+        user = self.builder.get_object('pref_user')
+        password = self.builder.get_object('pref_pass')
 
         s, u, p = self.get_opts()
 
@@ -142,14 +149,19 @@ class TrayIcon(gtk.StatusIcon):
             f.close()
 
             master = self.get_master()
+            if not master:
+                return '', '', ''
             aes = gecolib.AES()
             to_read = aes.decrypt(to_read, master)
 
             all = [i for i in to_read.split('\n') if i]
             values = {}
             for opt in all:
-                key, value = map(str.strip, opt.split('='))
-                values[key] = value
+                try:
+                    key, value = map(str.strip, opt.split('='))
+                    values[key] = value
+                except:
+                    return '', '', ''
             
             return values['server'], values['user'], values['passwd']
         else:
@@ -163,6 +175,13 @@ class TrayIcon(gtk.StatusIcon):
                 self.message('No encuentro el fichero de configuración, o está erroneo.\n'\
                         'Configúralo en Preferencias', type='info')
                 return
+
+        self.set_blinking(True)
+        t = threading.Thread(target=self.remote_auth,
+                args=(server, user, password))
+        t.start()
+
+    def remote_auth(self, server, user, password):
         try:
             self.gso = gecolib.GSO(xmlrpc_server=server)
             self.gso.auth(user, password)
@@ -170,9 +189,14 @@ class TrayIcon(gtk.StatusIcon):
             self.message('Error en el login: %s' % str(e))
             return
 
-        self.statusbar = self.gladefile.get_widget('statusbar')
-        self.statusbar.push(0, server)
-        self.get_passwords()
+        try:
+            gtk.gdk.threads_enter()
+            self.statusbar = self.builder.get_object('statusbar')
+            self.statusbar.push(0, server)
+            self.get_passwords()
+            self.set_blinking(False)
+        finally:
+            gtk.gdk.threads_leave()
 
     def del_user(self, widget, *args):
         server, user, passwd = self.__get_config_form()
@@ -213,9 +237,9 @@ class TrayIcon(gtk.StatusIcon):
 
     def export_file(self, widget, *args):
         dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                buttons=('Cancelar', 0, 'Seleccionar', 1))
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         response = dialog.run()
-        if response == 1:
+        if response == gtk.RESPONSE_OK:
             filename = dialog.get_filename()
             try:
                 out = open(filename, 'w')
@@ -228,9 +252,9 @@ class TrayIcon(gtk.StatusIcon):
 
     def import_file(self, widget, *args):
         dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                buttons=('Cancelar', 0, 'Seleccionar', 1))
+                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         response = dialog.run()
-        if response == 1:
+        if response == gtk.RESPONSE_OK:
             filename = dialog.get_filename()
             try:
                 inp = open(filename).read()
@@ -378,19 +402,18 @@ class TrayIcon(gtk.StatusIcon):
         # Refresh
         server, user, passwd = self.__get_config_form()
         self.auth(server, user, passwd)
-        self.get_passwords()
 
     def on_add(self, data, p=None):
         # hide window
         self.hide_win()
 
         self.new_form.show()
-        name = self.gladefile.get_widget('name')
-        account = self.gladefile.get_widget('account')
-        type = self.gladefile.get_widget('type')
-        exp = self.gladefile.get_widget('expiration')
-        desc = self.gladefile.get_widget('desc')
-        password = self.gladefile.get_widget('password')
+        name = self.builder.get_object('name')
+        account = self.builder.get_object('account')
+        type = self.builder.get_object('type')
+        exp = self.builder.get_object('expiration')
+        desc = self.builder.get_object('desc')
+        password = self.builder.get_object('password')
 
         if p:
             # EDIT, not new
@@ -404,6 +427,15 @@ class TrayIcon(gtk.StatusIcon):
             exp.set_text(str(days))
             desc.get_buffer().set_text(p['description'])
             password.set_text(p['password'])
+        else:
+            # new
+            name.set_text('')
+            name.editable = True
+            account.set_text('')
+            type.set_text('')
+            exp.set_text('180')
+            desc.get_buffer().set_text('')
+            password.set_text('')
 
         response = self.new_form.run()
 
@@ -429,14 +461,14 @@ class TrayIcon(gtk.StatusIcon):
 
     def generate(self, button):
         master = self.get_master()
-        length = self.gladefile.get_widget('length').get_text()
+        length = self.builder.get_object('length').get_text()
         length = int(length)
-        lower = self.gladefile.get_widget('low').get_active()
-        upper = self.gladefile.get_widget('up').get_active()
-        digits = self.gladefile.get_widget('digits').get_active()
-        other = self.gladefile.get_widget('other').get_active()
+        lower = self.builder.get_object('low').get_active()
+        upper = self.builder.get_object('up').get_active()
+        digits = self.builder.get_object('digits').get_active()
+        other = self.builder.get_object('other').get_active()
 
-        clear = self.gladefile.get_widget('clear')
+        clear = self.builder.get_object('clear')
 
         new_pass = gecolib.generate(length, lower, upper, digits,
                 other)
@@ -446,7 +478,7 @@ class TrayIcon(gtk.StatusIcon):
         self.cipher_pass(new_pass)
 
     def strength(self, password):
-        bar = self.gladefile.get_widget('strength')
+        bar = self.builder.get_object('strength')
         strength = gecolib.strength(password)
 
         text_strength = ('Mala', 'Buena', 'Fuerte', 'Perfecta')
@@ -457,21 +489,21 @@ class TrayIcon(gtk.StatusIcon):
 
     def cipher_pass(self, new_pass):
         master = self.get_master()
-        password = self.gladefile.get_widget('password')
+        password = self.builder.get_object('password')
 
         aes = gecolib.AES()
         cipher = aes.encrypt(new_pass, master)
         password.set_text(cipher)
 
     def cipher(self, button):
-        p1 = self.gladefile.get_widget('p1').get_text()
-        p2 = self.gladefile.get_widget('p2').get_text()
+        p1 = self.builder.get_object('p1').get_text()
+        p2 = self.builder.get_object('p2').get_text()
         self.strength(p1)
 
         if p1 == p2:
             self.cipher_pass(p1)
         else:
-            bar = self.gladefile.get_widget('strength')
+            bar = self.builder.get_object('strength')
             bar.set_text("Las contraseñas no coinciden")
             bar.set_fraction(0)
 

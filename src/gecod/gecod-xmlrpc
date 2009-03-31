@@ -1,0 +1,5 @@
+#!/usr/bin/python
+
+from gecod import xmlrpc_frontend
+
+xmlrpc_frontend.main('/etc/geco/gecod-xmlrpc.conf')

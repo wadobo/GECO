@@ -111,16 +111,14 @@ class frontend:
 def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())
 
-def main():
-    import sys
-    CONFIG = 'gecod-xmlrpc.conf'
+def main(config='gecod-xmlrpc.conf'):
     if len(sys.argv) > 1:
-        CONFIG = sys.argv[1]
-    parseconfig(CONFIG)
+    parseconfig(config)
 
     backend.DATABASE = DATABASE
     sxmlrpc.KEYFILE = KEYFILE
     sxmlrpc.CERTFILE = CERTFILE
+
     try:
         start_server()
     except KeyboardInterrupt:

@@ -113,7 +113,7 @@ def start_server():
 
 def main(config='gecod-xmlrpc.conf'):
     if len(sys.argv) > 1:
-    parseconfig(config)
+        parseconfig(config)
 
     backend.DATABASE = DATABASE
     sxmlrpc.KEYFILE = KEYFILE

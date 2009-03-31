@@ -10,6 +10,28 @@ import secure_xmlrpc as sxmlrpc
 
 HOST = 'localhost'
 PORT = 4343
+DATABASE = 'sqlite:///database.sqlite'
+KEYFILE='certs/key.pem'
+CERTFILE='certs/cert.pem'
+
+def parseconfig(configfile):
+    global HOST, PORT, DATABASE, KEYFILE, CERTFILE
+    options = open(configfile).readlines()
+    for opt in options:
+        k, v = opt.split('=')
+        k = k.strip()
+        v = v.strip()
+
+        if k == 'host':
+            HOST = v
+        elif k == 'port':
+            PORT = int(v)
+        elif k == 'database':
+            DATABASE = v
+        elif k == 'keyfile':
+            KEYFILE = v
+        elif k == 'certfile':
+            CERTFILE = v
 
 class frontend:
     def __init__(self):
@@ -89,8 +111,20 @@ class frontend:
 def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())
 
-if __name__ == '__main__':
+def main():
+    import sys
+    CONFIG = 'gecod-xmlrpc.conf'
+    if len(sys.argv) > 1:
+        CONFIG = sys.argv[1]
+    parseconfig(CONFIG)
+
+    backend.DATABASE = DATABASE
+    sxmlrpc.KEYFILE = KEYFILE
+    sxmlrpc.CERTFILE = CERTFILE
     try:
         start_server()
     except KeyboardInterrupt:
         print "Closing"
+
+if __name__ == '__main__':
+    main()

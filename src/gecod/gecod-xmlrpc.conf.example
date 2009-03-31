@@ -1,0 +1,5 @@
+host = localhost
+port = 4343
+database = sqlite:///database.sqlite
+KEYFILE = certs/key.pem
+CERTFILE = certs/cert.pem

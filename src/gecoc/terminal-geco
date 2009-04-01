@@ -6,7 +6,7 @@
 Terminal GECO client
 '''
 
-import gecolib
+from gecoc import gecolib
 import sys
 import os
 import types

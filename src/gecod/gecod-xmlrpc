@@ -1,5 +1,30 @@
 #!/usr/bin/python
 
+import os
+import sys
 from gecod import xmlrpc_frontend
 
-xmlrpc_frontend.main('/etc/gecod-xmlrpc.conf')
+if os.getpid():
+    print "Ejecutalo como root si tienes la base de datos con sqlite"
+
+daemon = False
+for i in sys.argv:
+    if i == '-d':
+        daemon = True
+
+if daemon:
+    pid = os.fork()
+    if not pid:
+        os.chdir('/')
+        os.setsid()
+        xmlrpc_frontend.main('/etc/gecod-xmlrpc.conf')
+    else:
+        try:
+            open('/var/run/gecod-xmlrpc.pid', 'w').write(str(pid)+'\n')
+        except:
+            print "pid: ", pid
+
+else:
+    print "Para ejecutarlo como demonio usa la opcion -d"
+    xmlrpc_frontend.main('/etc/gecod-xmlrpc.conf')
+

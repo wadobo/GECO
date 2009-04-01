@@ -2,4 +2,4 @@
 
 from gecod import xmlrpc_frontend
 
-xmlrpc_frontend.main('/etc/geco/gecod-xmlrpc.conf')
+xmlrpc_frontend.main('/etc/gecod-xmlrpc.conf')

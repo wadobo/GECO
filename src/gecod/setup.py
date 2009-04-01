@@ -36,7 +36,7 @@ conf.write(conffile)
 conf.close()
 
 if not os.path.exists('/etc/gecod-xmlrpc.conf'):
-    datafiles.append(('/etc/gecod-xmlrpc.conf', ['gecod-xmlrpc.conf']))
+    datafiles.append(('/etc', ['gecod-xmlrpc.conf']))
 
 setup(name = 'gecod-xmlrpc',
       version = '1.0',

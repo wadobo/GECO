@@ -112,8 +112,7 @@ def start_server():
     sxmlrpc.EasyServer(HOST, PORT, frontend())
 
 def main(config='gecod-xmlrpc.conf'):
-    if len(sys.argv) > 1:
-        parseconfig(config)
+    parseconfig(config)
 
     backend.DATABASE = DATABASE
     sxmlrpc.KEYFILE = KEYFILE

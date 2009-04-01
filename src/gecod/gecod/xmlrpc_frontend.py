@@ -19,7 +19,7 @@ def parseconfig(configfile):
     options = open(configfile).readlines()
     for opt in options:
         k, v = opt.split('=')
-        k = k.strip()
+        k = k.strip().lower()
         v = v.strip()
 
         if k == 'host':

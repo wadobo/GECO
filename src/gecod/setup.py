@@ -26,7 +26,7 @@ if not response or response.lower() in ['Yy']:
 
 conffile = '''host = localhost
 port = 4343
-database = sqlite://%(path)s/database.sqlite
+database = sqlite:///%(path)s/database.sqlite
 KEYFILE = %(path)s/certs/key.pem
 CERTFILE = %(path)s/certs/cert.pem
 ''' % {'path': prefix+'/share/gecod'}
@@ -37,6 +37,8 @@ conf.close()
 
 if not os.path.exists('/etc/gecod-xmlrpc.conf'):
     datafiles.append(('/etc', ['gecod-xmlrpc.conf']))
+
+# TODO Anadir un demonio en /etc/init.d
 
 setup(name = 'gecod-xmlrpc',
       version = '1.0',
@@ -49,3 +51,4 @@ setup(name = 'gecod-xmlrpc',
       scripts = ['gecod-xmlrpc'],
       packages = ['gecod']
       )
+

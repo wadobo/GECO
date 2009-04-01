@@ -3,7 +3,7 @@
 # License: GPLv3
 # Author: Daniel Garcia <dani@danigm.net>
 
-import os,sys
+import os, sys
 import gtk
 gtk.gdk.threads_init()
 import threading
@@ -12,7 +12,7 @@ import gobject
 import datetime
 from gecoc import gecolib
 
-__version__ = '0.1'
+__version__ = '1.0'
 IMG = 'glade'
 SECONDS = 600
 CONFFILE = 'geco.conf'
@@ -559,6 +559,9 @@ class TrayIcon(gtk.StatusIcon):
 
         dialog.destroy()
 
-if __name__ == '__main__':
+def main():
     t = TrayIcon()
     gtk.main()
+
+if __name__ == '__main__':
+    main()

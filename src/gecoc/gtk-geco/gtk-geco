@@ -1,0 +1,9 @@
+#!/usr/bin/python
+
+import os
+import gtkgeco
+
+gtkgeco.IMG = '/usr/share/gtk-geco'
+gtkgeco.SECONDS = 600
+gtkgeco.CONFFILE = os.path.expanduser('~') + '/.geco.conf'
+gtkgeco.main()

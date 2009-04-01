@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=gtk-geco
+Icon=geco
+Type=Application
+Terminal=false
+Name=gtk-GECO
+GenericName=gtk-GECO
+StartupNotify=true
+Categories=Application;Network;

@@ -1,0 +1,33 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+def main():
+    path = '/usr/share/web-geco'
+    sys.path += [path]
+    os.chdir(path)
+    import index
+    index.app.run()
+
+daemon = False
+for i in sys.argv:
+    if i == '-d':
+        daemon = True
+
+if daemon:
+    pid = os.fork()
+    if not pid:
+        os.chdir('/')
+        os.setsid()
+        main()
+    else:
+        try:
+            open('/var/run/web-geco.pid', 'w').write(str(pid)+'\n')
+        except:
+            print "pid: ", pid
+
+else:
+    print "Para ejecutarlo como demonio usa la opcion -d"
+    main()
+

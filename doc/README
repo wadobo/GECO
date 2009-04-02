@@ -3,7 +3,7 @@
 #      GECO (Gestor de Contraseñas)                      #
 #      Autor: Daniel García Moreno (danigm)              #
 #             <dani@danigm.net>                          #
-#      fecha: Thu, 19 Mar 2009 21:01:38 +0100            #
+#      fecha: Thu, 02 Apr 2009 12:16:31 +0200            #
 #                                                        #
 ##########################################################
 
@@ -28,15 +28,50 @@ cifran en cliente con una contraseña maestra que nunca es almacenada.
 # Instalación:
 --------------------------------------------------
 
-De momento no existe ningún instalable, tan solo hay que descargar el
-código, ya sea de la forja o a través de este enlace
-bzr.danigm.net/geco/tgz
+Hay que descargar el código, ya sea de la forja o a través de este
+enlace bzr.danigm.net/geco/tgz
+
+Hay un instalador en el directorio raiz llamado install.sh. Basandose
+en distutils de python instala los diferentes módulos seleccionados.
+
+Esta es la ayuda del instalador:
+Ayuda del instalador install.sh
+   Con este instalador puedes instalar:
+     gecod
+     gecoc
+     gtk-geco
+     web-geco
+
+ Usalo pasando como argumento el nombre de lo que quieras instalar
+ por ejemplo:
+    sudo ./install.sh gecod
+
+Se debe ejecutar con permisos de administración porque pone ficheros
+en /etc y /usr/
 
 La aplicación consta de dos partes independientes, el servidor y los
 diferentes clientes:
 
 - servidor:
 -----------
+
+    -forma automática:
+----------------------
+    sudo ./install.sh gecod
+
+    Esto preguntará si generar la base de datos (sqlite) y la
+    generación de certificado. El certificado es necesario para que la
+    conexión vaya a través de ssl, aunque no es necesario que esté
+    firmado.
+
+    Cuando se instala se ponen los ficheros en /usr/share/gecod, y los
+    módulos en /usr/lib/pythonX.X/site-packages/gecod y la
+    configuración en /etc/gecod-xmlrpc.conf
+
+    Se lanza con el comando gecod-xmlrpc. 
+
+    -forma manual:
+------------------
     Una vez descargado el código se puede acceder a la parte del
     servidor en src/gecod.
     Lo primero que hay que hacer es generar un certificado en el
@@ -84,15 +119,35 @@ diferentes clientes:
     # terminal-geco
     ---------------
 
+    -forma automática:
+----------------------
+    sudo ./install.sh gecoc
+    Esto instala el módulo gecoc y el script terminal-geco.
+
+    Se lanza con el comando terminal-geco.
+
+    -forma manual:
+------------------
     El cliente de terminal es muy simple, se ejecuta con "python
-    terminal-geco.py" y ofrece una interfaz interactiva para
-    registrarse en un servidor, añadir contraseñas, etc. Si quieres
-    conectarte a un servidor local la ruta por defecto es
-    https://localhost:4343
+    terminal-geco" y ofrece una interfaz interactiva para registrarse
+    en un servidor, añadir contraseñas, etc. Si quieres conectarte a
+    un servidor local la ruta por defecto es https://localhost:4343
 
     # gtk-geco
     ----------
+
+    -forma automática:
+----------------------
+    sudo ./install.sh gtk-geco
+
+    Esto instala el módulo gecoc además de gtk-geco. Se añaden fichero
+    en /usr/share/gtk-geco, el módulo
+    /usr/lib/pythonX.X/site-packages/gtkgeco.py y el script gtk-geco
+
+    Se lanza con el comando gtk-geco.
         
+    -forma manual:
+------------------
     El cliente gtk se encuentra en src/gecoc/gtk-geco. Para lanzarlo
     tan solo hay que entrar en el directorio y ejecutar el comando
     desde allí:
@@ -120,12 +175,33 @@ diferentes clientes:
     # web-geco
     ----------
      
+    -forma automática:
+----------------------
+    sudo ./install.sh web-geco
+
+    Esto instala el módulo gecoc además de gtk-geco. Se añaden fichero
+    en /usr/share/web-geco y el script web-geco
+
+    Se lanza con el comando web-geco y se puede entrar en la ruta
+    http://localhost:8080 Por defecto trata de conectarse a un
+    servidor en local https://localhost:4343, por lo tanto habrá que
+    lanzar el gecod-xmlrpc antes para que funcione correctamente.
+
+    Para cambiar el servidor al que se conecta hay que modificar el
+    fichero /usr/share/web-geco/index.py y cambiar:
+    
+    web.SERVER = 'https://localhost:4343'
+
+    por el servidor que quieras. Tengo intención de crear una interfaz
+    web de administración para cambiar esto.
+
+    -forma manual:
+------------------
     El cliente web se encuentra en src/gecoc/web-geco. Antes de
     lanzarlo es necesario crear un enlace a gecoc ya que hace uso de
     gecolib:
         
         $cd src/gecoc/web-geco
-        $ln -s ../../gecoc
 
     Para especificar a qué servidor se conecta el cliente web hay que
     modificar el fichero index.py y cambiar la variable web.SERVER.

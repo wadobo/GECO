@@ -1,7 +1,4 @@
 from distutils.core import setup
-import os
-import sys
-import shutil
 
 setup(name = 'gecoc',
       version = '1.0',

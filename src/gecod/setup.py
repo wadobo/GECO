@@ -11,13 +11,13 @@ for arg in sys.argv:
         opt, prefix = arg.split('=')
 
 response = raw_input('Crear base de datos [Y/n]: ')
-if not response or response.lower() in ['Yy']:
+if not response or response.lower() in 'Yy':
     from gecod import database
     database.create()
     datafiles.append(('share/gecod/', ['database.sqlite']))
 
 response = raw_input('Generar certificados [Y/n]: ')
-if not response or response.lower() in ['Yy']:
+if not response or response.lower() in 'Yy':
     os.chdir('certs')
     os.popen('bash generate-pem.sh')
     os.chdir('..')

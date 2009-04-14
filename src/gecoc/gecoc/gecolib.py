@@ -10,13 +10,6 @@ LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
                     string.digits,
                     '.:;,!?{}[]<>=-_()+#@$%&')
 
-#################################
-#                               #
-# TODO                          #
-# * Change master password      #
-#                               #
-#################################
-
 class GecoClient:
     '''
     Provides a simple object to interact with a GECO server.
@@ -71,6 +64,18 @@ class GecoClient:
         def new_funct(*args, **kwargs):
             return f(self.cookie, *args, **kwargs)
         return new_funct
+
+    def change_master(self, old, new):
+        '''
+        Change the master password of all passwords
+        '''
+
+        passwords = self.get_all_passwords()
+        for p in passwords:
+            method = cypher_methods[p.get('cypher_method', '')]
+            d = method.decrypt(p['password'], old)
+            c = method.encrypt(d, new)
+            self.change_attr(p['name'], {'password': c})
 
     def __repr__(self):
         auth = '< Authenticated >' if self.cookie else ''

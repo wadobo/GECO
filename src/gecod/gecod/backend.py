@@ -386,6 +386,7 @@ def register(name, password, session=None):
 
     try:
         new_user = db.User(name, password)
+        # TODO FIX save deprecated use add
         session.save(new_user)
         session.commit()
     except db.IntegrityError:
@@ -426,5 +427,31 @@ def change_password(cookie, new_password, session=None):
 
     user = user_by_cookie(cookie, session)
     user.set_password(new_password)
+    session.commit()
+
+@session_decorator
+def change_attr(cookie, name, session=None, **kwargs):
+    '''
+    def change_attr(cookie, name, **kwargs):
+
+    Changes all attrs of the password named name.
+    example:
+        change_attr('asdfsadf', 'mypassword', password='asdfasdfxcv',
+                account='newaccount')
+    '''
+
+    user = user_by_cookie(cookie, session)
+    try:
+        password = session.query(db.Password)\
+                .filter(db.Password.user_id == user.id)
+
+        password = password.filter_by(name=name).first()
+
+    except db.InvalidRequestError:
+        raise NotFoundError("Can't found password by name %s" % name)
+
+    for key, value in kwargs.items():
+        setattr(password, key, value)
+
     session.commit()
 

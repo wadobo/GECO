@@ -14,7 +14,6 @@ LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
 #                               #
 # TODO                          #
 # * Change master password      #
-# * Change password attributes  #
 #                               #
 #################################
 
@@ -94,6 +93,7 @@ def get_server_object(method='xmlrpc', **kwargs):
         def change_password(self, cookie, new_password)
         def check_user_name(self, name) -> bool
         def set_password(self, cookie, name, password, args)
+        def change_attr(self, cookie, name, args)
         def del_password(self, cookie, name)
         def get_password(self, cookie, name) -> password
         def get_passwords(self, cookie, args) -> [password]

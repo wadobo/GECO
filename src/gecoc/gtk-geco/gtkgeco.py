@@ -212,7 +212,7 @@ class TrayIcon(gtk.StatusIcon):
     def register(self, widget, *args):
         server, user, passwd = self.__get_config_form()
         gso = gecolib.GSO(xmlrpc_server=server)
-        gso.auth(uer, passwd)
+        gso.auth(user, passwd)
 
         try:
             gso.register(user, passwd)

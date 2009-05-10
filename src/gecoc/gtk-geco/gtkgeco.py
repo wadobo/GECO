@@ -319,11 +319,16 @@ class TrayIcon(gtk.StatusIcon):
             self.add_new(p)
 
     def add_new(self, p):
-        def clicked(button, p):
+        def clicked(button, event, p):
+            if event.button == 3:
+                password = p['account']
+            else:
+                master_password = self.get_master()
+                password = self.gso.get_password(p['name'], master_password)
+                password = password['password']
+                
             clipboard = gtk.clipboard_get()
-            master_password = self.get_master()
-            password = self.gso.get_password(p['name'], master_password)
-            clipboard.set_text(password['password'])
+            clipboard.set_text(password)
             clipboard.store()
             self.hide_win()
 
@@ -333,7 +338,7 @@ class TrayIcon(gtk.StatusIcon):
         # PASSWORD 
         button = gtk.Button(p['name'])
         button.set_relief(gtk.RELIEF_NONE)
-        button.connect('clicked', clicked, p)
+        button.connect('button_press_event', clicked, p)
         tooltip = '\t<b>%s</b>:\n\t%s' % (p['account'], p['description'])
         button.set_tooltip_markup(tooltip)
         button.set_alignment(0, 0.5)

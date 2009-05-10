@@ -1400,6 +1400,14 @@
        y1="16.830494"
        x2="22.697027"
        y2="15.894469" />
+    <filter
+       inkscape:collect="always"
+       id="filter3944">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="9.2003165"
+         id="feGaussianBlur3946" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1409,7 +1417,7 @@
      gridtolerance="10000"
      guidetolerance="10"
      objecttolerance="10"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.075560803"
      inkscape:cx="1070"
@@ -2926,8 +2934,36 @@
            x="46.449436"
            y="5012.2568">probable que no funcione :P</tspan></text>
     </g>
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.53640926;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:12.29127473, 6.14563737;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3948"
+       width="1813.3386"
+       height="2058.97"
+       x="1266.1096"
+       y="-105.61289"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="50.779999"
+       inkscape:export-ydpi="50.779999" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.45899998999999991;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:11.67200000000000060, 5.83600000000000030;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3944)"
+       id="rect3170"
+       width="1721.9764"
+       height="1955.2322"
+       x="1313.7904"
+       y="-51.744061" />
+    <rect
+       y="-53.744061"
+       x="1311.7904"
+       height="1955.2322"
+       width="1721.9764"
+       id="rect3942"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.45899998999999991;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:11.67200000000000060, 5.83600000000000030;stroke-dashoffset:0;stroke-opacity:1" />
     <g
-       id="g3567">
+       id="g3567"
+       transform="translate(26.46875,-580)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          transform="translate(1340,580)"
          id="g2712">
@@ -3040,7 +3076,7 @@
          id="path3643" />
       <path
          id="path3645"
-         d="M 2033.8125 1041.3125 C 2033.1846 1041.3526 2032.537 1041.4534 2031.9062 1041.625 C 2027.9877 1042.6908 2025.3562 1046.0862 2025 1049.9062 L 2003 1055.875 L 1998.2188 1041.4062 L 1991.5938 1043.5938 L 1998.5938 1064.8125 L 2005.2188 1062.625 L 2005.125 1062.375 L 2026.8438 1056.5 C 2029.1095 1059.4918 2033.0337 1060.9513 2036.875 1059.9062 C 2041.921 1058.5337 2044.9036 1053.3271 2043.5312 1048.2812 C 2042.3302 1043.8662 2038.2077 1041.032 2033.8125 1041.3125 z "
+         d="M 2033.8125,1041.3125 C 2033.1846,1041.3526 2032.537,1041.4534 2031.9062,1041.625 C 2027.9877,1042.6908 2025.3562,1046.0862 2025,1049.9062 L 2003,1055.875 L 1998.2188,1041.4062 L 1991.5938,1043.5938 L 1998.5938,1064.8125 L 2005.2188,1062.625 L 2005.125,1062.375 L 2026.8438,1056.5 C 2029.1095,1059.4918 2033.0337,1060.9513 2036.875,1059.9062 C 2041.921,1058.5337 2044.9036,1053.3271 2043.5312,1048.2812 C 2042.3302,1043.8662 2038.2077,1041.032 2033.8125,1041.3125 z"
          style="fill:#f57900;fill-opacity:1;stroke:#000000;stroke-width:3.00000024;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       <rect
          y="1102.3392"
@@ -3135,7 +3171,7 @@
       </g>
       <path
          id="path10903"
-         d="M 1783.4688 973.875 C 1776.8113 973.875 1771.4063 979.3635 1771.4062 986.125 C 1771.4062 991.18116 1774.4421 995.5055 1778.75 997.375 L 1769.9062 1021 L 1791.375 1027.7812 L 1786.875 998 L 1786.5312 997.9375 C 1791.7062 996.55926 1795.5312 991.81118 1795.5312 986.125 C 1795.5312 979.3635 1790.1262 973.87498 1783.4688 973.875 z "
+         d="M 1783.4688,973.875 C 1776.8113,973.875 1771.4063,979.3635 1771.4062,986.125 C 1771.4062,991.18116 1774.4421,995.5055 1778.75,997.375 L 1769.9062,1021 L 1791.375,1027.7812 L 1786.875,998 L 1786.5312,997.9375 C 1791.7062,996.55926 1795.5312,991.81118 1795.5312,986.125 C 1795.5312,979.3635 1790.1262,973.87498 1783.4688,973.875 z"
          style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       <g
          id="g3474"
@@ -3176,7 +3212,11 @@
       </g>
     </g>
     <g
-       id="g5393">
+       id="g5393"
+       transform="translate(847,-1195.6274)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          id="g3617"
          transform="translate(1340,1195.6274)">
@@ -3433,7 +3473,11 @@
          style="fill:#729fcf;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     </g>
     <g
-       id="g5453">
+       id="g5453"
+       transform="translate(26.46875,-1193.9661)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          transform="translate(1340,1815.6274)"
          id="g5089">
@@ -3588,7 +3632,7 @@
            sodipodi:role="line">mejor llaves diferentes para</tspan><tspan
            id="tspan5265"
            y="2037.8148"
-           x="1673.8086"
+           x="1668.4375"
            sodipodi:role="line">cada cosa.</tspan></text>
       <path
          id="path5150"
@@ -3684,7 +3728,7 @@
          id="g5386">
         <path
            sodipodi:nodetypes="csccccccccccccccccsccsssc"
-           style="fill:#73d216;fill-opacity:1;fill-rule:evenodd;stroke:#888a85;stroke-width:0.99999981999999998;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:#73d216;fill-opacity:1;fill-rule:evenodd;stroke:#888a85;stroke-width:0.99999982;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 2026.1922,2285.4642 C 2028.4638,2292.8897 2036.2874,2297.0749 2043.6859,2294.8116 C 2049.0258,2293.178 2052.7993,2288.6987 2053.565,2283.501 L 2056.4071,2282.6316 L 2058.3798,2278.9199 L 2062.0915,2280.8926 L 2063.9863,2280.313 L 2064.7217,2275.9438 L 2066.6165,2275.3642 L 2069.6706,2278.5741 L 2071.5654,2277.9944 L 2073.5381,2274.2828 L 2077.2497,2276.2555 L 2079.1445,2275.6759 L 2081.4849,2269.7796 L 2080.0358,2265.0427 L 2076.614,2264.0174 L 2050.0871,2272.1324 C 2046.5416,2268.3011 2040.7607,2266.6971 2035.4525,2268.321 C 2028.0539,2270.5843 2023.9207,2278.0388 2026.1922,2285.4642 z M 2030.0361,2284.4826 C 2029.3962,2282.3908 2030.5746,2280.1737 2032.6664,2279.5338 C 2034.7582,2278.8938 2036.9753,2280.0722 2037.6152,2282.164 C 2038.2552,2284.2559 2037.0768,2286.4729 2034.985,2287.1129 C 2032.8931,2287.7528 2030.6761,2286.5744 2030.0361,2284.4826 z"
            id="path5319" />
         <path
@@ -3723,7 +3767,7 @@
         <path
            id="path5339"
            d="M 2020.411,2291.7563 C 2017.952,2299.1217 2021.8947,2307.0703 2029.2335,2309.5205 C 2034.5302,2311.2889 2040.2027,2309.8308 2043.8426,2306.0421 L 2046.6618,2306.9834 L 2050.4222,2305.1054 L 2052.3002,2308.8659 L 2054.1797,2309.4934 L 2057.3141,2306.3619 L 2059.1936,2306.9894 L 2059.8181,2311.3758 L 2061.6975,2312.0033 L 2065.458,2310.1254 L 2067.3359,2313.8858 L 2069.2154,2314.5133 L 2074.5431,2311.0696 L 2076.1118,2306.371 L 2073.9201,2303.5503 L 2047.6076,2294.7653 C 2046.9434,2289.5876 2043.1663,2284.9266 2037.901,2283.1687 C 2030.5622,2280.7185 2022.8701,2284.3909 2020.411,2291.7563 z M 2024.1112,2293.1875 C 2024.8039,2291.1126 2027.0502,2289.9908 2029.1251,2290.6836 C 2031.2,2291.3763 2032.3218,2293.6226 2031.629,2295.6975 C 2030.9363,2297.7724 2028.69,2298.8942 2026.6151,2298.2014 C 2024.5402,2297.5087 2023.4184,2295.2624 2024.1112,2293.1875 z"
-           style="fill:#729fcf;fill-opacity:1;fill-rule:evenodd;stroke:#888a85;stroke-width:0.99999981999999998;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:#729fcf;fill-opacity:1;fill-rule:evenodd;stroke:#888a85;stroke-width:0.99999982;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            sodipodi:nodetypes="csccccccccccccccccsccsssc" />
         <path
            id="path5341"
@@ -3769,7 +3813,11 @@
          id="tspan5557"
          sodipodi:role="line" /></text>
     <g
-       id="g5963">
+       id="g5963"
+       transform="translate(847,-1813.9661)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          id="g5515"
          transform="translate(1340,2435.6274)">
@@ -4156,7 +4204,11 @@
          style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     </g>
     <g
-       id="g6387">
+       id="g6387"
+       transform="translate(26.46875,-1811.24)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          transform="translate(1340,3055.6274)"
          id="g6036">
@@ -4323,7 +4375,11 @@
          style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     </g>
     <g
-       id="g6790">
+       id="g6790"
+       transform="translate(847,-2451.24)"
+       inkscape:export-filename="/tmp/comic.png"
+       inkscape:export-xdpi="56.869999"
+       inkscape:export-ydpi="56.869999">
       <g
          id="g6420"
          transform="translate(1340,3695.6274)">
@@ -4427,7 +4483,7 @@
          style="fill:#babdb6;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       <path
          id="path6770"
-         d="M 2020.4688 4152.5 C 2020.2811 4152.4894 2020.1016 4152.5025 2019.9062 4152.5312 L 2019.4375 4152.5938 C 2017.8748 4152.8236 2016.754 4154.2716 2016.9062 4155.8438 L 2017.7188 4164.4375 C 2016.7327 4165.4468 2015.9619 4166.6686 2015.5 4168.0312 L 1998.2812 4168.5625 L 1996.4375 4155.6875 L 1990.875 4156.5 L 1992.875 4170.5312 L 1993.2812 4175.5625 L 2015.7812 4174.875 C 2017.2921 4178.3101 2020.7711 4180.6577 2024.75 4180.5312 C 2029.9768 4180.3653 2034.072 4175.9765 2033.9062 4170.75 C 2033.7609 4166.1768 2030.4032 4162.4644 2026.0625 4161.7188 C 2025.4424 4161.6123 2024.8097 4161.5729 2024.1562 4161.5938 C 2023.9769 4161.5994 2023.8015 4161.6095 2023.625 4161.625 L 2023 4154.9375 C 2022.8669 4153.5618 2021.782 4152.5743 2020.4688 4152.5 z "
+         d="M 2020.4688,4152.5 C 2020.2811,4152.4894 2020.1016,4152.5025 2019.9062,4152.5312 L 2019.4375,4152.5938 C 2017.8748,4152.8236 2016.754,4154.2716 2016.9062,4155.8438 L 2017.7188,4164.4375 C 2016.7327,4165.4468 2015.9619,4166.6686 2015.5,4168.0312 L 1998.2812,4168.5625 L 1996.4375,4155.6875 L 1990.875,4156.5 L 1992.875,4170.5312 L 1993.2812,4175.5625 L 2015.7812,4174.875 C 2017.2921,4178.3101 2020.7711,4180.6577 2024.75,4180.5312 C 2029.9768,4180.3653 2034.072,4175.9765 2033.9062,4170.75 C 2033.7609,4166.1768 2030.4032,4162.4644 2026.0625,4161.7188 C 2025.4424,4161.6123 2024.8097,4161.5729 2024.1562,4161.5938 C 2023.9769,4161.5994 2023.8015,4161.6095 2023.625,4161.625 L 2023,4154.9375 C 2022.8669,4153.5618 2021.782,4152.5743 2020.4688,4152.5 z"
          style="fill:#f57900;fill-opacity:1;stroke:#000000;stroke-width:3.00000024;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       <path
          style="fill:#f57900;fill-opacity:1;stroke:#000000;stroke-width:3.00000024;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"

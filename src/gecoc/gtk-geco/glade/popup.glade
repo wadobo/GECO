@@ -1050,14 +1050,14 @@ con otro servidor.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox3">
+                  <object class="GtkHBox" id="hbox7">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkLabel" id="cmasterlabel2">
+                      <object class="GtkLabel" id="cmasterlabel4">
                         <property name="visible">True</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Nueva contrase&#xF1;a:</property>
+                        <property name="label" translatable="yes">Repite la contrase&#xF1;a actual:</property>
                       </object>
                       <packing>
                         <property name="position">0</property>
@@ -1084,21 +1084,21 @@ con otro servidor.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox4">
+                  <object class="GtkHBox" id="hbox3">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkLabel" id="cmasterlabel3">
+                      <object class="GtkLabel" id="cmasterlabel2">
                         <property name="visible">True</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Repite la contrase&#xF1;a nueva:</property>
+                        <property name="label" translatable="yes">Nueva contrase&#xF1;a:</property>
                       </object>
                       <packing>
                         <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry" id="cmasterp3">
+                      <object class="GtkEntry" id="cmasternp1">
                         <property name="width_request">220</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1115,6 +1115,40 @@ con otro servidor.</property>
                     <property name="expand">False</property>
                     <property name="padding">5</property>
                     <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkHBox" id="hbox4">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkLabel" id="cmasterlabel3">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Repite la contrase&#xF1;a nueva:</property>
+                      </object>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="cmasternp2">
+                        <property name="width_request">220</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="visibility">False</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="padding">5</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
@@ -1140,7 +1174,7 @@ con otro servidor.</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>

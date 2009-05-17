@@ -113,6 +113,11 @@ class TrayIcon(gtk.StatusIcon):
         remove_text(add_button)
         add_button.connect('clicked', self.on_add)
         
+        # TODO add change master password signals
+        # change background color if not the same 
+        # cmasterp1 == cmasterp2 and cmasternp1 == cmasternp2
+        # change_master_button -> gso.change_master(cmasterp1, cmasternp1)
+        
         self.master = ''
         self.auth()
 
@@ -168,7 +173,6 @@ class TrayIcon(gtk.StatusIcon):
             return '', '', ''
 
     def auth(self, server='', user='', password=''):
-        # TODO conectar en un thread
         if not server:
             server, user, password = self.get_opts()
             if not server:
@@ -182,6 +186,7 @@ class TrayIcon(gtk.StatusIcon):
         t.start()
 
     def remote_auth(self, server, user, password):
+        # TODO use, gobject.idle_add
         try:
             self.gso = gecolib.GSO(xmlrpc_server=server)
             self.gso.auth(user, password)

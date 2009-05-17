@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# TODO cifrar/descifrar passwords
 
 '''
 Terminal GECO client

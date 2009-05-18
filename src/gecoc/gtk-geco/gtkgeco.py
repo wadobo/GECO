@@ -180,30 +180,30 @@ class TrayIcon(gtk.StatusIcon):
             conf.close()
 
     def threaded(self, f, *args):
-            def newf(*args1):
-                f(*args1)
-                self.thread_finished = True
+        def newf(*args1):
+            f(*args1)
+            self.thread_finished = True
 
-            t = threading.Thread(target=newf, args=args)
-            self.thread_finished = False
-            t.start()
+        t = threading.Thread(target=newf, args=args)
+        self.thread_finished = False
+        t.start()
 
-            d = gtk.Dialog()
-            progress = gtk.ProgressBar()
-            progress.show()
+        d = gtk.Dialog()
+        progress = gtk.ProgressBar()
+        progress.show()
 
-            def update_progress_cb(data=None):
-                if not self.thread_finished:
-                    progress.pulse()
-                    return True
+        def update_progress_cb(data=None):
+            if not self.thread_finished:
+                progress.pulse()
+                return True
 
-                d.destroy()
-                return False
+            d.destroy()
+            return False
 
-            gobject.timeout_add(100, update_progress_cb)
+        gobject.timeout_add(100, update_progress_cb)
 
-            d.vbox.add(progress)
-            d.run()
+        d.vbox.add(progress)
+        d.run()
             
     def validate_password(self, editable, new_text, new_text_length,
             position, editable1, editable2, label):

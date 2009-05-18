@@ -113,13 +113,125 @@ class TrayIcon(gtk.StatusIcon):
         remove_text(add_button)
         add_button.connect('clicked', self.on_add)
         
-        # TODO add change master password signals
-        # change background color if not the same 
-        # cmasterp1 == cmasterp2 and cmasternp1 == cmasternp2
-        # change_master_button -> gso.change_master(cmasterp1, cmasternp1)
+        self.cmasterl1 = self.builder.get_object('cmasterl1')
+        self.cmasterl2 = self.builder.get_object('cmasterl2')
+        self.cmasterp1 = self.builder.get_object('cmasterp1')
+        self.cmasterp2 = self.builder.get_object('cmasterp2')
+        self.cmasterp1.connect('insert-text', self.validate_password, self.cmasterp2, self.cmasterp1, self.cmasterl1)
+        self.cmasterp2.connect('insert-text', self.validate_password, self.cmasterp2, self.cmasterp1, self.cmasterl1)
+        self.cmasternp1 = self.builder.get_object('cmasternp1')
+        self.cmasternp2 = self.builder.get_object('cmasternp2')
+        self.cmasternp1.connect('insert-text', self.validate_password, self.cmasternp2, self.cmasternp1, self.cmasterl2)
+        self.cmasternp2.connect('insert-text', self.validate_password, self.cmasternp2, self.cmasternp1, self.cmasterl2)
+        self.validated = False
+
+        self.change_master_button = self.builder.get_object('change_master_button')
+        self.change_master_button.set_sensitive(False)
+        self.change_master_button.connect('clicked', self.change_master)
         
         self.master = ''
         self.auth()
+
+    def change_master(self, *args):
+        # change_master_button -> gso.change_master(cmasterp1, cmasternp1)
+        # change_master config file
+
+        oldp = self.cmasterp1.get_text()
+        newp = self.cmasternp1.get_text()
+
+        # Test conffile with oldp and change password
+        self.check_conffile(oldp, newp)
+
+        self.threaded(self.gso.change_master, oldp, newp)
+        self.forget()
+        self.cmasterp1.set_text('')
+        self.cmasterp2.set_text('')
+        self.cmasternp1.set_text('')
+        self.cmasternp2.set_text('')
+        self.message('Contraseña cambiada con éxito', type='info')
+
+    def check_conffile(self, oldp, newp):
+        aes = gecolib.AES()
+        conf = open(CONFFILE, 'r')
+        conft = conf.read()
+        conf.close()
+        to_save = aes.decrypt(conft, oldp)
+        if to_save.find('server') < 0:
+            # wrong conffile or wrong master password
+
+            msg = ('No he podido abrir el fichero de configuración'
+                   'con esta contraseña, esto puede significar'
+                   'que has escrito mal la contraseña maestra.'
+                   '\n\n'
+                   '¿Continuar de todos modos?')
+
+            dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
+                    buttons=gtk.BUTTONS_YES_NO,
+                    message_format=msg)
+            ret = dialog.run()
+            if ret == gtk.RESPONSE_NO:
+                return
+            dialog.destroy()
+
+        else:
+            to_save = aes.encrypt(to_save, newp)
+            conf = open(CONFFILE, 'w')
+            conf.write(to_save)
+            conf.close()
+
+    def threaded(self, f, *args):
+            def newf(*args1):
+                f(*args1)
+                self.thread_finished = True
+
+            t = threading.Thread(target=newf, args=args)
+            self.thread_finished = False
+            t.start()
+
+            d = gtk.Dialog()
+            progress = gtk.ProgressBar()
+            progress.show()
+
+            def update_progress_cb(data=None):
+                if not self.thread_finished:
+                    progress.pulse()
+                    return True
+
+                d.destroy()
+                return False
+
+            gobject.timeout_add(100, update_progress_cb)
+
+            d.vbox.add(progress)
+            d.run()
+            
+    def validate_password(self, editable, new_text, new_text_length,
+            position, editable1, editable2, label):
+        text1 = editable1.get_text()
+        text1 += new_text
+        text2 = editable2.get_text()
+
+        if text1 != text2:
+            editable1.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#ff0000'))
+            label.set_text("No coinciden")
+        else:
+            editable1.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#00ff00'))
+            strength = self.get_text_strength(text1)
+            strength = '<span foreground="#66BF66">%s</span>' % strength
+            label.set_markup(strength)
+
+        t1, t2 = self.cmasterp2.get_text(), self.cmasterp1.get_text()
+        t3, t4 = self.cmasternp2.get_text(), self.cmasternp1.get_text()
+
+        if editable1.name == 'cmasterp2':
+            t1 += new_text
+        else:
+            t3 += new_text
+
+        if t1 == t2 and t3 == t4 and not '' in [t1,t2,t3,t4]:
+            self.change_master_button.set_sensitive(True)
+        else:
+            self.change_master_button.set_sensitive(False)
 
     def __get_config_form(self):
         server = self.builder.get_object('pref_server').get_text()
@@ -186,7 +298,6 @@ class TrayIcon(gtk.StatusIcon):
         t.start()
 
     def remote_auth(self, server, user, password):
-        # TODO use, gobject.idle_add
         try:
             self.gso = gecolib.GSO(xmlrpc_server=server)
             self.gso.auth(user, password)
@@ -206,7 +317,7 @@ class TrayIcon(gtk.StatusIcon):
     def del_user(self, widget, *args):
         server, user, passwd = self.__get_config_form()
         gso = gecolib.GSO(xmlrpc_server=server)
-        gso.auth(uer, passwd)
+        gso.auth(user, passwd)
 
         try:
             gso.unregister()
@@ -487,13 +598,18 @@ class TrayIcon(gtk.StatusIcon):
         self.strength(new_pass)
         self.cipher_pass(new_pass)
 
-    def strength(self, password):
-        bar = self.builder.get_object('strength')
+    def get_text_strength(self, password):
         strength = gecolib.strength(password)
 
         text_strength = ('Mala', 'Buena', 'Fuerte', 'Perfecta')
         index = int(strength * (len(text_strength)-1))
         text_strength = text_strength[index]
+        return text_strength
+
+    def strength(self, password):
+        bar = self.builder.get_object('strength')
+        strength = gecolib.strength(password)
+        text_strength = self.get_text_strength(password)
         bar.set_text(text_strength)
         bar.set_fraction(strength)
 

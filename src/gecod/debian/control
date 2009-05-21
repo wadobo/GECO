@@ -1,0 +1,14 @@
+Source: gecod
+Section: admin
+Build-Depends: python, debhelper
+Priority: extra
+Maintainer: Daniel Garcia Moreno <dani@danigm.net>
+Standards-Version: 3.8.0
+
+Package: gecod
+Architecture: any
+Pre-Depends: python
+Depends: python, python-sqlalchemy, openssl
+Description: Servidor del gestor de contrasenas GECO
+ Servidor de GECO, ofrece el servicio de almacenamiento
+ de contrasenas para diferentes clientes GECO

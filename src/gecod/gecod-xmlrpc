@@ -4,6 +4,17 @@ import os
 import sys
 from gecod import xmlrpc_frontend
 
+root = '/usr/share/gecod'
+if not os.path.exists(root+'/database.sqlite'):
+    from gecod import database
+    database.create('sqlite:///'+root+'/database.sqlite')
+
+if not os.path.exists(root+'/certs/cert.pem'):
+    curdir = os.getcwd()
+    os.chdir(root+'/certs')
+    os.popen('bash generate-pem.sh')
+    os.chdir(curdir)
+
 if os.getpid():
     print "Ejecutalo como root si tienes la base de datos con sqlite"
 

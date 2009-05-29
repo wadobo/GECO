@@ -1,0 +1,15 @@
+Source: python-gecoc
+Section: 
+Priority: extra
+Maintainer: Daniel Garcia Moreno <dani@danigm.net>
+Build-Depends: debhelper (>= 7), python
+Standards-Version: 3.8.0
+Homepage: http://bzr.danigm.net/geco
+
+Package: python-gecoc
+Architecture: any
+Depends: python
+Description: Modulo de conexion con el servidor gecod
+ python-gecoc es la base de los clientes de gecod, se puede
+ importar con from gecoc import gecolib. Ademas ofrece un
+ cliente basico de terminal para geco, terminal-geco

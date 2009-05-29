@@ -4,6 +4,7 @@
 # Author: Daniel Garcia <dani@danigm.net>
 
 import os, sys
+import signal
 import gtk
 gtk.gdk.threads_init()
 import threading
@@ -31,6 +32,7 @@ class TrayIcon(gtk.StatusIcon):
                 <menubar name="Menubar">
                 <menu action="Menu">
                 <menuitem action="Add"/>
+                <menuitem action="Search"/>
                 <menuitem action="Config"/>
                 <menuitem action="About"/>
                 <menuitem action="Quit"/>
@@ -41,6 +43,7 @@ class TrayIcon(gtk.StatusIcon):
         actions = [
                 ('Menu',  None, 'Menu'),
                 ('Add', gtk.STOCK_ADD, '_Add...', None, 'Add', self.on_add),
+                ('Search', gtk.STOCK_FIND, '_Search...', None, 'Search', self.on_search),
                 ('Config', gtk.STOCK_PREFERENCES, '_Config...', None, 'Configure', self.on_config),
                 ('About', gtk.STOCK_ABOUT, '_About...', None, 'About gtk-GECO', self.on_about),
                 ('Quit',gtk.STOCK_QUIT,'_Quit',None, 'Quit', self.on_quit),
@@ -57,6 +60,12 @@ class TrayIcon(gtk.StatusIcon):
         self.set_visible(True)
         self.connect('popup-menu', self.on_popup_menu)
         self.connect('activate', self.on_click)
+
+        def double_click(widget, event):
+            if event.type == gtk.gdk._2BUTTON_PRESS:
+                self.on_search()
+
+        self.connect('button_press_event', double_click)
 
         popupfile = os.path.join(IMG, 'popup.glade')
         self.builder = gtk.Builder()
@@ -131,6 +140,14 @@ class TrayIcon(gtk.StatusIcon):
         
         self.master = ''
         self.auth()
+
+        def on_search2(*args):
+            gobject.idle_add(self.on_search)
+
+        signal.signal(14, on_search2)
+        self.password_names = []
+        self.pid = str(os.getpid())
+        open('%s/.gtkgeco.pid' % os.environ['HOME'], 'w').write(self.pid)
 
     def change_master(self, *args):
         # change_master_button -> gso.change_master(cmasterp1, cmasternp1)
@@ -419,6 +436,7 @@ class TrayIcon(gtk.StatusIcon):
         self.passwords = gtk.VBox()
         self.passwords.show()
         self.viewport.add(self.passwords)
+        self.password_names = []
 
         try:
             passwords = self.gso.get_all_passwords()
@@ -432,6 +450,7 @@ class TrayIcon(gtk.StatusIcon):
         passwords.sort(cmp)
 
         for p in passwords:
+            self.password_names.append(p['name'])
             self.add_new(p)
 
     def add_new(self, p):
@@ -661,6 +680,7 @@ class TrayIcon(gtk.StatusIcon):
         
         rootwin = screen.get_root_window()
         x, y, mods = rootwin.get_pointer()
+        x+=5
 
         if x + win_w > width:
             x = width - win_w
@@ -684,6 +704,37 @@ class TrayIcon(gtk.StatusIcon):
             self.get_passwords()
 
         dialog.destroy()
+
+    def on_search(self, *args):
+        self.search_win = self.builder.get_object('search')
+        self.search_entry = self.builder.get_object('search_entry')
+
+        completion = gtk.EntryCompletion()
+        self.search_entry.set_completion(completion)
+        liststore = gtk.ListStore(gobject.TYPE_STRING)
+        [liststore.append([i]) for i in self.password_names] 
+        completion.set_model(liststore)
+        completion.set_text_column(0)
+
+        self.search_button = self.builder.get_object('search_ok')
+        def f(*args):
+            text = self.search_entry.get_text()
+            self.search_win.hide()
+
+            master_password = self.get_master()
+            password = self.gso.get_password(text, master_password)
+            password = password['password']
+                
+            clipboard = gtk.clipboard_get()
+            clipboard.set_text(password)
+            clipboard.store()
+
+        self.search_entry.connect('activate', f)
+        ret = self.search_win.run()
+        if ret == 1:
+            f()
+        else:
+            self.search_win.hide()
 
 def main():
     t = TrayIcon()

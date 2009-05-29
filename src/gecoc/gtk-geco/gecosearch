@@ -1,0 +1,8 @@
+#!/usr/bin/python
+import os
+
+try:
+    pid = int(open('%s/.gtkgeco.pid' % os.environ['HOME']).read().strip())
+    os.kill(pid, 14)
+except:
+    print "nada que hacer"

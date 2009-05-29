@@ -17,7 +17,7 @@ setup(name = 'gtk-geco',
       url = 'http://bzr.danigm.net/geco',
       license = 'GPLv3',
       data_files = datafiles,
-      scripts = ['gtk-geco'],
+      scripts = ['gtk-geco', 'gecosearch'],
       py_modules = ['gtkgeco'],
       packages = ['gecoc']
       )

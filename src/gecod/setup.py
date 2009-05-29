@@ -32,7 +32,7 @@ port = 4343
 database = sqlite:///%(path)s/database.sqlite
 KEYFILE = %(path)s/certs/key.pem
 CERTFILE = %(path)s/certs/cert.pem
-''' % {'path': prefix+'/share/gecod'}
+''' % {'path': 'usr/share/gecod'}
 
 conf = open('gecod-xmlrpc.conf', 'w')
 conf.write(conffile)

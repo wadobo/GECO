@@ -1,15 +1,4 @@
 #! /bin/sh
-#
-# skeleton	example file to build /etc/init.d/ scripts.
-#		This file should be used to construct scripts for /etc/init.d.
-#
-#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
-#		Modified for Debian
-#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
-#               Further changes by Javier Fernandez-Sanguino <jfs@debian.org>
-#
-# Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
-#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/gecod-xmlrpc
@@ -19,7 +8,7 @@ DESC=gecod
 test -x $DAEMON || exit 0
 
 LOGDIR=/var/log/gecod
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/var/run/gecod-xmlrpc.pid
 DODTIME=1                   # Time to wait for the server to die, in seconds
                             # If this value is set too low you might not
                             # let some servers to die gracefully and
@@ -39,9 +28,6 @@ running_pid()
     name=$2
     [ -z "$pid" ] && return 1
     [ ! -d /proc/$pid ] &&  return 1
-    cmd=`cat /proc/$pid/cmdline | tr "\000" "\n"|head -n 1 |cut -d : -f 1`
-    # Is this the expected child?
-    [ "$cmd" != "$name" ] &&  return 1
     return 0
 }
 
@@ -56,6 +42,13 @@ running()
     pid=`cat $PIDFILE`
     running_pid $pid $DAEMON || return 1
     return 0
+}
+
+gecodstop()
+{
+    [ ! -f "$PIDFILE" ] && return 0
+    kill -9 $(cat $PIDFILE)
+    rm $PIDFILE
 }
 
 force_stop() {
@@ -91,48 +84,19 @@ case "$1" in
 	;;
   stop)
 	echo -n "Stopping $DESC: "
-	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
-		--exec $DAEMON
+    gecodstop
 	echo "$NAME."
-	;;
-  force-stop)
-	echo -n "Forcefully stopping $DESC: "
-        force_stop
-        if ! running ; then
-            echo "$NAME."
-        else
-            echo " ERROR."
-        fi
-	;;
-  #reload)
-	#
-	#	If the daemon can reload its config files on the fly
-	#	for example by sending it SIGHUP, do it here.
-	#
-	#	If the daemon responds to changes in its config file
-	#	directly anyway, make this a do-nothing entry.
-	#
-	# echo "Reloading $DESC configuration files."
-	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
-  #;;
-  force-reload)
-	#
-	#	If the "reload" option is implemented, move the "force-reload"
-	#	option to the "reload" entry above. If not, "force-reload" is
-	#	just the same as "restart" except that it does nothing if the
-	#   daemon isn't already running.
-	# check wether $DAEMON is running. If so, restart
-	start-stop-daemon --stop --test --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON \
-	&& $0 restart \
-	|| exit 0
 	;;
   restart)
     echo -n "Restarting $DESC: "
-	start-stop-daemon --stop --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON
-	[ -n "$DODTIME" ] && sleep $DODTIME
+    gecodstop
+	start-stop-daemon --start --quiet --pidfile \
+		/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
+	echo "$NAME."
+	;;
+  force-reload)
+    echo -n "Restarting $DESC: "
+    gecodstop
 	start-stop-daemon --start --quiet --pidfile \
 		/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
 	echo "$NAME."
@@ -148,8 +112,8 @@ case "$1" in
     ;;
   *)
 	N=/etc/init.d/$NAME
-	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $N {start|stop|restart|force-reload|status|force-stop}" >&2
+	# echo "Usage: $N {start|stop|restart}" >&2
+	echo "Usage: $N {start|stop|restartstatus}" >&2
 	exit 1
 	;;
 esac

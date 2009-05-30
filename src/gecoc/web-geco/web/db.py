@@ -435,8 +435,13 @@ class DB:
     def __init__(self, db_module, keywords):
         """Creates a database.
         """
+        # some DB implementaions take optional paramater `driver` to use a specific driver modue
+        # but it should not be passed to connect
+        keywords.pop('driver', None)
+
         self.db_module = db_module
         self.keywords = keywords
+
         
         self._ctx = threadeddict()
         # flag to enable/disable printing queries
@@ -528,17 +533,6 @@ class DB:
             return '%s'
         raise UnknownParamstyle, style
 
-    def _py2sql(self, val):
-        """
-        Transforms a Python value into a value to pass to cursor.execute.
-
-        This exists specifically for a workaround in SqliteDB.
-
-        """
-        if isinstance(val, unicode):
-            val = val.encode('UTF-8')
-        return val
-
     def _db_execute(self, cur, sql_query): 
         """executes an sql query"""
         self.ctx.dbq_count += 1
@@ -546,9 +540,7 @@ class DB:
         try:
             a = time.time()
             paramstyle = getattr(self, 'paramstyle', 'pyformat')
-            out = cur.execute(sql_query.query(paramstyle),
-                              [self._py2sql(x)
-                               for x in sql_query.values()])
+            out = cur.execute(sql_query.query(paramstyle), sql_query.values())
             b = time.time()
         except:
             if self.printing:
@@ -869,25 +861,17 @@ class PostgresDB(DB):
             keywords['password'] = keywords['pw']
             del keywords['pw']
             
-        db_module = self.get_db_module()
+        db_module = import_driver(["psycopg2", "psycopg", "pgdb"], preferred=keywords.pop('driver', None))
+        if db_module.__name__ == "psycopg2":
+            import psycopg2.extensions
+            psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+
         keywords['database'] = keywords.pop('db')
         self.dbname = "postgres"
         self.paramstyle = db_module.paramstyle
         DB.__init__(self, db_module, keywords)
         self.supports_multiple_insert = True
         
-    def get_db_module(self):
-        try: 
-            import psycopg2 as db
-            import psycopg2.extensions
-            psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-        except ImportError: 
-            try: 
-                import psycopg as db
-            except ImportError: 
-                import pgdb as db
-        return db
-
     def _process_insert_query(self, query, tablename, seqname):
         if seqname is None: 
             seqname = tablename + "_id_seq"
@@ -923,17 +907,26 @@ class MySQLDB(DB):
     def _process_insert_query(self, query, tablename, seqname):
         return query, SQLQuery('SELECT last_insert_id();')
 
+def import_driver(drivers, preferred=None):
+    """Import the first available driver or preferred driver.
+    """
+    if preferred:
+        drivers = [preferred]
+
+    for d in drivers:
+        try:
+            return __import__(d, None, None, ['x'])
+        except ImportError:
+            pass
+    raise ImportError("Unable to import " + " or ".join(drivers))
+
 class SqliteDB(DB): 
     def __init__(self, **keywords):
-        try:
-            import sqlite3 as db
+        db = import_driver(["sqlite3", "pysqlite2.dbapi2", "sqlite"], preferred=keywords.pop('driver', None))
+
+        if db.__name__ in ["sqlite3", "pysqlite2.dbapi2"]:
             db.paramstyle = 'qmark'
-        except ImportError:
-            try:
-                from pysqlite2 import dbapi2 as db
-                db.paramstyle = 'qmark'
-            except ImportError:
-                import sqlite as db
+
         self.paramstyle = db.paramstyle
         keywords['database'] = keywords.pop('db')
         self.dbname = "sqlite"        
@@ -948,29 +941,6 @@ class SqliteDB(DB):
             # rowcount is not provided by sqlite
             del out.__len__
         return out
-
-    # as with PostgresDB, the database is assumed to be in UTF-8.
-    # This doesn't mean we turn byte-strings coming out of it into
-    # Unicode objects, but we avoid trying to put Unicode objects into
-    # it.
-    encoding = 'UTF-8'
-
-    def _py2sql(self, val):
-        r"""
-        Work around a couple of problems in SQLite that maybe pysqlite
-        should take care of: give it True and False and it thinks
-        they're column names; give it Unicode and it tries to insert
-        it in, possibly, ASCII.
-
-            >>> meth = SqliteDB(db='nonexistent')._py2sql
-            >>> [meth(x) for x in [True, False, 1, 2, 'foo', u'souffl\xe9']]
-            [1, 0, 1, 2, 'foo', 'souffl\xc3\xa9']
-
-        """
-        if val is True: return 1
-        elif val is False: return 0
-        elif isinstance(val, unicode): return val.encode(self.encoding)
-        else: return val
 
 class FirebirdDB(DB):
     """Firebird Database.

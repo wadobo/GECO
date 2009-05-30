@@ -6,7 +6,7 @@ from web import form
 from utils import authenticated, templated
 
 web.config.debug = False
-#web.SERVER = 'https://danigm.net:10000'
+#web.SERVER = 'https://danigm.net:8080'
 web.SERVER = 'https://localhost:4343'
 
 web.menu_user = (

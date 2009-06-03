@@ -13,6 +13,8 @@ import gobject
 import datetime
 from gecoc import gecolib
 
+import pynotify
+
 __version__ = '1.0'
 IMG = 'glade'
 SECONDS = 600
@@ -263,6 +265,8 @@ class TrayIcon(gtk.StatusIcon):
         password = self.builder.get_object('pref_pass')
 
         s, u, p = self.get_opts()
+        if not s:
+            return
 
         server.set_text(s)
         user.set_text(u)
@@ -432,6 +436,9 @@ class TrayIcon(gtk.StatusIcon):
             return self.master
 
     def get_passwords(self, *args):
+
+        self.expirated = []
+
         self.passwords.destroy()
         self.passwords = gtk.VBox()
         self.passwords.show()
@@ -452,6 +459,9 @@ class TrayIcon(gtk.StatusIcon):
         for p in passwords:
             self.password_names.append(p['name'])
             self.add_new(p)
+
+        if self.expirated:
+            self.show_alert()
 
     def add_new(self, p):
         def clicked(button, event, p):
@@ -488,6 +498,8 @@ class TrayIcon(gtk.StatusIcon):
             img = 'yellow.png'
         if days <= 7:
             img = 'red.png'
+        if days <= 0:
+            self.expirated.append((p, days))
 
         expiration = gtk.Image()
         expiration.set_from_file(os.path.join(IMG, img))
@@ -735,6 +747,20 @@ class TrayIcon(gtk.StatusIcon):
             f()
         else:
             self.search_win.hide()
+
+    def show_alert(self):
+        title = "GECO - Alerta!"
+        msg = 'Hay %s contraseñas expiradas:\n' % len(self.expirated)
+        for i, d in self.expirated:
+            msg += '<b>%s</b> (%s) \n' % (i['name'], d)
+        seconds = 5
+
+        pynotify.init("GECO")
+        note = pynotify.Notification(title, msg, "dialog-warning")
+        note.set_urgency(pynotify.URGENCY_CRITICAL)
+        note.attach_to_status_icon(self)
+        note.set_timeout(seconds*1000)
+        note.show()
 
 def main():
     t = TrayIcon()

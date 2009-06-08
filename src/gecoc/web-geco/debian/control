@@ -1,0 +1,15 @@
+Source: web-geco
+Section: python
+Priority: extra
+Maintainer: Daniel Garcia Moreno <dani@danigm.net>
+Build-Depends: debhelper (>= 7), python
+Standards-Version: 3.8.0
+Homepage: http://bzr.danigm.net/geco
+
+Package: web-geco
+Architecture: any
+Depends: python, python-gecoc
+Description: Cliente web de GECO, gestor de contrasenas.
+ web-geco es un cliente web para GECO, junto con el demonio gecod
+ ofrece un gestor de contrasenas completo. Se puede conectar a otros servidores
+ geco.

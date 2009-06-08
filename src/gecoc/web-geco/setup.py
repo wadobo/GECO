@@ -30,6 +30,5 @@ setup(name = 'web-geco',
       license = 'GPLv3',
       data_files = datafiles,
       scripts = ['web-geco'],
-      packages = ['gecoc']
       )
 

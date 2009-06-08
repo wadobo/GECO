@@ -19,6 +19,5 @@ setup(name = 'gtk-geco',
       data_files = datafiles,
       scripts = ['gtk-geco', 'gecosearch'],
       py_modules = ['gtkgeco'],
-      packages = ['gecoc']
       )
 

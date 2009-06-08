@@ -43,7 +43,7 @@ install: build
 	dh_installdirs
 	dh_install
 
-	python setup.py install --prefix=$(CURDIR)/debian/python-gecoc/usr/
+	python setup.py install --prefix=$(CURDIR)/debian/gtk-geco/usr/
 
 binary-indep: build install
 # We have nothing to do by default.

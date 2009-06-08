@@ -44,12 +44,20 @@ do
 		;;
 	gtk-geco)
         cd $root
+        cd src/gecoc/
+        echo "instalando gecoc"
+        python setup.py install
+        cd $root
         cd src/gecoc/gtk-geco
         echo "instalando gtk-geco"
         python setup.py install
 		shift
 		;;
 	web-geco)
+        cd $root
+        cd src/gecoc/
+        echo "instalando gecoc"
+        python setup.py install
         cd $root
         cd src/gecoc/web-geco
         echo "instalando web-geco"

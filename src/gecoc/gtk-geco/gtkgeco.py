@@ -151,6 +151,17 @@ class TrayIcon(gtk.StatusIcon):
         self.pid = str(os.getpid())
         open('%s/.gtkgeco.pid' % os.environ['HOME'], 'w').write(self.pid)
 
+        self.messages = []
+
+        gobject.timeout_add(500, self.show_messages)
+
+    def show_messages(self, *args):
+        while len(self.messages):
+            v = self.messages.pop()
+            self.message(*v)
+
+        return True
+
     def change_master(self, *args):
         # change_master_button -> gso.change_master(cmasterp1, cmasternp1)
         # change_master config file
@@ -273,12 +284,20 @@ class TrayIcon(gtk.StatusIcon):
         password.set_text(p)
     
     def message(self, msg="ERROR no se por qué :(", type='err'):
+        def dialog_response_cb(dialog, response_id):
+            dialog.destroy()
+
+        def dialog_run(dialog):
+            if not dialog.modal:
+                dialog.set_modal(True)
+            dialog.connect('response', dialog_response_cb)
+            dialog.show()
+
         type = gtk.MESSAGE_ERROR if type == 'err' else gtk.MESSAGE_INFO
         dialog = gtk.MessageDialog(type=type,
                 buttons=gtk.BUTTONS_CLOSE,
                 message_format=msg)
-        dialog.run()
-        dialog.destroy()
+        dialog_run(dialog)
 
     def get_opts(self):
         if os.path.exists(CONFFILE):
@@ -323,8 +342,13 @@ class TrayIcon(gtk.StatusIcon):
             self.gso = gecolib.GSO(xmlrpc_server=server)
             self.gso.auth(user, password)
         except Exception, e:
-            self.message('Error en el login: %s' % str(e))
-            return
+            try:
+                gtk.gdk.threads_enter()
+                self.messages.insert(0, ('Error en el login: %s' % str(e), 'err'))
+                self.set_blinking(False)
+                return
+            finally:
+                gtk.gdk.threads_leave()
 
         try:
             gtk.gdk.threads_enter()

@@ -1,5 +1,5 @@
 Source: python-gecoc
-Section: 
+Section: python
 Priority: extra
 Maintainer: Daniel Garcia Moreno <dani@danigm.net>
 Build-Depends: debhelper (>= 7), python

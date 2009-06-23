@@ -148,6 +148,7 @@ class TrayIcon(gtk.StatusIcon):
 
         signal.signal(14, on_search2)
         self.password_names = []
+        self.cached_passwords = {}
         self.pid = str(os.getpid())
         open('%s/.gtkgeco.pid' % os.environ['HOME'], 'w').write(self.pid)
 
@@ -468,6 +469,7 @@ class TrayIcon(gtk.StatusIcon):
         self.passwords.show()
         self.viewport.add(self.passwords)
         self.password_names = []
+        self.cached_passwords = {}
 
         try:
             passwords = self.gso.get_all_passwords()
@@ -482,6 +484,7 @@ class TrayIcon(gtk.StatusIcon):
 
         for p in passwords:
             self.password_names.append(p['name'])
+            self.cached_passwords[p['name']] = p
             self.add_new(p)
 
         if self.expirated:
@@ -492,10 +495,7 @@ class TrayIcon(gtk.StatusIcon):
             if event.button == 3:
                 password = p['account']
             else:
-                master_password = self.get_master()
-                password = self.gso.get_password(p['name'], master_password)
-                password = password['password']
-                
+                password = self.get_password(p['name'])
             clipboard = gtk.clipboard_get()
             clipboard.set_text(password)
             clipboard.store()
@@ -757,9 +757,7 @@ class TrayIcon(gtk.StatusIcon):
             text = self.search_entry.get_text()
             self.search_win.hide()
 
-            master_password = self.get_master()
-            password = self.gso.get_password(text, master_password)
-            password = password['password']
+            password = self.get_password(text)
                 
             clipboard = gtk.clipboard_get()
             clipboard.set_text(password)
@@ -771,6 +769,15 @@ class TrayIcon(gtk.StatusIcon):
             f()
         else:
             self.search_win.hide()
+
+    def get_password(self, text):
+        master_password = self.get_master()
+        try:
+            password = self.gso.decrypt_password(self.cached_passwords[text],
+                    master_password)
+        except:
+            password = self.gso.get_password(text, master_password)
+        return password
 
     def show_alert(self):
         title = "GECO - Alerta!"

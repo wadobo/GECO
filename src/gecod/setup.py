@@ -27,12 +27,14 @@ for arg in sys.argv:
 #    os.chdir('..')
 #    datafiles.append(('share/gecod/certs/', ['certs/cert.pem', 'certs/key.pem']))
 
+datafiles.append(('share/gecod/certs/', ['certs/generate-pem.sh']))
+
 conffile = '''host = localhost
 port = 4343
 database = sqlite:///%(path)s/database.sqlite
 KEYFILE = %(path)s/certs/key.pem
 CERTFILE = %(path)s/certs/cert.pem
-''' % {'path': 'usr/share/gecod'}
+''' % {'path': prefix+'/share/gecod'}
 
 conf = open('gecod-xmlrpc.conf', 'w')
 conf.write(conffile)

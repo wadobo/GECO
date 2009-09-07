@@ -7,7 +7,7 @@ setup(name = 'gecoc',
       author_email = '<dani@danigm.net>',
       url = 'http://bzr.danigm.net/geco',
       license = 'GPLv3',
-      scripts = ['terminal-geco'],
+      scripts = ['terminal-geco', 'change-master'],
       packages = ['gecoc']
       )
 

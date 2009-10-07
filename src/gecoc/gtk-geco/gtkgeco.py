@@ -24,6 +24,7 @@ def remove_text(button):
     alignment = button.get_children()[0]
     hbox = alignment.get_children()[0]
     image, label = hbox.get_children()
+    image.show()
     label.set_text('')
 
 class TrayIcon(gtk.StatusIcon):

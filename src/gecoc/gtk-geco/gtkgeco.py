@@ -776,7 +776,12 @@ class TrayIcon(gtk.StatusIcon):
         def cf(*args):
             self.search_win.hide()
 
+        def close_if_escape(widget, event, *args):
+            if gtk.gdk.keyval_name(event.keyval) == 'Escape':
+                cf()
+
         self.search_entry.connect('activate', f)
+        self.search_win.connect('key-press-event', close_if_escape)
 
         self.search_button = self.builder.get_object('search_ok')
         self.search_cancel = self.builder.get_object('search_cancel')

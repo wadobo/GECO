@@ -15,6 +15,11 @@ from gecoc import gecolib
 
 import pynotify
 
+try:
+    import keybinder
+except:
+    keybinder = None
+
 __version__ = '1.0'
 IMG = 'glade'
 SECONDS = 600
@@ -143,6 +148,11 @@ class TrayIcon(gtk.StatusIcon):
         
         self.master = ''
         self.auth()
+        
+        # keybinding
+
+        if keybinder is not None:
+            keybinder.bind("<ALT>g", self.on_search)
 
         def on_search2(*args):
             gobject.idle_add(self.on_search)
@@ -743,7 +753,7 @@ class TrayIcon(gtk.StatusIcon):
         dialog.destroy()
 
     def on_search(self, *args):
-        self.search_win = self.builder.get_object('search')
+        self.search_win = self.builder.get_object('search_window')
         self.search_entry = self.builder.get_object('search_entry')
 
         completion = gtk.EntryCompletion()
@@ -753,7 +763,6 @@ class TrayIcon(gtk.StatusIcon):
         completion.set_model(liststore)
         completion.set_text_column(0)
 
-        self.search_button = self.builder.get_object('search_ok')
         def f(*args):
             text = self.search_entry.get_text()
             self.search_win.hide()
@@ -764,12 +773,20 @@ class TrayIcon(gtk.StatusIcon):
             clipboard.set_text(password)
             clipboard.store()
 
-        self.search_entry.connect('activate', f)
-        ret = self.search_win.run()
-        if ret == 1:
-            f()
-        else:
+        def cf(*args):
             self.search_win.hide()
+
+        self.search_entry.connect('activate', f)
+
+        self.search_button = self.builder.get_object('search_ok')
+        self.search_cancel = self.builder.get_object('search_cancel')
+        self.search_button.connect('clicked', f)
+        self.search_cancel.connect('clicked', cf)
+
+        self.search_win.show()
+        self.search_win.present()
+        self.search_win.set_focus(self.search_entry)
+        gobject.idle_add(self.search_win.present)
 
     def get_password(self, text):
         master_password = self.get_master()

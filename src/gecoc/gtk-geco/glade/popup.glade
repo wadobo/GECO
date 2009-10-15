@@ -25,7 +25,7 @@
             <property name="visible">True</property>
             <child>
               <object class="GtkButton" id="prefs_button">
-                <property name="label" translatable="yes">gtk-preferences</property>
+                <property name="label">gtk-preferences</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -47,7 +47,7 @@
             </child>
             <child>
               <object class="GtkButton" id="add_button">
-                <property name="label" translatable="yes">gtk-add</property>
+                <property name="label">gtk-add</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -61,7 +61,7 @@
             </child>
             <child>
               <object class="GtkButton" id="refresh">
-                <property name="label" translatable="yes">gtk-refresh</property>
+                <property name="label">gtk-refresh</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -88,7 +88,7 @@
             </child>
             <child>
               <object class="GtkButton" id="hide">
-                <property name="label" translatable="yes">gtk-close</property>
+                <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -618,7 +618,7 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button_cancel_add">
-                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -632,7 +632,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button2">
-                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -775,7 +775,7 @@
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkButton" id="save_conf">
-                        <property name="label" translatable="yes">gtk-save</property>
+                        <property name="label">gtk-save</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -1180,7 +1180,7 @@ con otro servidor.</property>
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkButton" id="change_master_button">
-                        <property name="label" translatable="yes">gtk-apply</property>
+                        <property name="label">gtk-apply</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -1230,7 +1230,7 @@ con otro servidor.</property>
             </child>
             <child>
               <object class="GtkButton" id="button1">
-                <property name="label" translatable="yes">gtk-close</property>
+                <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1255,22 +1255,17 @@ con otro servidor.</property>
       <action-widget response="0">button1</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkDialog" id="search">
-    <property name="border_width">5</property>
-    <property name="modal">True</property>
+  <object class="GtkWindow" id="search_window">
     <property name="window_position">center</property>
-    <property name="type_hint">normal</property>
-    <property name="urgency_hint">True</property>
     <property name="decorated">False</property>
-    <property name="has_separator">False</property>
-    <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox3">
+    <child>
+      <object class="GtkVBox" id="search_vbox">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
         <child>
-          <object class="GtkHBox" id="hbox1000">
+          <object class="GtkHBox" id="search_hbox1">
             <property name="visible">True</property>
+            <property name="spacing">2</property>
             <child>
               <object class="GtkLabel" id="search_label">
                 <property name="visible">True</property>
@@ -1280,6 +1275,7 @@ con otro servidor.</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="padding">5</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -1290,58 +1286,58 @@ con otro servidor.</property>
                 <property name="invisible_char">&#x25CF;</property>
               </object>
               <packing>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area3">
-            <property name="visible">True</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="search_cancel">
-                <property name="label" translatable="yes">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="search_ok">
-                <property name="label" translatable="yes">gtk-find</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
+                <property name="padding">5</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
+            <property name="fill">False</property>
+            <property name="padding">8</property>
             <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHBox" id="search_hbox2">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkButton" id="search_cancel">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="search_ok">
+                <property name="label">gtk-find</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="padding">5</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="padding">5</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="0">search_cancel</action-widget>
-      <action-widget response="1">search_ok</action-widget>
-    </action-widgets>
   </object>
 </interface>

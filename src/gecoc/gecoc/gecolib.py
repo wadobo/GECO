@@ -75,7 +75,33 @@ class GecoClient:
             method = cypher_methods[p.get('cypher_method', '')]
             d = method.decrypt(p['password'], old)
             c = method.encrypt(d, new)
+            # TODO test that password is changed correctly
+            #c1 = method.decrypt(c, new)
+            #if not self.unicode_password(c1):
+
             self.change_attr(p['name'], {'password': c})
+
+    def unicode_password(self, password):
+        try:
+            unicode(password)
+            return True
+        except:
+            return False
+
+    def test_passwords(self, masterp):
+        '''
+        return the length of all passwords
+        '''
+
+        passwords = self.get_all_passwords()
+        passwds = []
+        for p in passwords:
+            method = cypher_methods[p.get('cypher_method', '')]
+            d = method.decrypt(p['password'], masterp)
+            if not self.unicode_password(d):
+                passwds.append(p['name'])
+
+        return passwds
 
     def __repr__(self):
         auth = '< Authenticated >' if self.cookie else ''

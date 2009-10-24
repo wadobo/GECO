@@ -2,26 +2,45 @@
 
 import getpass
 import sys
+import os
 from gecoc import gecolib
 
-inp = raw_input
-inp_p = getpass.getpass
+def inp(prompt, default="", function=raw_input):
+    value = function(prompt)
+    if not value:
+        value = default
 
-server = inp("server: ")
-user = inp("user: ")
+    return value
+
+def inp_p(prompt, default=""):
+    return inp(prompt, default, getpass.getpass)
+
+server = inp("server (https://localhost:4343): ", "https://localhost:4343")
+user = inp("user: ", os.environ["USER"])
 passwd = inp_p("passwd: ")
 print "----"
-master1 = inp("actual master: ")
-master2 = inp("new master: ")
+master1 = inp_p("actual master (default user password): ", passwd)
+master2 = inp_p("new master: ")
+master3 = inp_p("new master again: ")
 
-gso = g.GSO(xmlrpc_server=server)
+if master2 != master3:
+    print "new master not the same"
+    sys.exit(-1)
+
+gso = gecolib.GSO(xmlrpc_server=server)
 try:
     gso.auth(user, passwd)
 except:
     print "wrong server, username or password"
     sys.exit(-1)
 
-cont = inp("Continue? y/N")
+wp = gso.test_passwords(master1)
+if wp:
+    print "wrong passwords"
+    for i in wp:
+        print i
+
+cont = inp("Continue? y/N: ", "N")
 
 if cont in 'yY':
     print "changing..."

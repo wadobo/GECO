@@ -5,6 +5,18 @@ import sys
 import os
 from gecoc import gecolib
 
+
+def test_passwd(gso, master):
+    wp = gso.test_passwords(master)
+    if wp:
+        print "wrong passwords"
+        for i in wp:
+            print i
+
+def export(gso, filename):
+    out = open(filename, 'w')
+    out.write(gso.export())
+
 def inp(prompt, default="", function=raw_input):
     value = function(prompt)
     if not value:
@@ -34,17 +46,18 @@ except:
     print "wrong server, username or password"
     sys.exit(-1)
 
-wp = gso.test_passwords(master1)
-if wp:
-    print "wrong passwords"
-    for i in wp:
-        print i
+try:
+    export(gso, "/tmp/geco.backup")
+    print "backup created in /tmp/geco.backup"
+except Exception, e:
+    print "can't create backup, aborting", e
 
 cont = inp("Continue? y/N: ", "N")
 
 if cont in 'yY':
     print "changing..."
     gso.change_master(master1, master2)
+    test_passwd(gso, master2)
     print "changed"
 else:
     print "not changed"

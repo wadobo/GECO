@@ -1,0 +1,131 @@
+Arquitectura
+============
+
+GECO implementa una arquitectura clásica cliente-servidor, de tal
+forma que hay un servidor GECO al cual se pueden conectar diferentes
+clientes para administrar contraseñas.
+
+De esta forma un usuario puede tener un servidor GECO en su máquina y
+utilizarlo normalmente como un gestor de contraseñas local, pero
+además puede sincronizar su servidor con otro en una máquina remota,
+de tal forma que si el usuario se mueve pueda tirar de la interfaz web
+del servidor de la máquina remota para administrar o acceder a sus
+contraseñas.
+
+Por lo tanto GECO se divide en en dos partes claras, el servidor gecod
+y los diferentes clientes, que pueden compartir el código para cifrado
+y las operaciones comunes a través de gecoc.
+
+GECOD
+-----
+
+El servidor no es más que una base de datos de contraseñas con
+usuarios. Para independizar el sistema gestor de bases de datos de la
+aplicación se usa el orm sqlobject que permite utilizar postgresql,
+mysql, sqlite, etc. Sobre el orm se ha desarrollado un backend donde
+están las operaciones comunes. Y sobre este backend se pueden
+desarrollar diferentes frontends para ofrecer una interfaz de
+comunicación con la base de datos. De momento solo hay un frontend
+implementado que es el de xmlrpc, pero el desarrollo está
+perfectamente modularizado para poder desarrollar un frontend
+diferente de forma sencilla.
+
+Un frontend no es más que una fachada a los diferentes servicios del
+backend, en el caso del frontend xmlrpc, ofrece un servicio xmlrpc
+sobre https para poder usarlo de forma distribuida.
+
+GECOC
+-----
+
+Cada cliente de geco es un gecoc, y para poder comunicarse con un
+demonio gecod está la librería gecolib. Gecolib ofrece las
+funcionalidades básicas de un gestor de contraseñas, como la
+generación de contraseñas aleatorias, cifrado y descifrado de
+contraseñas, un algoritmo que cuantifica la seguridad de una
+contraseña, etc. Y además de estas funcionalidades ofrece la interfaz
+de comunicación con el los servicios gecod de forma sencilla.
+
+Sobre este backend (gecolib) se pueden desarrollar difernetes clientes
+que ofrezcan diferentes interfaces al usuario. De momento existen tres
+interfaces desarrolladas en el proyecto, una solución para el
+escritorio gnome en gtk, una solución web, y una solución de
+terminal.clientes que ofrezcan diferentes interfaces al usuario. De
+momento existen tres interfaces desarrolladas en el proyecto, una
+solución para el escritorio gnome en gtk, una solución web, y una
+solución para la línea de comandos.
+
+Comunicación entre gecoc y gecod
+--------------------------------
+
+Toda comunicación entre cliente y servidor se hace de manera cifrada y
+segura. El cliente se autentica en el servidor y recibe una cookie que
+utilizará para posteriores peticiones. Todas las contraseñas se cifran
+en cliente, incluso en el cliente web (se cifra con javascript),
+evitando así que el servidor pueda conocer alguna contraseña.
+
+Para el cifrado se ha utilizado el algoritmo AES, aunque el desarrollo
+permite utilizar otros algoritmos de forma sencilla, pero no están
+introducidos. La elección de AES viene motivada por su seguridad y por
+que este algoritmo está implementado en diferentes lenguajes,
+permitiendo así que se pueda cifrar en javascript para el cliente web.
+
+Factores innovadores del proyecto
+=================================
+
+Antecedentes
+------------
+
+La gestión de contraseñas no es algo novedoso, para cada escritorio
+existe una solución, por ejemplo gnome tiene el suyo, kde también.
+Incluso los navegadores como firefox, epiphany, chrome, etc. incluyen
+un gestor de contraseñas que te permite no tener que recordarlas
+todas.
+
+Además de almacenar las contraseñas, los gestores normalmente ofrecen
+una manera sencilla para la generación de contraseñas aleatorias.
+
+Existen soluciones web como http://www.clipperz.com/, pero estas no
+ofrecen la posibilidad de montarte tu propio servidor de contraseñas.
+
+Estos gestores de contraseñas ofrecen la posibilidad de gestionar las
+contraseñas almacenándolas en una base de datos o en ficheros cifrados
+en la máquina local lo que imposibilita el acceso a estas contraseñas
+cuando estamos usando un ordenador público, el ordenador del trabajo,
+etc.
+
+Aportaciones de GECO
+--------------------
+
+GECO da solución al problema de la localidad de la base de datos del
+gestor de contraseñas, permitiendo almacenar las contraseñas en un
+servidor remoto, así estas contraseñas estarán accesibles desde
+cualquier parte del mundo con acceso a internet.
+
+Al separar el almacenamiento de las contraseñas de la
+interfaz/aplicación, se puede llevar este almacenamiento a "la nube" y
+esto permite utilizar tu gestor de contraseñas con todas tus claves
+desde cualquier ordenador.
+
+Además, al ser completamente software libre permite que cualquier
+persona se pueda instalar su propio servidor de contraseñas pudiendo
+así tener control total sobre su información, aunque esta esté
+completamente cifrada.
+
+Otro aspecto diferenciador de GECO es su gran modularidad, permitiendo
+poder desarrollar tanto diferentes servidores como diferentes clientes
+de forma fácil.
+
+Por qué python
+==============
+
+Python es un lenguaje de programación muy versátil que permite hacer
+casi cualquier cosa de manera sencilla y rápida. Además ofrece
+multitud de módulos y herramientas para el desarrollo que facilitan
+bastante la tarea.
+
+Otra de las grandes ventajas de python es que es un lenguaje
+interpretado, lo que permite hacer la aplicación multiplataforma con
+menor esfuerzo.
+
+Además, python es muy flexible, por lo que es más fácil implementar un
+proyecto tan modular y configurable como este.

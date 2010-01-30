@@ -1,0 +1,19 @@
+resumen:
+
+GECO pretende ser un gestor de contraseñas distribuido con diferentes
+interfaces de comunicación con el usuario. Presentanto tanto una
+interfaz de escritorio en GTK como una interfaz web desarrollada con
+python y web.py.
+
+keywords: contraseñas, seguridad, python, gtk+, web.py, software libre
+
+historial-academico:
+
+Daniel García Moreno es Ingeniero Superior Informático por la
+Universidad de Sevilla. Es miembro del grupo de SUGUS (el grupo de
+usuarios de GNU/Linux de la Universidad de Sevilla) contribuyendo a
+impulsar el desarrollo y uso de software libre en el ambito
+universitario. Ha trabajado en Emergya, desarrollando software libre
+como Guadalinex y actualmente trabaja en Yaco sistemas, otra empresa
+comprometida con el desarrollo de software libre. blog:
+http://danigm.net

@@ -1,0 +1,101 @@
+GECO, gestor de contraseñas
+
+Introducción
+============
+
+Tras varios años usando internet y navegando por multitud de páginas,
+tienes que registrarte en un gran número de aplicaciones web. Existen
+diferentes técnicas para asignar contraseñas a diferentes servicios
+webs, cada una con sus ventajas y desventajas:
+
+1. La misma contraseña para todo: Muy fácil de recordar, pero muy
+inseguro. Es muy complicado cambiar la contraseña de todos los
+servicios si ha sido comprometida.
+
+2. Contraseña semilla y variaciones: Esta técnica consiste en utilizar
+una contraseña como "semilla" para generar el resto de las contraseñas
+que variará según el sitio. Por ejemplo si usamos como semilla
+"mipasswd" para barrapunto.com podríamos tener por ejemplo
+"mipasswd.bar", para meneame.net "mipasswd.men" y así sucesivamente.
+Esta técnica ofrece más seguridad que la anterior puesto que no
+estamos usando la misma para todo, pero sabiendo una es posible
+encontrar la de otro servicio.
+
+3. Diferentes tipos de contraseña por seguridad: Esta técnica consiste
+en tener dos, tres o cuatro contraseñas ordenadas por seguridad. Es
+decir, tengo una contraseña segura para servicios críticos (correo,
+universidad, trabajo, etc), una contraseña menos segura para servicios
+que puedan ser comprometidos y no me afecten demasiado, etc. Esta
+técnica se acerca más a tener una contraseña por cada servicio, lo que
+lo hace más seguro, pero aunque reduce el problema, no lo resuelve,
+porque implica tener que recordar varias contraseñas y también la
+compartición de contraseñas entre servicios, aunque en menor medida.
+
+Problema
+========
+
+Hoy en día la mayoría de la gente que navega con regularidad tiene
+multitud de cuentas creadas en diferentes páginas webs, estas cuentas,
+normalmente, están basadas en usuario y contraseña. Las contraseñas se
+almacenan de diferentes formas en las bases de datos de los diferentes
+servicios, de tal forma que no podemos saber si el administrador, un
+intruso de esa máquina, u otra persona, puede llegar a ver nuestra
+contraseña. Aunque parezca mentira, hoy en día muchas aplicaciones web
+almacenan las contraseñas en claro en la base de datos.
+
+Además, muchísimo tráfico web se realiza por http en lugar de https,
+incluso la autenticación, lo que implica que nuestra contraseña viaja
+por internet en claro. Si a esto le sumamos el uso de conexiones
+wireless, el conseguir la contraseña de otra persona es relativamente
+sencillo.
+
+Por tanto es realmente importante utilizar claves diferentes (y
+aleatorias) para cada aplicación, puesto que si usamos la misma clave
+para diferentes servicios y alguno de estos servicios es comprometido,
+el intruso tendrá acceso a todos los servicios que comparten la misma
+contraseña. Pero memorizar 5, 10 o 20 claves seguras es realmente
+complicado y para esto están los gestores de contraseñas.
+
+Un gestor de contraseñas te ofrece la posibilidad de tener un gran
+número de contraseñas diferentes sin necesidad de recordarlas todas,
+sólo tienes que recordar una clave maestra que es la que cifra el
+resto de claves.
+
+Al usar un gestor de contraseñas y utilizar contraseñas diferentes
+para cada servicio estás incrementando tu seguridad, pero a cambio
+pierdes la posibilidad de recordar cada contraseña de cada servicio, y
+por tanto estás perdiendo la movilidad y la libertad de usar
+diferentes máquinas en las cuales no tengas instalado tu gestor de
+contraseñas con tu base de datos de contraseñas.
+
+Además en el caso de rotura de tu disco duro puedes llegar a perder la
+base de datos de tu gestor de contraseñas perdiendo así para siempre
+muchas contraseñas que no podrás recuperar.
+
+Solución
+========
+
+GECO pretende dar solución a los problemas que presentan los gestores
+de contraseñas de escritorio tradicionales, dando un paso más allá y
+prestando un servicio de almacenamiento y gestión de contraseñas
+distribuido (o centralizado) con diferentes interfaces de
+administración (línea de comandos, escritorio, web, móvil, etc).
+
+Esto a primera vista puede parecer más inseguro que utilizar siempre
+la misma contraseña, porque tendríamos todas las contraseñas en un
+servidor alojado en internet. Por supuesto la seguridad y privacidad
+es uno de los objetivos de este proyecto, por tanto toda información
+que salga del cliente irá cifrada con una clave maestra, y de esta
+manera en el servidor no se almacenará información recuperable sin
+esta contraseña.
+
+Motivos personales por los que se desarrolla GECO
+=================================================
+
+GECO no es un proyecto desarrollado para ser vendido, ni para intentar
+llegar a un gran público, sino que la motivación principal para el
+desarrollo es una necesidad personal. Al haber sido desarrollado como
+software libre permite que cualquier otra persona con la misma
+necesidad pueda utilizar este desarrollo, e incluso permite que
+cualquier empresa que lo vea rentable lo venda, ya sea como servicio o
+como producto.

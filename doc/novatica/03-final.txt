@@ -1,0 +1,66 @@
+Conclusión y futuro
+===================
+
+El concurso universitario de software libre se vió como una
+oportunidad para motivar un desarrollo necesario, dado que GECO nace
+de una necesidad personal.
+
+Desde la primera versión funcional, antes de finalizar el concurso,
+empecé a utilizar geco para gestionar mis contraseñas, lo que motivó
+muchos cambios y desarrollos que no estaban contemplados en un primer
+momento, pero que con el uso se vieron necesarios.
+
+El participar en el concurso ha sido una motivación para llegar a
+"finalizar" el proyecto por tener una fecha límite, permitiendo así
+disponer de este gestor de contraseñas en un tiempo razonable.
+
+Comunidad
+=========
+
+Puesto que el proyecto iba dirigido a cubrir una necesidad personal,
+no he realizado demasiada campaña de uso o integración en diferentes
+sistemas. Por lo que no he dado a conocer el proyecto a la comunidad
+de software libre, lo que implica que las aportaciones de esta, ya sea
+con reporte de bugs, parches o comentarios es nula.
+
+Tambiés es verdad que este proyecto no va dirigido al grueso de los
+usuarios, puesto que desgraciadamente hoy en día la mayoría de los
+usuarios no se preocupan demasiado por la seguridad y por tanto la
+gestión de contraseñas, aunque es un problema común y recurrente, no
+es una prioridad.
+
+Por tanto se puede decir que a día de hoy la comunidad alrededor del
+proyecto GECO está formada por el desarrollador y usuario, y por dos
+o tres usuarios no habituales.
+
+Futuro
+======
+
+Al ser mi gestor de contraseñas habitual, hoy en día es un proyecto
+imprescindible para mí, por tanto seguiré manteninedolo y haciendo
+pequeñas modificaciones al proyecto para que siga siendome util. Por
+lo tanto, en mi planificación entra portar todo el código a python 3.0
+cuando este esté estable y las librerías que utilizo estén portadas.
+
+Colaboración
+============
+
+Aún quedan muchas cosas que se pueden desarrollar para GECO, se pueden
+desarrollar otros clientes, (kde, windows, etc), instaladores/paquetes
+para debian/ubuntu u otras distribuciones, otros frontends y
+algoritmos de cifrado para el servidor. Corrección de bugs, etc.
+
+Animo a todo el mundo a colaborar en el proyecto ya sea usandolo y
+reportando bugs, o mandando pequeñas modificaciones, sugerencias o
+cualquier comentario.
+
+También animo a cualquier empresa que vea que este proyecto pueda ser
+rentable a venderlo o distribuirlo.
+
+Además, geco es un buen proyecto para los estudiantes que estén
+empezando a programar, porque es un proyecto relativamente complejo y
+muestra un sistema heterogéneo que puede ser bastante educativo.
+
+El desarrollo del proyecto: http://git.danigm.net/gitphp/index.php?p=geco.git
+
+El blog del proyecto: http://danigm.net/geco.

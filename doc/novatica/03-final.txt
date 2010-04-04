@@ -41,26 +41,3 @@ imprescindible para mí, por tanto seguiré manteninedolo y haciendo
 pequeñas modificaciones al proyecto para que siga siendome util. Por
 lo tanto, en mi planificación entra portar todo el código a python 3.0
 cuando este esté estable y las librerías que utilizo estén portadas.
-
-Colaboración
-============
-
-Aún quedan muchas cosas que se pueden desarrollar para GECO, se pueden
-desarrollar otros clientes, (kde, windows, etc), instaladores/paquetes
-para debian/ubuntu u otras distribuciones, otros frontends y
-algoritmos de cifrado para el servidor. Corrección de bugs, etc.
-
-Animo a todo el mundo a colaborar en el proyecto ya sea usandolo y
-reportando bugs, o mandando pequeñas modificaciones, sugerencias o
-cualquier comentario.
-
-También animo a cualquier empresa que vea que este proyecto pueda ser
-rentable a venderlo o distribuirlo.
-
-Además, geco es un buen proyecto para los estudiantes que estén
-empezando a programar, porque es un proyecto relativamente complejo y
-muestra un sistema heterogéneo que puede ser bastante educativo.
-
-El desarrollo del proyecto: http://git.danigm.net/gitphp/index.php?p=geco.git
-
-El blog del proyecto: http://danigm.net/geco.

@@ -1,0 +1,78 @@
+Colaboración
+============
+
+Busco colaboración en el proyecto principalmente para que no dependa
+únicamente de un desarrollador, sino que el desarrollo, mantenimiento
+y difusión se haga desde una comunidad de desarrolladores.
+
+Aún quedan muchas cosas que se pueden desarrollar para GECO, se pueden
+desarrollar otros clientes, (kde, windows, etc), instaladores/paquetes
+para debian/ubuntu u otras distribuciones, otros frontends y
+algoritmos de cifrado para el servidor. Corrección de bugs, etc.
+
+Animo a todo el mundo a colaborar en el proyecto ya sea usandolo y
+reportando bugs, o mandando pequeñas modificaciones, sugerencias o
+cualquier comentario.
+
+También animo a cualquier empresa que vea que este proyecto pueda ser
+rentable a venderlo o distribuirlo.
+
+Además, geco es un buen proyecto para los estudiantes que estén
+empezando a programar, porque es un proyecto relativamente complejo y
+muestra un sistema heterogéneo que puede ser bastante educativo.
+
+Me gustaría colaborar, pero no se por dónde empezar
+---------------------------------------------------
+
+El mejor lugar por el que empezar es preguntando. Si quieres colaborar
+en el proyecto, porque tienes una idea de mejora, o simplemente porque
+te interesa el proyecto, y no sabes por dónde empezar, manda un correo
+a dani@danigm.net y con mucho gusto te explicaré el estado del
+proyecto y podremos crear una comunidad de desarrollo del proyecto.
+
+Soy estudiante y me gustaría estudiar GECO
+------------------------------------------
+
+Si quieres estudiar el funcionamiento de GECO, descargate el código y
+empieza a mirarlo, si no entiendes algo, no dudes en preguntar. Si
+crees que puedes mejorar algo, no dudes en modificar el código y
+enviar el parche, cualquier mejora al código será bienvenida.
+
+También animo a los estudiantes de últimos cursos y profesores de
+universidades a que propongan proyectos fin de carrera relacionados
+con GECO, se pueden implementar nuevos algoritmos de cifrado, nuevos
+clientes, mejorar clientes existentes, etc.
+
+No se programar, pero me interesa el proyecto y quiero colaborar
+----------------------------------------------------------------
+
+Si no sabes programar, o no eres informático, también puedes colaborar
+en el proyecto. De momento no hay una plataforma de desarrollo
+montada, porque no hay un equipo de desarrollo, pero se puede crear
+una comunidad, se puede hacer publicidad del proyecto, darlo a
+conocer, o simplemente reportar problemas que un usuario se encuentra
+al intentar usarlo.
+
+Si quieres colaborar de alguna manera, y no sabes cómo, ponte en
+contacto con danigm (dani@danigm.net) y nos coordinaremos para hacer
+de GECO un proyecto mejor.
+
+Soy una empresa y me gustaría vender GECO
+-----------------------------------------
+
+Si crees que GECO se puede explotar económicamente, adelante, puedes
+empezar a comercializarlo. Si tienes un equipo de desarrollo y quieres
+mejorarlo para poder venderlo, recuerda que es GPL, y por lo tanto
+todas las mejoras tendrán que ser publicadas bajo GPL.
+
+De todas formas, para cualquier duda en el desarrollo y si se crea un
+producto a partir de GECO, estaré encantado de recibir las
+contribuciones, ya sean de empresas o de particulares, que mejoren el
+proyecto.
+
+Enlaces de interés
+------------------
+
+El desarrollo del proyecto: http://git.danigm.net/gitphp/index.php?p=geco.git
+
+El blog del proyecto: http://danigm.net/geco.

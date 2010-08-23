@@ -386,8 +386,7 @@ def register(name, password, session=None):
 
     try:
         new_user = db.User(name, password)
-        # TODO FIX save deprecated use add
-        session.save(new_user)
+        session.add(new_user)
         session.commit()
     except db.IntegrityError:
         raise RegisteredUserError('User %s is registered' % name)

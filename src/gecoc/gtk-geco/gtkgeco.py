@@ -489,7 +489,7 @@ class TrayIcon(gtk.StatusIcon):
             return
 
         def cmp(x, y):
-            if x['name'] > y['name']: return 1
+            if x['name'].upper() > y['name'].upper(): return 1
             else: return -1
         passwords.sort(cmp)
 

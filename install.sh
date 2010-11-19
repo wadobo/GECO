@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z $PYTHON ]
+then
+    PYTHON=python
+fi
+
 function install_help(){
 		echo "Ayuda del instalador $(basename $0)"
                 echo "   Con este instalador puedes instalar:"
@@ -32,36 +37,36 @@ do
         cd $root
         cd src/gecod/
         echo "instalando gecod"
-        python setup.py install
+        $PYTHON setup.py install
 		shift
 		;;
 	gecoc)
         cd $root
         cd src/gecoc/
         echo "instalando gecoc"
-        python setup.py install
+        $PYTHON setup.py install
 		shift
 		;;
 	gtk-geco)
         cd $root
         cd src/gecoc/
         echo "instalando gecoc"
-        python setup.py install
+        $PYTHON setup.py install
         cd $root
         cd src/gecoc/gtk-geco
         echo "instalando gtk-geco"
-        python setup.py install
+        $PYTHON setup.py install
 		shift
 		;;
 	web-geco)
         cd $root
         cd src/gecoc/
         echo "instalando gecoc"
-        python setup.py install
+        $PYTHON setup.py install
         cd $root
         cd src/gecoc/web-geco
         echo "instalando web-geco"
-        python setup.py install
+        $PYTHON setup.py install
 		shift
 		;;
 	*)  

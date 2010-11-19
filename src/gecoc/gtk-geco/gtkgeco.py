@@ -14,11 +14,13 @@ import datetime
 from gecoc import gecolib
 
 import pynotify
+import keyring
 
 try:
     import keybinder
 except:
     keybinder = None
+
 
 __version__ = '1.0'
 IMG = 'glade'
@@ -147,6 +149,7 @@ class TrayIcon(gtk.StatusIcon):
         self.change_master_button.connect('clicked', self.change_master)
         
         self.master = ''
+        self.use_keyring = False
         self.auth()
         
         # keybinding
@@ -221,7 +224,7 @@ class TrayIcon(gtk.StatusIcon):
             conf.write(to_save)
             conf.close()
 
-    def threaded(self, f, *args):
+    def threaded(self, f, *args, **kwargs):
         def newf(*args1):
             f(*args1)
             self.thread_finished = True
@@ -230,7 +233,10 @@ class TrayIcon(gtk.StatusIcon):
         self.thread_finished = False
         t.start()
 
-        d = gtk.Dialog()
+        title = kwargs.get('title', '')
+        label = gtk.Label(title)
+        label.show()
+        d = gtk.Dialog(title)
         progress = gtk.ProgressBar()
         progress.show()
 
@@ -244,9 +250,10 @@ class TrayIcon(gtk.StatusIcon):
 
         gobject.timeout_add(100, update_progress_cb)
 
+        d.vbox.add(label)
         d.vbox.add(progress)
         d.run()
-            
+
     def validate_password(self, editable, new_text, new_text_length,
             position, editable1, editable2, label):
         text1 = editable1.get_text()
@@ -279,21 +286,24 @@ class TrayIcon(gtk.StatusIcon):
         server = self.builder.get_object('pref_server').get_text()
         user = self.builder.get_object('pref_user').get_text()
         password = self.builder.get_object('pref_pass').get_text()
-        
-        return server, user, password
+        use_keyring = self.builder.get_object('use_keyring').get_active()
+
+        return server, user, password, use_keyring
 
     def __set_config_form(self):
         server = self.builder.get_object('pref_server')
         user = self.builder.get_object('pref_user')
         password = self.builder.get_object('pref_pass')
+        use_keyring = self.builder.get_object('use_keyring')
 
-        s, u, p = self.get_opts()
+        s, u, p, uk = self.get_opts()
         if not s:
             return
 
         server.set_text(s)
         user.set_text(u)
         password.set_text(p)
+        use_keyring.set_active(1 if uk else 0)
     
     def message(self, msg="ERROR no se por qué :(", type='err'):
         def dialog_response_cb(dialog, response_id):
@@ -319,7 +329,7 @@ class TrayIcon(gtk.StatusIcon):
 
             master = self.get_master()
             if not master:
-                return '', '', ''
+                return '', '', '', False
             aes = gecolib.AES()
             to_read = aes.decrypt(to_read, master)
 
@@ -330,20 +340,24 @@ class TrayIcon(gtk.StatusIcon):
                     key, value = map(str.strip, opt.split('='))
                     values[key] = value
                 except:
-                    return '', '', ''
-            
-            return values['server'], values['user'], values['passwd']
-        else:
-            return '', '', ''
+                    return '', '', '', False
 
-    def auth(self, server='', user='', password=''):
+            use_keyring = values.get('use_keyring', False)
+            if use_keyring and use_keyring.lower() in ['false', 'no', '0']:
+                use_keyring = False
+            return values['server'], values['user'], values['passwd'], use_keyring
+        else:
+            return '', '', '', False
+
+    def auth(self, server='', user='', password='', use_keyring=False):
         if not server:
-            server, user, password = self.get_opts()
+            server, user, password, use_keyring = self.get_opts()
             if not server:
                 self.message('No encuentro el fichero de configuración, o está erroneo.\n'\
                         'Configúralo en Preferencias', type='info')
                 return
 
+        self.use_keyring = use_keyring
         self.set_blinking(True)
         t = threading.Thread(target=self.remote_auth,
                 args=(server, user, password))
@@ -372,7 +386,7 @@ class TrayIcon(gtk.StatusIcon):
             gtk.gdk.threads_leave()
 
     def del_user(self, widget, *args):
-        server, user, passwd = self.__get_config_form()
+        server, user, passwd, use_keyring = self.__get_config_form()
         gso = gecolib.GSO(xmlrpc_server=server)
         gso.auth(user, passwd)
 
@@ -383,7 +397,7 @@ class TrayIcon(gtk.StatusIcon):
             self.message('Error al borrar la cuenta: %s' % str(e))
 
     def register(self, widget, *args):
-        server, user, passwd = self.__get_config_form()
+        server, user, passwd, use_keyring = self.__get_config_form()
         gso = gecolib.GSO(xmlrpc_server=server)
         gso.auth(user, passwd)
 
@@ -394,11 +408,13 @@ class TrayIcon(gtk.StatusIcon):
             self.message('Error en el registro: %s' % str(e))
 
     def save_conf(self, widget, *args):
-        server, user, passwd = self.__get_config_form()
+        server, user, passwd, use_keyring = self.__get_config_form()
         f = open(CONFFILE, 'w')
         to_save = 'server = %s\n'\
                 'user = %s\n'\
                 'passwd = %s\n' % (server, user, passwd)
+        if use_keyring:
+            to_save += 'use_keyring = True\n'
 
         master = self.get_master()
         aes = gecolib.AES()
@@ -406,7 +422,7 @@ class TrayIcon(gtk.StatusIcon):
 
         f.write(to_save)
         f.close()
-        self.auth(server, user, passwd)
+        self.auth(server, user, passwd, use_keyring)
 
     def export_file(self, widget, *args):
         dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -501,6 +517,21 @@ class TrayIcon(gtk.StatusIcon):
         if self.expirated:
             self.show_alert()
 
+        if self.use_keyring:
+            self.sync_passwords()
+
+    def sync_passwords(self):
+        try:
+            passwords = self.gso.get_all_passwords()
+        except Exception, e:
+            self.message('Error obteniendo contraseñas: %s' % str(e))
+            return
+        for p in passwords:
+            # Storing password in python keyring (gnome, kde, etc)
+            p2 = self.get_password(p['name'])
+            keyring.set_password(p['name'], p['account'], p2)
+            del p2
+
     def add_new(self, p):
         def clicked(button, event, p):
             if event.button == 3:
@@ -523,7 +554,7 @@ class TrayIcon(gtk.StatusIcon):
         button.set_tooltip_markup(tooltip)
         button.set_alignment(0, 0.5)
         hbox.add(button)
-        
+
         exp = p['expiration']
         expdate = datetime.datetime.fromtimestamp(float(exp))
         days = (expdate - datetime.datetime.now()).days
@@ -578,7 +609,7 @@ class TrayIcon(gtk.StatusIcon):
         # hide window
         self.hide_win()
 
-        server, user, passwd = self.__get_config_form()
+        server, user, passwd, use_keyring = self.__get_config_form()
         if not user:
             self.__set_config_form()
 
@@ -587,8 +618,8 @@ class TrayIcon(gtk.StatusIcon):
 
         dialog.hide()
         # Refresh
-        server, user, passwd = self.__get_config_form()
-        self.auth(server, user, passwd)
+        server, user, passwd, use_keyring = self.__get_config_form()
+        self.auth(server, user, passwd, use_keyring)
 
     def on_add(self, data, p=None):
         # hide window

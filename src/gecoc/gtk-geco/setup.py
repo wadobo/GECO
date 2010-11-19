@@ -18,6 +18,8 @@ setup(name = 'gtk-geco',
       license = 'GPLv3',
       data_files = datafiles,
       scripts = ['gtk-geco', 'gecosearch'],
+      packages = ['keyring', 'keyring.tests', 'keyring.util',
+                  'keyring.backends'],
       py_modules = ['gtkgeco'],
       )
 

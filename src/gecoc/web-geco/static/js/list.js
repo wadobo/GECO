@@ -12,7 +12,8 @@ $(document).ready(function() {
         $(this).removeClass("selected");
     });
 
-    $(".pwdname").click(function(){
+    $(".pwdname").click(function(event){
+        event.stopPropagation();
         pwd = $(this).next().html();
         show_passwd();
     });

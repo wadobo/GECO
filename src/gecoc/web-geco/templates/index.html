@@ -24,7 +24,7 @@ $def with (username='', pwdlist=[])
                         <td class="showdesc">+</td>
                     $else:
                         <td></td>
-                    <td class="pwdname">${password.get('name', 'NONAME')}</td>
+                    <td><a href="#" class="pwdname">${password.get('name', 'NONAME')}</a></td>
                     <td class="pwdpwd">${password['password']}</td>
                     <td class="pwdacc">${password.get('account', '--')}</td>
                     <td class="pwdtype">${password.get('type', '--')}</td>

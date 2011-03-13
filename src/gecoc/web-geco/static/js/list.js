@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     $(".pwdname").click(function(event){
         event.stopPropagation();
-        pwd = $(this).next().html();
+        pwd = $(this).parent().next().html();
         show_passwd();
     });
 

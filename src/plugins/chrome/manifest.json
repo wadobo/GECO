@@ -1,0 +1,12 @@
+{
+  "name": "Geco Extension",
+  "version": "0.1",
+  "description": "Gestor de Contraseñas.",
+  "browser_action": {
+    "default_icon": "geco.png",
+    "popup": "popup.html"
+  },
+  "permissions": [
+    "http://wadobo.com/"
+  ]
+}

@@ -93,6 +93,15 @@ class Password(Base):
         self.expiration = datetime.datetime.now() +\
             datetime.timedelta(default)
 
+    def serialize(self):
+        return dict(type=self.type, name=self.name,
+                description=self.description,
+                updated=self.updated.strftime("%d/%m/%Y %H:%M:%S"),
+                expiration=self.expiration.strftime("%d/%m/%Y %H:%M:%S"),
+                account=self.account,
+                password=self.password,
+                cypher_method=self.cypher_method)
+
 class Conffile(Base):
     __tablename__ = 'conffiles'
 

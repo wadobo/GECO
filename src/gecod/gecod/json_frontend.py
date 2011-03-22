@@ -5,77 +5,86 @@ import json
 import backend
 
 urls = (
-        '/auth/(.*)/(.*)', 'auth',
-        '/logout/(.*)', 'logout',
-        '/register/(.*)/(.*)', 'register',
-        '/unregister/(.*)', 'unregister',
-        '/change_password/(.*)/(.*)', 'change_password',
-        '/change_attr/(.*)/(.*)/(.*)', 'change_attr',
-        '/check_user_name/(.*)', 'check_user_name',
-        '/set_password/(.*)/(.*)/(.*)/(.*)', 'set_password',
-        '/del_password/(.*)/(.*)', 'del_password',
-        '/get_password/(.*)/(.*)', 'get_password',
-        '/get_passwords/(.*)', 'get_passwords',
-        '/get_all_passwords/(.*)', 'get_all_passwords',
-        '/export/(.*)', 'export',
-        '/restore/(.*)', 'restore',
+        '/auth', 'auth',
+        '/logout', 'logout',
+        '/register', 'register',
+        '/unregister', 'unregister',
+        '/change_password', 'change_password',
+        '/change_attr', 'change_attr',
+        '/check_user_name', 'check_user_name',
+        '/set_password', 'set_password',
+        '/del_password', 'del_password',
+        '/get_password', 'get_password',
+        '/get_passwords', 'get_passwords',
+        '/get_all_passwords', 'get_all_passwords',
+        '/export', 'export',
+        '/restore', 'restore',
         )
 
 app = web.application(urls, globals())
 
 
-class greet:
-    def GET(self, name, name2):
-        return json.dumps({'message': 'Hello, ' + name + " " + name2 + '!'})
-
-
 class auth:
-    def GET(self, user, password):
+    def POST(self):
         '''
         Return the cookie.
         '''
-        cookie = backend.auth(user, 'password', password=password)
-        return json.dumps({'cookie' : cookie})
+        inp = web.input()
+        cookie = backend.auth(inp.user, 'password', password=inp.password)
+        if cookie:
+            return json.dumps({'status' : 'ok', 'cookie' : cookie})
+        return json.dumps({'status' : 'error'})
 
 class logout:
-    def GET(self, cookie):
-        backend.logout(cookie)
+    def POST(self):
+        inp = web.input()
+        backend.logout(inp.cookie)
         return json.dumps({'status' : 'ok'})
 
 class register:
-    def POST(self, user, password):
-        backend.register(user, password)
+    def POST(self):
+        inp = web.input()
+        try:
+            backend.register(inp.user, inp.password)
+        except:
+            return json.dumps({'status' : 'error'})
         return json.dumps({'status' : 'ok'})
 
 class unregister:
-    def GET(self, cookie):
-        backend.unregister(cookie)
+    def POST(self):
+        inp = web.input()
+        backend.unregister(inp.cookie)
         return json.dumps({'status' : 'ok'})
 
 class change_password:
-    def GET(self, cookie, new_password):
-        backend.change_password(cookie, new_password)
+    def POST(self):
+        inp = web.input()
+        backend.change_password(inp.cookie, inp.new_password)
         return json.dumps({'status' : 'ok'})
 
 class change_attr:
-    def GET(self, cookie, name, args):
+    def POST(self):
         '''
         args is a dict with possible keys:
             type, description, account, expiration, password
 
             expiration must be a datetime
         '''
-        backend.change_attr(cookie, name, **args)
+        inp = web.input()
+        cookie = inp.pop('cookie')
+        name = inp.pop('name')
+        backend.change_attr(cookie, name, **inp)
         return json.dumps({'status' : 'ok'})
 
 
 class check_user_name:
-    def GET(self, name):
-        result = backend.check_user_name(name)
+    def POST(self):
+        inp = web.input()
+        result = backend.check_user_name(inp.name)
         return json.dumps({'status' : result})
 
 class set_password:
-    def GET(self, cookie, name, password, args):
+    def POST(self):
         '''
         args is a dict with possible keys:
             type, description, account, expiration
@@ -83,53 +92,59 @@ class set_password:
             expiration must be an integer (days)
         '''
 
-        backend.set_password(cookie, name, password, **args)
+        inp = web.input()
+        cookie = inp.pop('cookie')
+        name = inp.pop('name')
+        password = inp.pop('password')
+        backend.set_password(cookie, name, password, **inp)
+        return json.dumps({'status' : 'ok'})
 
 class del_password:
-    def GET(self, cookie, name):
-        backend.del_password(cookie, name)
+    def POST(self):
+        inp = web.input()
+        backend.del_password(inp.cookie, inp.name)
         return json.dumps({'status' : 'ok'})
 
 class get_password: 
-    def GET(self, cookie, name):
-        p = backend.get_password(cookie, name)
-        return json.dumps({'password' : p})
+    def POST(self):
+        inp = web.input()
+        p = backend.get_password(inp.cookie, inp.name)
+        return json.dumps({'status' : 'ok', 'password' : p.serialize()})
 
 class get_passwords:
-    def GET(self, cookie, args):
-        '''
-        args is a dict with possible keys:
-            name, type, updated, expiration, account
-        '''
-
-        p = backend.get_passwords_by(cookie, **args)
-        return [i for i in p]
+    def POST(self):
+        inp = web.input()
+        cookie = inp.pop('cookie')
+        p = backend.get_passwords_by(cookie, **inp)
+        return json.dumps({'status' : 'ok', 'passwords' :
+            [i.serialize() for i in p]})
 
 class get_all_passwords: 
-    def GET(self, cookie):
+    def POST(self):
         '''
         Return all passwords of user
         '''
-
-        p = backend.get_all_passwords(cookie)
-        return [i for i in p]
+        inp = web.input()
+        p = backend.get_all_passwords(inp.cookie, from_db=True)
+        return json.dumps({'status' : 'ok', 'passwords' :
+            [i.serialize() for i in p]})
 
 class export:
-    def GET(self, cookie):
+    def POST(self):
         '''
         Returns a string with all passwords
         ready to import
         '''
-
-        return backend.export(cookie)
+        inp = web.input()
+        return backend.export(inp.cookie)
 
 class restore:
-    def GET(self, cookie, data):
+    def POST(self):
         '''
         Restore data from a backup doit with export
         '''
-
-        backend.restore(cookie, data)
+        inp = web.input()
+        backend.restore(inp.cookie, inp.data)
 
 
 if __name__ == "__main__":

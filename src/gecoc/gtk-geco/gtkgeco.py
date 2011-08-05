@@ -1,23 +1,26 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # License: GPLv3
 # Author: Daniel Garcia <dani@danigm.net>
 
 import os, sys
 import signal
-import gtk
-gtk.gdk.threads_init()
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
 import threading
 
-import gobject
+from gi.repository import GObject
 import datetime
 from gecoc import gecolib
 
-import pynotify
+from gi.repository import Notify
+Notify.init('GECO')
 import keyring
 
 try:
-    import keybinder
+    from gi.repository import Keybinder as keybinder
+    keybinder.init()
 except:
     keybinder = None
 
@@ -34,9 +37,9 @@ def remove_text(button):
     image.show()
     label.set_text('')
 
-class TrayIcon(gtk.StatusIcon):
+class TrayIcon(Gtk.StatusIcon):
     def __init__(self):
-        gtk.StatusIcon.__init__(self)
+        GObject.GObject.__init__(self)
         menu = '''
                 <ui>
                 <menubar name="Menubar">
@@ -52,33 +55,33 @@ class TrayIcon(gtk.StatusIcon):
         '''
         actions = [
                 ('Menu',  None, 'Menu'),
-                ('Add', gtk.STOCK_ADD, '_Add...', None, 'Add', self.on_add),
-                ('Search', gtk.STOCK_FIND, '_Search...', None, 'Search', self.on_search),
-                ('Config', gtk.STOCK_PREFERENCES, '_Config...', None, 'Configure', self.on_config),
-                ('About', gtk.STOCK_ABOUT, '_About...', None, 'About gtk-GECO', self.on_about),
-                ('Quit',gtk.STOCK_QUIT,'_Quit',None, 'Quit', self.on_quit),
+                ('Add', Gtk.STOCK_ADD, '_Add...', None, 'Add', self.on_add),
+                ('Search', Gtk.STOCK_FIND, '_Search...', None, 'Search', self.on_search),
+                ('Config', Gtk.STOCK_PREFERENCES, '_Config...', None, 'Configure', self.on_config),
+                ('About', Gtk.STOCK_ABOUT, '_About...', None, 'About gtk-GECO', self.on_about),
+                ('Quit',Gtk.STOCK_QUIT,'_Quit',None, 'Quit', self.on_quit),
                 ]
 
-        ag = gtk.ActionGroup('Actions')
+        ag = Gtk.ActionGroup('Actions')
         ag.add_actions(actions)
-        self.manager = gtk.UIManager()
+        self.manager = Gtk.UIManager()
         self.manager.insert_action_group(ag, 0)
         self.manager.add_ui_from_string(menu)
         self.menu = self.manager.get_widget('/Menubar/Menu/About').props.parent
         self.current_icon_path = ''
-        gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "lock.png"))
+        Gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "lock.png"))
         self.set_visible(True)
         self.connect('popup-menu', self.on_popup_menu)
         self.connect('activate', self.on_click)
 
         def double_click(widget, event):
-            if event.type == gtk.gdk._2BUTTON_PRESS:
+            if event.type == Gdk.EventType._2BUTTON_PRESS:
                 self.on_search()
 
         self.connect('button_press_event', double_click)
 
         popupfile = os.path.join(IMG, 'popup.glade')
-        self.builder = gtk.Builder()
+        self.builder = Gtk.Builder()
         self.builder.add_from_file(popupfile)
         self.win = self.builder.get_object('popup')
         self.win.show_all()
@@ -147,18 +150,18 @@ class TrayIcon(gtk.StatusIcon):
         self.change_master_button = self.builder.get_object('change_master_button')
         self.change_master_button.set_sensitive(False)
         self.change_master_button.connect('clicked', self.change_master)
-        
+
         self.master = ''
         self.use_keyring = False
         self.auth()
-        
+
         # keybinding
 
         if keybinder is not None:
-            keybinder.bind("<ALT>g", self.on_search)
+            keybinder.bind("<ALT>g", self.on_search, None)
 
         def on_search2(*args):
-            gobject.idle_add(self.on_search)
+            GObject.idle_add(self.on_search)
 
         signal.signal(14, on_search2)
         self.password_names = []
@@ -168,7 +171,7 @@ class TrayIcon(gtk.StatusIcon):
 
         self.messages = []
 
-        gobject.timeout_add(500, self.show_messages)
+        GObject.timeout_add(500, self.show_messages)
 
     def show_messages(self, *args):
         while len(self.messages):
@@ -210,11 +213,11 @@ class TrayIcon(gtk.StatusIcon):
                    '\n\n'
                    '¿Continuar de todos modos?')
 
-            dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
-                    buttons=gtk.BUTTONS_YES_NO,
+            dialog = Gtk.MessageDialog(type=Gtk.MessageType.ERROR,
+                    buttons=Gtk.ButtonsType.YES_NO,
                     message_format=msg)
             ret = dialog.run()
-            if ret == gtk.RESPONSE_NO:
+            if ret == Gtk.ResponseType.NO:
                 return
             dialog.destroy()
 
@@ -234,10 +237,10 @@ class TrayIcon(gtk.StatusIcon):
         t.start()
 
         title = kwargs.get('title', '')
-        label = gtk.Label(title)
+        label = Gtk.Label(label=title)
         label.show()
-        d = gtk.Dialog(title)
-        progress = gtk.ProgressBar()
+        d = Gtk.Dialog(title)
+        progress = Gtk.ProgressBar()
         progress.show()
 
         def update_progress_cb(data=None):
@@ -248,7 +251,7 @@ class TrayIcon(gtk.StatusIcon):
             d.destroy()
             return False
 
-        gobject.timeout_add(100, update_progress_cb)
+        GObject.timeout_add(100, update_progress_cb)
 
         d.vbox.add(label)
         d.vbox.add(progress)
@@ -261,10 +264,10 @@ class TrayIcon(gtk.StatusIcon):
         text2 = editable2.get_text()
 
         if text1 != text2:
-            editable1.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#ff0000'))
+            editable1.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse('#ff0000'))
             label.set_text("No coinciden")
         else:
-            editable1.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#00ff00'))
+            editable1.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse('#00ff00'))
             strength = self.get_text_strength(text1)
             strength = '<span foreground="#66BF66">%s</span>' % strength
             label.set_markup(strength)
@@ -310,14 +313,12 @@ class TrayIcon(gtk.StatusIcon):
             dialog.destroy()
 
         def dialog_run(dialog):
-            if not dialog.modal:
-                dialog.set_modal(True)
             dialog.connect('response', dialog_response_cb)
             dialog.show()
 
-        type = gtk.MESSAGE_ERROR if type == 'err' else gtk.MESSAGE_INFO
-        dialog = gtk.MessageDialog(type=type,
-                buttons=gtk.BUTTONS_CLOSE,
+        type = Gtk.MessageType.ERROR if type == 'err' else Gtk.MessageType.INFO
+        dialog = Gtk.MessageDialog(type=type,
+                buttons=Gtk.ButtonsType.CLOSE,
                 message_format=msg)
         dialog_run(dialog)
 
@@ -358,10 +359,14 @@ class TrayIcon(gtk.StatusIcon):
                 return
 
         self.use_keyring = use_keyring
-        self.set_blinking(True)
+        self.blinking = True
         t = threading.Thread(target=self.remote_auth,
                 args=(server, user, password))
         t.start()
+
+    def remote_auth2(self, args):
+        self.remote_auth(*args)
+        return False
 
     def remote_auth(self, server, user, password):
         try:
@@ -369,21 +374,22 @@ class TrayIcon(gtk.StatusIcon):
             self.gso.auth(user, password)
         except Exception, e:
             try:
-                gtk.gdk.threads_enter()
+                Gdk.threads_enter()
                 self.messages.insert(0, ('Error en el login: %s' % str(e), 'err'))
-                self.set_blinking(False)
+                self.blinking = False
                 return
             finally:
-                gtk.gdk.threads_leave()
+                Gdk.threads_leave()
 
         try:
-            gtk.gdk.threads_enter()
+            Gdk.threads_enter()
             self.statusbar = self.builder.get_object('statusbar')
             self.statusbar.push(0, server)
             self.get_passwords()
-            self.set_blinking(False)
+            self.blinking = False
         finally:
-            gtk.gdk.threads_leave()
+            Gdk.threads_leave()
+            pass
 
     def del_user(self, widget, *args):
         server, user, passwd, use_keyring = self.__get_config_form()
@@ -425,10 +431,10 @@ class TrayIcon(gtk.StatusIcon):
         self.auth(server, user, passwd, use_keyring)
 
     def export_file(self, widget, *args):
-        dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog = Gtk.FileChooserDialog(action=Gtk.FileChooserAction.SAVE,
+                buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
         response = dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
             try:
                 out = open(filename, 'w')
@@ -440,10 +446,10 @@ class TrayIcon(gtk.StatusIcon):
         dialog.destroy()
 
     def import_file(self, widget, *args):
-        dialog = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        dialog = Gtk.FileChooserDialog(action=Gtk.FileChooserAction.OPEN,
+                buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
         response = dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
             try:
                 inp = open(filename).read()
@@ -466,24 +472,25 @@ class TrayIcon(gtk.StatusIcon):
             return self.master
         else:
             master_dialog = \
-                    gtk.MessageDialog(buttons=gtk.BUTTONS_OK_CANCEL,
+                    Gtk.MessageDialog(buttons=Gtk.ButtonsType.OK_CANCEL,
                     message_format="Contraseña maestra")
 
-            master_input = gtk.Entry()
+            master_input = Gtk.Entry()
             master_input.set_visibility(False)
             master_input.show()
             master_input.set_activates_default(True)
 
-            master_dialog.vbox.pack_start(master_input, False, True)
+            vbox = master_dialog.get_message_area()
+            vbox.pack_start(master_input, False, True, 0)
 
-            master_dialog.set_default_response(gtk.RESPONSE_OK)
+            master_dialog.set_default_response(Gtk.ResponseType.OK)
 
             response = master_dialog.run()
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 self.master = master_input.get_text()
                 master_input.set_text('')
                 self.unlocked(True)
-                gobject.timeout_add(SECONDS * 1000, self.forget)
+                GObject.timeout_add(SECONDS * 1000, self.forget)
             master_dialog.destroy()
             return self.master
 
@@ -492,7 +499,7 @@ class TrayIcon(gtk.StatusIcon):
         self.expirated = []
 
         self.passwords.destroy()
-        self.passwords = gtk.VBox()
+        self.passwords = Gtk.VBox()
         self.passwords.show()
         self.viewport.add(self.passwords)
         self.password_names = []
@@ -538,17 +545,17 @@ class TrayIcon(gtk.StatusIcon):
                 password = p['account']
             else:
                 password = self.get_password(p['name'])
-            clipboard = gtk.clipboard_get()
-            clipboard.set_text(password)
+            clipboard = Gtk.Clipboard.get(Gdk.atom_intern_static_string("CLIPBOARD"))
+            clipboard.set_text(password, len(password))
             clipboard.store()
             self.hide_win()
 
         vbox = self.passwords
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
 
         # PASSWORD 
-        button = gtk.Button(p['name'])
-        button.set_relief(gtk.RELIEF_NONE)
+        button = Gtk.Button(p['name'])
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.connect('button_press_event', clicked, p)
         tooltip = '\t<b>%s</b>:\n\t%s' % (p['account'], p['description'])
         button.set_tooltip_markup(tooltip)
@@ -567,41 +574,41 @@ class TrayIcon(gtk.StatusIcon):
         if days <= 0:
             self.expirated.append((p, days))
 
-        expiration = gtk.Image()
+        expiration = Gtk.Image()
         expiration.set_from_file(os.path.join(IMG, img))
-        hbox.pack_start(expiration, False, False)
+        hbox.pack_start(expiration, False, False, 0)
 
         # EDIT
-        edit = gtk.Button(stock=gtk.STOCK_EDIT)
-        edit.set_relief(gtk.RELIEF_NONE)
+        edit = Gtk.Button(stock=Gtk.STOCK_EDIT)
+        edit.set_relief(Gtk.ReliefStyle.NONE)
         edit.connect('clicked', self.on_add, p)
         remove_text(edit)
-        hbox.pack_start(edit, False)
+        hbox.pack_start(edit, False, False, 0)
 
         # DELETE
-        delete = gtk.Button(stock=gtk.STOCK_DELETE)
-        delete.set_relief(gtk.RELIEF_NONE)
+        delete = Gtk.Button(stock=Gtk.STOCK_DELETE)
+        delete.set_relief(Gtk.ReliefStyle.NONE)
         delete.connect('clicked', self.delete, p)
         remove_text(delete)
-        hbox.pack_start(delete, False)
+        hbox.pack_start(delete, False, False, 0)
 
         hbox.show_all()
 
-        vbox.pack_start(hbox, False, False)
+        vbox.pack_start(hbox, False, False, 0)
 
-    def on_quit(self,widget):
+    def on_quit(self, widget, *args):
         sys.exit()
 
     def on_popup_menu(self, status, button, time):
-        self.menu.popup(None, None, None, button, time)
+        self.menu.popup(None, None, None, None, button, time)
 
     def on_about(self, data):
-        dialog = gtk.AboutDialog()
+        dialog = Gtk.AboutDialog()
         dialog.set_name('GTK GECO')
         dialog.set_version(__version__)
         dialog.set_comments('Gestor de Contraseñas distribuido')
         dialog.set_website('http://danigm.net/geco')
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(IMG, 'poweredby.png')))
+        dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(os.path.join(IMG, 'poweredby.png')))
         dialog.run()
         dialog.destroy()
 
@@ -737,6 +744,14 @@ class TrayIcon(gtk.StatusIcon):
         else:
             self.win_visible = True
             x, y = self.get_mouse()
+            win, x, y, mods = self.win.get_screen().get_root_window().get_pointer()
+            a, b, width, height = self.win.get_screen().get_root_window().get_geometry()
+            wwidth = self.win.get_allocated_width()
+            wheight = self.win.get_allocated_height()
+            if (x + wwidth > width):
+                x = width - wwidth
+            if (y + wheight > height):
+                y = height - wheight
             self.win.move(x,y)
             self.win.show()
 
@@ -744,18 +759,19 @@ class TrayIcon(gtk.StatusIcon):
         if self.win_visible:
             self.win_visible = False
             self.win.hide()
-    
+
     def unlocked(self, boolean):
         if not boolean:
-            gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "lock.png"))
+            Gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "lock.png"))
         else:
-            gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "unlock.png"))
+            Gtk.StatusIcon.set_from_file(self, os.path.join(IMG, "unlock.png"))
 
     def get_mouse(self):
+        return 0, 40
         win_w, win_h = self.win.get_size()
         screen = self.get_screen()
         width, height = screen.get_width(), screen.get_height()
-        
+
         rootwin = screen.get_root_window()
         x, y, mods = rootwin.get_pointer()
         x+=5
@@ -773,11 +789,11 @@ class TrayIcon(gtk.StatusIcon):
         self.hide_win()
         name = p['name']
         message = '¿Estás seguro de que quieres eliminar la contraseña "%s"?' % name
-        dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(buttons=Gtk.ButtonsType.YES_NO,
                 message_format=message)
         response = dialog.run()
-        
-        if response == gtk.RESPONSE_YES:
+
+        if response == Gtk.ResponseType.YES:
             self.gso.del_password(name)
             self.get_passwords()
 
@@ -787,9 +803,9 @@ class TrayIcon(gtk.StatusIcon):
         self.search_win = self.builder.get_object('search_window')
         self.search_entry = self.builder.get_object('search_entry')
 
-        completion = gtk.EntryCompletion()
+        completion = Gtk.EntryCompletion()
         self.search_entry.set_completion(completion)
-        liststore = gtk.ListStore(gobject.TYPE_STRING)
+        liststore = Gtk.ListStore(GObject.TYPE_STRING)
         [liststore.append([i]) for i in self.password_names] 
         completion.set_model(liststore)
         completion.set_text_column(0)
@@ -799,16 +815,26 @@ class TrayIcon(gtk.StatusIcon):
             self.search_win.hide()
 
             password = self.get_password(text)
-                
-            clipboard = gtk.clipboard_get()
-            clipboard.set_text(password)
+
+            clipboard = Gtk.Clipboard.get(Gdk.atom_intern_static_string("CLIPBOARD"))
+            clipboard.set_text(password, len(password))
+            clipboard.store()
+
+        def af(*args):
+            text = self.search_entry.get_text()
+            self.search_win.hide()
+
+            p = self.cached_passwords[text]
+
+            clipboard = Gtk.Clipboard.get(Gdk.atom_intern_static_string("CLIPBOARD"))
+            clipboard.set_text(p['account'], len(p['account']))
             clipboard.store()
 
         def cf(*args):
             self.search_win.hide()
 
         def close_if_escape(widget, event, *args):
-            if gtk.gdk.keyval_name(event.keyval) == 'Escape':
+            if Gdk.keyval_name(event.keyval) == 'Escape':
                 cf()
 
         self.search_entry.connect('activate', f)
@@ -816,13 +842,14 @@ class TrayIcon(gtk.StatusIcon):
 
         self.search_button = self.builder.get_object('search_ok')
         self.search_cancel = self.builder.get_object('search_cancel')
+        self.search_account_button = self.builder.get_object('search_account_button')
         self.search_button.connect('clicked', f)
+        self.search_account_button.connect('clicked', af)
         self.search_cancel.connect('clicked', cf)
 
-        self.search_win.show()
+        self.search_win.set_keep_above(True)
         self.search_win.present()
         self.search_win.set_focus(self.search_entry)
-        gobject.idle_add(self.search_win.present)
 
     def get_password(self, text):
         master_password = self.get_master()
@@ -840,16 +867,21 @@ class TrayIcon(gtk.StatusIcon):
             msg += '<b>%s</b> (%s) \n' % (i['name'], d)
         seconds = 5
 
-        pynotify.init("GECO")
-        note = pynotify.Notification(title, msg, "dialog-warning")
-        note.set_urgency(pynotify.URGENCY_CRITICAL)
-        note.attach_to_status_icon(self)
+        note = Notify.Notification.new("GECO", msg, None)
+        note.set_urgency(Notify.Urgency.CRITICAL)
         note.set_timeout(seconds*1000)
         note.show()
 
 def main():
+    GObject.threads_init(None)
     t = TrayIcon()
-    gtk.main()
+
+    Gdk.threads_init()
+    Gdk.threads_enter()
+
+    Gtk.main()
+
+    Gdk.threads_leave()
 
 if __name__ == '__main__':
     main()

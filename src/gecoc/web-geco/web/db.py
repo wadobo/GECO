@@ -17,7 +17,11 @@ try:
 except ImportError:
     datetime = None
 
-from utils import threadeddict, storage, iters, iterbetter
+try: set
+except NameError:
+    from sets import Set as set
+    
+from utils import threadeddict, storage, iters, iterbetter, safestr, safeunicode
 
 try:
     # db module can work independent of web.py
@@ -50,7 +54,7 @@ class UnknownParamstyle(Exception):
     """
     pass
     
-class SQLParam:
+class SQLParam(object):
     """
     Parameter in SQLQuery.
     
@@ -62,6 +66,8 @@ class SQLParam:
         >>> q.values()
         ['joe']
     """
+    __slots__ = ["value"]
+
     def __init__(self, value):
         self.value = value
         
@@ -91,7 +97,7 @@ class SQLParam:
 
 sqlparam =  SQLParam
 
-class SQLQuery:
+class SQLQuery(object):
     """
     You can pass this sort of thing as a clause in any db function.
     Otherwise, you can pass a dictionary to the keyword argument `vars`
@@ -100,9 +106,11 @@ class SQLQuery:
     Internally, consists of `items`, which is a list of strings and
     SQLParams, which get concatenated to produce the actual query.
     """
+    __slots__ = ["items"]
+
     # tested in sqlquote's docstring
-    def __init__(self, items=[]):
-        """Creates a new SQLQuery.
+    def __init__(self, items=None):
+        r"""Creates a new SQLQuery.
         
             >>> SQLQuery("x")
             <sql: 'x'>
@@ -114,19 +122,24 @@ class SQLQuery:
             >>> SQLQuery(SQLParam(1))
             <sql: '1'>
         """
-        if isinstance(items, list):
+        if items is None:
+            self.items = []
+        elif isinstance(items, list):
             self.items = items
         elif isinstance(items, SQLParam):
             self.items = [items]
         elif isinstance(items, SQLQuery):
             self.items = list(items.items)
         else:
-            self.items = [str(items)]
+            self.items = [items]
             
         # Take care of SQLLiterals
         for i, item in enumerate(self.items):
             if isinstance(item, SQLParam) and isinstance(item.value, SQLLiteral):
                 self.items[i] = item.value.v
+
+    def append(self, value):
+        self.items.append(value)
 
     def __add__(self, other):
         if isinstance(other, basestring):
@@ -146,13 +159,12 @@ class SQLQuery:
         return SQLQuery(items + self.items)
 
     def __iadd__(self, other):
-        if isinstance(other, basestring):
-            items = [other]
+        if isinstance(other, (basestring, SQLParam)):
+            self.items.append(other)
         elif isinstance(other, SQLQuery):
-            items = other.items
+            self.items.extend(other.items)
         else:
             return NotImplemented
-        self.items.extend(items)
         return self
 
     def __len__(self):
@@ -167,12 +179,20 @@ class SQLQuery:
             >>> q.query(paramstyle='qmark')
             'SELECT * FROM test WHERE name=?'
         """
-        s = ''
+        s = []
         for x in self.items:
             if isinstance(x, SQLParam):
                 x = x.get_marker(paramstyle)
-            s += x
-        return s
+                s.append(safestr(x))
+            else:
+                x = safestr(x)
+                # automatically escape % characters in the query
+                # For backward compatability, ignore escaping when the query looks already escaped
+                if paramstyle in ['format', 'pyformat']:
+                    if '%' in x and '%%' not in x:
+                        x = x.replace('%', '%%')
+                s.append(x)
+        return "".join(s)
     
     def values(self):
         """
@@ -183,29 +203,53 @@ class SQLQuery:
         """
         return [i.value for i in self.items if isinstance(i, SQLParam)]
         
-    def join(items, sep=' '):
+    def join(items, sep=' ', prefix=None, suffix=None, target=None):
         """
         Joins multiple queries.
         
         >>> SQLQuery.join(['a', 'b'], ', ')
         <sql: 'a, b'>
-        """
-        if len(items) == 0:
-            return SQLQuery("")
 
-        q = SQLQuery(items[0])
-        for item in items[1:]:
-            q += sep
-            q += item
-        return q
+        Optinally, prefix and suffix arguments can be provided.
+
+        >>> SQLQuery.join(['a', 'b'], ', ', prefix='(', suffix=')')
+        <sql: '(a, b)'>
+
+        If target argument is provided, the items are appended to target instead of creating a new SQLQuery.
+        """
+        if target is None:
+            target = SQLQuery()
+
+        target_items = target.items
+
+        if prefix:
+            target_items.append(prefix)
+
+        for i, item in enumerate(items):
+            if i != 0:
+                target_items.append(sep)
+            if isinstance(item, SQLQuery):
+                target_items.extend(item.items)
+            else:
+                target_items.append(item)
+
+        if suffix:
+            target_items.append(suffix)
+        return target
     
     join = staticmethod(join)
-
-    def __str__(self):
+    
+    def _str(self):
         try:
-            return self.query() % tuple([sqlify(x) for x in self.values()])
+            return self.query() % tuple([sqlify(x) for x in self.values()])            
         except (ValueError, TypeError):
             return self.query()
+        
+    def __str__(self):
+        return safestr(self._str())
+        
+    def __unicode__(self):
+        return safeunicode(self._str())
 
     def __repr__(self):
         return '<sql: %s>' % repr(str(self))
@@ -285,6 +329,7 @@ def sqlify(obj):
     elif datetime and isinstance(obj, datetime.datetime):
         return repr(obj.isoformat())
     else:
+        if isinstance(obj, unicode): obj = obj.encode('utf8')
         return repr(obj)
 
 def sqllist(lst): 
@@ -442,10 +487,9 @@ class DB:
         self.db_module = db_module
         self.keywords = keywords
 
-        
         self._ctx = threadeddict()
         # flag to enable/disable printing queries
-        self.printing = config.get('debug', False)
+        self.printing = config.get('debug_sql', config.get('debug', False))
         self.supports_multiple_insert = False
         
         try:
@@ -539,8 +583,8 @@ class DB:
         
         try:
             a = time.time()
-            paramstyle = getattr(self, 'paramstyle', 'pyformat')
-            out = cur.execute(sql_query.query(paramstyle), sql_query.values())
+            query, params = self._process_query(sql_query)
+            out = cur.execute(query, params)
             b = time.time()
         except:
             if self.printing:
@@ -554,6 +598,14 @@ class DB:
         if self.printing:
             print >> debug, '%s (%s): %s' % (round(b-a, 2), self.ctx.dbq_count, str(sql_query))
         return out
+
+    def _process_query(self, sql_query):
+        """Takes the SQLQuery object and returns query string and parameters.
+        """
+        paramstyle = getattr(self, 'paramstyle', 'pyformat')
+        query = sql_query.query(paramstyle)
+        params = sql_query.values()
+        return query, params
     
     def _where(self, where, vars): 
         if isinstance(where, (int, long)):
@@ -639,13 +691,21 @@ class DB:
             <sql: 'SELECT * FROM foo WHERE bar_id = 3'>
             >>> db.where('foo', source=2, crust='dewey', _test=True)
             <sql: "SELECT * FROM foo WHERE source = 2 AND crust = 'dewey'">
+            >>> db.where('foo', _test=True)
+            <sql: 'SELECT * FROM foo'>
         """
-        where = []
+        where_clauses = []
         for k, v in kwargs.iteritems():
-            where.append(k + ' = ' + sqlquote(v))
+            where_clauses.append(k + ' = ' + sqlquote(v))
+            
+        if where_clauses:
+            where = SQLQuery.join(where_clauses, " AND ")
+        else:
+            where = None
+            
         return self.select(table, what=what, order=order, 
                group=group, limit=limit, offset=offset, _test=_test, 
-               where=SQLQuery.join(where, ' AND '))
+               where=where)
     
     def sql_clauses(self, what, tables, where, group, order, limit, offset): 
         return (
@@ -699,7 +759,7 @@ class DB:
             _values = SQLQuery.join([sqlparam(v) for v in values.values()], ', ')
             sql_query = "INSERT INTO %s " % tablename + q(_keys) + ' VALUES ' + q(_values)
         else:
-            sql_query = SQLQuery("INSERT INTO %s DEFAULT VALUES" % tablename)
+            sql_query = SQLQuery(self._get_insert_default_values_query(tablename))
 
         if _test: return sql_query
         
@@ -725,6 +785,9 @@ class DB:
             self.ctx.commit()
         return out
         
+    def _get_insert_default_values_query(self, table):
+        return "INSERT INTO %s DEFAULT VALUES" % table
+
     def multiple_insert(self, tablename, values, seqname=None, _test=False):
         """
         Inserts multiple rows into `tablename`. The `values` must be a list of dictioanries, 
@@ -757,14 +820,13 @@ class DB:
             if v.keys() != keys:
                 raise ValueError, 'Bad data'
 
-        sql_query = SQLQuery('INSERT INTO %s (%s) VALUES ' % (tablename, ', '.join(keys))) 
+        sql_query = SQLQuery('INSERT INTO %s (%s) VALUES ' % (tablename, ', '.join(keys)))
 
-        data = []
-        for row in values:
-            d = SQLQuery.join([SQLParam(row[k]) for k in keys], ', ')
-            data.append('(' + d + ')')
-        sql_query += SQLQuery.join(data, ', ')
-
+        for i, row in enumerate(values):
+            if i != 0:
+                sql_query.append(", ")
+            SQLQuery.join([SQLParam(row[k]) for k in keys], sep=", ", target=sql_query, prefix="(", suffix=")")
+        
         if _test: return sql_query
 
         db_cursor = self._db_cursor()
@@ -836,8 +898,8 @@ class DB:
         where = self._where(where, vars)
 
         q = 'DELETE FROM ' + table
-        if where: q += ' WHERE ' + where
         if using: q += ' USING ' + sqllist(using)
+        if where: q += ' WHERE ' + where
 
         if _test: return q
 
@@ -858,28 +920,49 @@ class PostgresDB(DB):
     """Postgres driver."""
     def __init__(self, **keywords):
         if 'pw' in keywords:
-            keywords['password'] = keywords['pw']
-            del keywords['pw']
+            keywords['password'] = keywords.pop('pw')
             
         db_module = import_driver(["psycopg2", "psycopg", "pgdb"], preferred=keywords.pop('driver', None))
         if db_module.__name__ == "psycopg2":
             import psycopg2.extensions
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
-        keywords['database'] = keywords.pop('db')
+        # if db is not provided postgres driver will take it from PGDATABASE environment variable
+        if 'db' in keywords:
+            keywords['database'] = keywords.pop('db')
+        
         self.dbname = "postgres"
         self.paramstyle = db_module.paramstyle
         DB.__init__(self, db_module, keywords)
         self.supports_multiple_insert = True
+        self._sequences = None
         
     def _process_insert_query(self, query, tablename, seqname):
-        if seqname is None: 
+        if seqname is None:
+            # when seqname is not provided guess the seqname and make sure it exists
             seqname = tablename + "_id_seq"
-        return query + "; SELECT currval('%s')" % seqname
+            if seqname not in self._get_all_sequences():
+                seqname = None
+        
+        if seqname:
+            query += "; SELECT currval('%s')" % seqname
+            
+        return query
+    
+    def _get_all_sequences(self):
+        """Query postgres to find names of all sequences used in this database."""
+        if self._sequences is None:
+            q = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'"
+            self._sequences = set([c.relname for c in self.query(q)])
+        return self._sequences
 
     def _connect(self, keywords):
         conn = DB._connect(self, keywords)
-        conn.set_client_encoding('UTF8')
+        try:
+            conn.set_client_encoding('UTF8')
+        except AttributeError:
+            # fallback for pgdb driver
+            conn.cursor().execute("set client_encoding to 'UTF-8'")
         return conn
         
     def _connect_with_pooling(self, keywords):
@@ -906,6 +989,9 @@ class MySQLDB(DB):
         
     def _process_insert_query(self, query, tablename, seqname):
         return query, SQLQuery('SELECT last_insert_id();')
+        
+    def _get_insert_default_values_query(self, table):
+        return "INSERT INTO %s () VALUES()" % table
 
 def import_driver(drivers, preferred=None):
     """Import the first available driver or preferred driver.
@@ -926,6 +1012,10 @@ class SqliteDB(DB):
 
         if db.__name__ in ["sqlite3", "pysqlite2.dbapi2"]:
             db.paramstyle = 'qmark'
+            
+        # sqlite driver doesn't create datatime objects for timestamp columns unless `detect_types` option is passed.
+        # It seems to be supported in sqlite3 and pysqlite2 drivers, not surte about sqlite.
+        keywords.setdefault('detect_types', db.PARSE_DECLTYPES)
 
         self.paramstyle = db.paramstyle
         keywords['database'] = keywords.pop('db')
@@ -938,7 +1028,6 @@ class SqliteDB(DB):
     def query(self, *a, **kw):
         out = DB.query(self, *a, **kw)
         if isinstance(out, iterbetter):
-            # rowcount is not provided by sqlite
             del out.__len__
         return out
 
@@ -983,6 +1072,16 @@ class MSSQLDB(DB):
         keywords['database'] = keywords.pop('db')
         self.dbname = "mssql"
         DB.__init__(self, db, keywords)
+
+    def _process_query(self, sql_query):
+        """Takes the SQLQuery object and returns query string and parameters.
+        """
+        # MSSQLDB expects params to be a tuple. 
+        # Overwriting the default implementation to convert params to tuple.
+        paramstyle = getattr(self, 'paramstyle', 'pyformat')
+        query = sql_query.query(paramstyle)
+        params = sql_query.values()
+        return query, tuple(params)
 
     def sql_clauses(self, what, tables, where, group, order, limit, offset): 
         return (

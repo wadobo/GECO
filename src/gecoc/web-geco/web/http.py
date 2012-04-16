@@ -6,7 +6,6 @@ HTTP Utilities
 __all__ = [
   "expires", "lastmodified", 
   "prefixurl", "modified", 
-  "write",
   "changequery", "url",
   "profiler",
 ]
@@ -57,8 +56,8 @@ def modified(date=None, etag=None):
     
     This function takes the last-modified date `date` and the ETag `etag`
     and checks the headers to see if they match. If they do, it returns 
-    `True` and sets the response status to `304 Not Modified`. It also
-    sets `Last-Modified and `ETag` output headers.
+    `True`, or otherwise it raises NotModified error. It also sets 
+    `Last-Modified` and `ETag` output headers.
     """
     try:
         from __builtin__ import set
@@ -78,42 +77,30 @@ def modified(date=None, etag=None):
         if date-datetime.timedelta(seconds=1) <= m:
             validate = True
     
-    if validate: web.ctx.status = '304 Not Modified'
     if date: lastmodified(date)
     if etag: web.header('ETag', '"' + etag + '"')
-    return not validate
+    if validate:
+        raise web.notmodified()
+    else:
+        return True
 
-def write(cgi_response):
-    """
-    Converts a standard CGI-style string response into `header` and 
-    `output` calls.
-    """
-    cgi_response = str(cgi_response)
-    cgi_response.replace('\r\n', '\n')
-    head, body = cgi_response.split('\n\n', 1)
-    lines = head.split('\n')
-
-    for line in lines:
-        if line.isspace(): 
-            continue
-        hdr, value = line.split(":", 1)
-        value = value.strip()
-        if hdr.lower() == "status": 
-            web.ctx.status = value
-        else: 
-            web.header(hdr, value)
-
-    web.output(body)
-
-def urlencode(query):
+def urlencode(query, doseq=0):
     """
     Same as urllib.urlencode, but supports unicode strings.
     
         >>> urlencode({'text':'foo bar'})
         'text=foo+bar'
+        >>> urlencode({'x': [1, 2]}, doseq=True)
+        'x=1&x=2'
     """
-    query = dict([(k, utils.utf8(v)) for k, v in query.items()])
-    return urllib.urlencode(query)
+    def convert(value, doseq=False):
+        if doseq and isinstance(value, list):
+            return [convert(v) for v in value]
+        else:
+            return utils.safestr(value)
+        
+    query = dict([(k, convert(v, doseq)) for k, v in query.items()])
+    return urllib.urlencode(query, doseq=doseq)
 
 def changequery(query=None, **kw):
     """
@@ -122,7 +109,7 @@ def changequery(query=None, **kw):
     changed.
     """
     if query is None:
-        query = web.input(_method='get')
+        query = web.rawinput(method='get')
     for k, v in kw.iteritems():
         if v is None:
             query.pop(k, None)
@@ -130,12 +117,12 @@ def changequery(query=None, **kw):
             query[k] = v
     out = web.ctx.path
     if query:
-        out += '?' + urlencode(query)
+        out += '?' + urlencode(query, doseq=True)
     return out
 
-def url(path=None, **kw):
+def url(path=None, doseq=False, **kw):
     """
-    Makes url by concatinating web.ctx.homepath and path and the 
+    Makes url by concatenating web.ctx.homepath and path and the 
     query string created using the arguments.
     """
     if path is None:
@@ -146,7 +133,7 @@ def url(path=None, **kw):
         out = path
 
     if kw:
-        out += '?' + urlencode(kw)
+        out += '?' + urlencode(kw, doseq=doseq)
     
     return out
 

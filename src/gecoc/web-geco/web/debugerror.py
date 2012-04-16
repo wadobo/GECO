@@ -11,9 +11,9 @@ http://www.xfree86.org/3.3.6/COPYRIGHT2.html#5
 __all__ = ["debugerror", "djangoerror", "emailerrors"]
 
 import sys, urlparse, pprint, traceback
-from net import websafe
 from template import Template
-from utils import sendmail
+from net import websafe
+from utils import sendmail, safestr
 import webapi as web
 
 import os, os.path
@@ -162,7 +162,7 @@ $def dicttable_items(items, kls='req', id=None):
 $for frame in frames:
     <li class="frame">
     <code>$frame.filename</code> in <code>$frame.function</code>
-    $if frame.context_line:
+    $if frame.context_line is not None:
         <div class="context" id="c$frame.id">
         $if frame.pre_context:
             <ol start="$frame.pre_context_lineno" class="pre-context" id="pre$frame.id">
@@ -201,7 +201,7 @@ $if ctx.output or ctx.headers:
 <h2>Request information</h2>
 
 <h3>INPUT</h3>
-$:dicttable(web.input())
+$:dicttable(web.input(_unicode=False))
 
 <h3 id="cookie-info">COOKIES</h3>
 $:dicttable(web.cookies())
@@ -217,7 +217,7 @@ $:dicttable(ctx.env)
 <div id="explanation">
   <p>
     You're seeing this error because you have <code>web.config.debug</code>
-    set to <code>True</code>. Set that to <code>False</code> if you don't to see this.
+    set to <code>True</code>. Set that to <code>False</code> if you don't want to see this.
   </p>
 </div>
 
@@ -245,7 +245,7 @@ def djangoerror():
                 [line.strip('\n') for line in source[lineno + 1:upper_bound]]
 
             return lower_bound, pre_context, context_line, post_context
-        except (OSError, IOError):
+        except (OSError, IOError, IndexError):
             return None, [], None, []    
     
     exception_type, exception_value, tback = sys.exc_info()
@@ -254,20 +254,26 @@ def djangoerror():
         filename = tback.tb_frame.f_code.co_filename
         function = tback.tb_frame.f_code.co_name
         lineno = tback.tb_lineno - 1
+
+        # hack to get correct line number for templates
+        lineno += tback.tb_frame.f_locals.get("__lineoffset__", 0)
+        
         pre_context_lineno, pre_context, context_line, post_context = \
             _get_lines_from_file(filename, lineno, 7)
-        frames.append(web.storage({
-            'tback': tback,
-            'filename': filename,
-            'function': function,
-            'lineno': lineno,
-            'vars': tback.tb_frame.f_locals,
-            'id': id(tback),
-            'pre_context': pre_context,
-            'context_line': context_line,
-            'post_context': post_context,
-            'pre_context_lineno': pre_context_lineno,
-        }))
+
+        if '__hidetraceback__' not in tback.tb_frame.f_locals:
+            frames.append(web.storage({
+                'tback': tback,
+                'filename': filename,
+                'function': function,
+                'lineno': lineno,
+                'vars': tback.tb_frame.f_locals,
+                'id': id(tback),
+                'pre_context': pre_context,
+                'context_line': context_line,
+                'post_context': post_context,
+                'pre_context_lineno': pre_context_lineno,
+            }))
         tback = tback.tb_next
     frames.reverse()
     urljoin = urlparse.urljoin
@@ -298,15 +304,17 @@ def debugerror():
     """
     return web._InternalError(djangoerror())
 
-def emailerrors(email_address, olderror):
+def emailerrors(to_address, olderror, from_address=None):
     """
     Wraps the old `internalerror` handler (pass as `olderror`) to 
-    additionally email all errors to `email_address`, to aid in 
+    additionally email all errors to `to_address`, to aid in
     debugging production websites.
     
     Emails contain a normal text traceback as well as an
     attachment containing the nice `debugerror` page.
     """
+    from_address = from_address or to_address
+
     def emailerrors_internal():
         error = olderror()
         tb = sys.exc_info()
@@ -314,28 +322,19 @@ def emailerrors(email_address, olderror):
         error_value = tb[1]
         tb_txt = ''.join(traceback.format_exception(*tb))
         path = web.ctx.path
-        request = web.ctx.method+' '+web.ctx.home+web.ctx.fullpath
-        eaddr = email_address
-        text = ("""\
-------here----
-Content-Type: text/plain
-Content-Disposition: inline
-
-%(request)s
-
-%(tb_txt)s
-
-------here----
-Content-Type: text/html; name="bug.html"
-Content-Disposition: attachment; filename="bug.html"
-
-""" % locals()) + str(djangoerror())
+        request = web.ctx.method + ' ' + web.ctx.home + web.ctx.fullpath
+        
+        message = "\n%s\n\n%s\n\n" % (request, tb_txt)
+        
         sendmail(
-          "your buggy site <%s>" % eaddr,
-          "the bugfixer <%s>" % eaddr,
-          "bug: %(error_name)s: %(error_value)s (%(path)s)" % locals(),
-          text, 
-          headers={'Content-Type': 'multipart/mixed; boundary="----here----"'})
+            "your buggy site <%s>" % from_address,
+            "the bugfixer <%s>" % to_address,
+            "bug: %(error_name)s: %(error_value)s (%(path)s)" % locals(),
+            message,
+            attachments=[
+                dict(filename="bug.html", content=safestr(djangoerror()))
+            ],
+        )
         return error
     
     return emailerrors_internal

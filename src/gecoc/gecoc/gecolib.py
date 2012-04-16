@@ -55,7 +55,7 @@ class GecoClient:
         if master is not None:
             p['password'] = method.decrypt(p['password'], master)
         return p
-    
+
     def decrypt_password(self, p, master):
         method = cypher_methods[p.get('cypher_method', '')]
         return method.decrypt(p['password'], master)
@@ -108,7 +108,7 @@ class GecoClient:
         return '< GecoClient %s %s >' % (self.name, auth)
 
     def __getattr__(self, attr):
-        return self.cookied(self.server.__getattr__(attr))
+        return self.cookied(getattr(self.server, attr))
 
 def get_server_object(method='xmlrpc', **kwargs):
     '''
@@ -146,6 +146,11 @@ def get_server_object(method='xmlrpc', **kwargs):
                     cookie=kwargs['cookie'])
         else:
             return GecoClient(server, name=kwargs['xmlrpc_server'])
+
+    if method == 'json':
+        import jsonclient
+        server = jsonclient.JsonClient(kwargs['base'], kwargs.get('path', ''))
+        return GecoClient(server, kwargs['name'], kwargs.get('cookie', ''))
 
 GSO = get_server_object
 
@@ -273,7 +278,7 @@ class AES:
         '''
         hkey = map(ord, hashlib.sha256(key).digest())
         iv = map(ord, hashlib.md5(key).digest())
-        
+
         return hkey, iv
 
 cypher_methods = {

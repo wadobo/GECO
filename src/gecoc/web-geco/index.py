@@ -5,6 +5,11 @@ import web
 from web import form
 from utils import authenticated, templated
 
+try:
+    from api import api
+except:
+    api = None
+
 web.config.debug = False
 #web.SERVER = 'https://danigm.net:8080'
 web.SERVER = 'https://localhost:4343'
@@ -15,7 +20,7 @@ web.menu_user = (
         ('Opciones', '/options'),
         )
 
-urls = (
+urls = [
         '/error', 'error',
         '/logout', 'login.logout',
         '/options', 'options.options',
@@ -28,7 +33,10 @@ urls = (
         '/edit/(.*)', 'edit.edit',
         '/getpwd/(.*)', 'ajax.getpwd',
         '/(.*)', 'index',
-        )
+        ]
+
+if api:
+    urls = ['/api/(.*)', 'api'] + urls
 
 app = web.application(urls, globals())
 session = web.session.Session(app, web.session.DiskStore('sessions'))
@@ -56,6 +64,7 @@ class error:
     def GET(self, *args):
         render = web.template.render('templates')
         return render.error()
-    
+
+
 if __name__ == '__main__':
     app.run()

@@ -16,9 +16,17 @@ import threading
 TIMEOUT = 10.0 * 60 # 10 minutos
 debug = True
 
-def login(server='https://localhost:4343'):
-    ''' Autentica contra un servidor 
-        login https://localhost:4343
+
+def get_gso(server):
+    base = server.split('/')[0]
+    path = '/'.join(server.split('/')[1:])
+    gso = gecolib.GSO("json", name=server, base=base, path=path)
+    return gso
+
+
+def login(server='localhost:8080/api'):
+    ''' Autentica contra un servidor
+        login localhost:8080/api
     '''
     global gso
     unix_user = os.environ.get('USER', '')
@@ -26,12 +34,13 @@ def login(server='https://localhost:4343'):
     if not user:
         user = unix_user
     password = getpass.getpass()
-    gso = gecolib.GSO(xmlrpc_server=server)
+
+    gso = get_gso(server)
     gso.auth(user, password)
 
 def change_password():
     ''' Cambia la contraseña del usuario en el servidor '''
-    
+
     global gso
 
     password = getpass.getpass('Introduce la nueva contraseña: ')
@@ -41,11 +50,11 @@ def change_password():
         print "No coinciden, intentalo de nuevo"
         password = getpass.getpass('Introduce la nueva contraseña: ')
         password2 = getpass.getpass('Introducela de nuevo: ')
-    
+
     gso.change_password(password)
 
 def export(dest='/tmp/mypasswords'):
-    ''' Exporta todas las contraseñas a un fichero 
+    ''' Exporta todas las contraseñas a un fichero
         export dest
     '''
 
@@ -58,17 +67,18 @@ def export(dest='/tmp/mypasswords'):
     print "exportado a %s" % dest
 
 def restore(source="/tmp/mypasswords"):
-    ''' Importa todas las contraseñas de un fichero 
+    ''' Importa todas las contraseñas de un fichero
         restore fichero
     '''
     import codecs
     global gso
-    data = codecs.open(source, encoding='utf-8').read()
+    #data = codecs.open(source, encoding='utf-8').read()
+    data = open(source).read()
     gso.restore(data)
     print "importado con exito"
 
 def change(name=''):
-    ''' Cambia una contraseña 
+    ''' Cambia una contraseña
         change name
     '''
 
@@ -99,7 +109,7 @@ def list():
 
     global gso
     passwords = gso.get_all_passwords()
-                
+
     today = datetime.datetime.now()
     formatted = '%-22s | %-14s | %-8s | %-24s'
     header = formatted % ('NAME', 'ACCOUNT',
@@ -116,13 +126,13 @@ def list():
             expiration = "EXPIRED (%s)" % (today - expiration).days
         else:
             expiration = expiration.ctime()
-        
+
         print formatted % (name, account,
                 type, expiration)
 
 def get(name=''):
     ''' Devuelve una contraseña en concreto
-        get [nombre] 
+        get [nombre]
     '''
 
     global gso
@@ -135,7 +145,7 @@ def get(name=''):
 
 def getcp(name=''):
     ''' Devuelve una contraseña en concreto en el portapapeles (solo funciona con GTK)
-        getcp [nombre] 
+        getcp [nombre]
     '''
 
     global gso
@@ -154,8 +164,8 @@ def getcp(name=''):
     clipboard.store()
 
 def new(name=''):
-    ''' Almacena un password en el servidor 
-        new [nombre] 
+    ''' Almacena un password en el servidor
+        new [nombre]
     '''
     # TODO dejar poner el tiempo de expiracion
 
@@ -172,11 +182,11 @@ def new(name=''):
     gso.set_password(name, password, master, args)
 
 def register(server, name=''):
-    ''' Registra un usuario nuevo en el servidor 
+    ''' Registra un usuario nuevo en el servidor
         register server [usuario]
     '''
-    global gso 
-    gso = gecolib.GSO(xmlrpc_server=server)
+    global gso
+    gso = get_gso(server)
 
     if gso.check_user_name(name):
         print "%s no está disponible" % name
@@ -202,7 +212,7 @@ def unregister():
 
 def rm(name=''):
     ''' Borra una contraseña del servidor
-        rm [nombre] 
+        rm [nombre]
     '''
 
     global gso
@@ -279,7 +289,7 @@ def _ask_for_password():
     print " 2  Generación aleatoria personalizada"
     print " 3  Introducción manual"
     mode = raw_input("modo?: ")
-        
+
     if mode in ['', '1']:
         password = gecolib.generate()
     elif mode == '2':
@@ -288,7 +298,7 @@ def _ask_for_password():
         upper = _input('Utilizar mayusculas? [Y/n]: ', True, bool)
         digits = _input('Utilizar digitos? [Y/n]: ', True, bool)
         punctuation = _input('Utilizar signos de puntuación? [y/N]: ', False, bool)
-        
+
         while True:
             password = gecolib.generate(size, lower, upper, digits,
                     punctuation)
@@ -309,7 +319,7 @@ def _ask_for_password():
 # Muestra todas las funciones como opciones
 help_str = ''' Ayuda de terminal-geco
 comandos:
-''' 
+'''
 
 functions = [v for v in globals().values()\
         if type(v) == types.FunctionType\
@@ -348,9 +358,8 @@ if __name__ == '__main__':
             help()
         else:
             try:
-                fargs = ' '.join(args[1:])
-                if fargs:
-                    callable_functions[args[0]](fargs)
+                if args[1:]:
+                    callable_functions[args[0]](*args[1:])
                 else:
                     callable_functions[args[0]]()
             except Exception, inst:

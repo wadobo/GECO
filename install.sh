@@ -2,7 +2,7 @@
 
 if [ -z $PYTHON ]
 then
-    PYTHON=python
+    PYTHON=python2
 fi
 
 function install_help(){

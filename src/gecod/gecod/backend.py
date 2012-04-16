@@ -80,7 +80,7 @@ class Password:
 
         self.updated = time.mktime(password.updated.timetuple())
         self.expiration = time.mktime(password.expiration.timetuple())
-    
+
     def __str__(self):
         n = self.name
         t = self.type

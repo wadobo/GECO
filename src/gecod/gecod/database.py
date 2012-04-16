@@ -11,7 +11,11 @@
 
 import sys
 from sqlalchemy import *
-from sqlalchemy.exceptions import InvalidRequestError, IntegrityError
+
+import sqlalchemy
+InvalidRequestError = sqlalchemy.exceptions.InvalidRequestError
+IntegrityError = sqlalchemy.exceptions.IntegrityError
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relation, backref, sessionmaker

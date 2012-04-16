@@ -18,15 +18,22 @@ debug = True
 
 
 def get_gso(server):
+    if server.startswith('http://'):
+        ssl = False
+        server = server[7:]
+    elif server.startswith('https://'):
+        ssl = True
+        server = server[7:]
     base = server.split('/')[0]
     path = '/'.join(server.split('/')[1:])
-    gso = gecolib.GSO("json", name=server, base=base, path=path)
+    gso = gecolib.GSO("json", name=server, base=base, path=path, ssl=ssl)
     return gso
 
 
-def login(server='localhost:8080/api'):
+def login(server='http://localhost:8080/api'):
     ''' Autentica contra un servidor
-        login localhost:8080/api
+        login server
+        example: login https://localhost:8080/api
     '''
     global gso
     unix_user = os.environ.get('USER', '')
@@ -184,6 +191,7 @@ def new(name=''):
 def register(server, name=''):
     ''' Registra un usuario nuevo en el servidor
         register server [usuario]
+        example: register https://localhost:8080/api danigm
     '''
     global gso
     gso = get_gso(server)

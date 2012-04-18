@@ -30,6 +30,7 @@ IMG = 'glade'
 SECONDS = 600
 CONFFILE = 'geco.conf'
 
+
 def remove_text(button):
     alignment = button.get_children()[0]
     hbox = alignment.get_children()[0]
@@ -370,7 +371,7 @@ class TrayIcon(Gtk.StatusIcon):
 
     def remote_auth(self, server, user, password):
         try:
-            self.gso = gecolib.GSO(xmlrpc_server=server)
+            self.gso = self.get_gso(server)
             self.gso.auth(user, password)
         except Exception, e:
             try:
@@ -393,7 +394,7 @@ class TrayIcon(Gtk.StatusIcon):
 
     def del_user(self, widget, *args):
         server, user, passwd, use_keyring = self.__get_config_form()
-        gso = gecolib.GSO(xmlrpc_server=server)
+        gso = self.get_gso(server)
         gso.auth(user, passwd)
 
         try:
@@ -404,7 +405,7 @@ class TrayIcon(Gtk.StatusIcon):
 
     def register(self, widget, *args):
         server, user, passwd, use_keyring = self.__get_config_form()
-        gso = gecolib.GSO(xmlrpc_server=server)
+        gso = self.get_gso(server)
         gso.auth(user, passwd)
 
         try:
@@ -861,16 +862,29 @@ class TrayIcon(Gtk.StatusIcon):
         return password
 
     def show_alert(self):
-        title = "GECO - Alerta!"
-        msg = 'Hay %s contraseñas expiradas:\n' % len(self.expirated)
+        title = u"GECO - Alerta!"
+        msg = u'Hay %s contraseñas expiradas:\n' % len(self.expirated)
         for i, d in self.expirated:
-            msg += '<b>%s</b> (%s) \n' % (i['name'], d)
+            msg += u'<b>%s</b> (%s) \n' % (i['name'], d)
         seconds = 5
 
         note = Notify.Notification.new("GECO", msg, None)
         note.set_urgency(Notify.Urgency.CRITICAL)
         note.set_timeout(seconds*1000)
         note.show()
+
+    def get_gso(self, server, **params):
+        if server.startswith('http://'):
+            ssl = False
+            server = server[7:]
+        elif server.startswith('https://'):
+            ssl = True
+            server = server[8:]
+        base = server.split('/')[0]
+        path = '/'.join(server.split('/')[1:])
+        gso = gecolib.GSO("json", name=server, base=base, path=path, ssl=ssl, **params)
+        return gso
+
 
 def main():
     GObject.threads_init(None)

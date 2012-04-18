@@ -47,7 +47,7 @@ class Frontend:
 
     def m_change_attr(self, cookie, name, args):
         ''' args is a dict with possible keys: type, description, account, expiration, password. expiration must be an integer (days) '''
-        if args['expiration']:
+        if args.get('expiration', ''):
             args['expiration'] = datetime.datetime.now() + datetime.timedelta(int(args['expiration']))
         backend.change_attr(cookie, name, **args)
 

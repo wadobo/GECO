@@ -15,7 +15,9 @@ def test_passwd(gso, master):
 
 def export(gso, filename):
     out = open(filename, 'w')
-    out.write(gso.export())
+    d = gso.export()
+    out.write(d.encode("utf-8"))
+    out.close()
 
 def inp(prompt, default="", function=raw_input):
     value = function(prompt)
@@ -27,7 +29,7 @@ def inp(prompt, default="", function=raw_input):
 def inp_p(prompt, default=""):
     return inp(prompt, default, getpass.getpass)
 
-server = inp("server (https://localhost:4343): ", "https://localhost:4343")
+server = inp("server (http://localhost:8080/api): ", "http://localhost:8080/api")
 user = inp("user: ", os.environ["USER"])
 passwd = inp_p("passwd: ")
 print "----"
@@ -39,7 +41,18 @@ if master2 != master3:
     print "new master not the same"
     sys.exit(-1)
 
-gso = gecolib.GSO(xmlrpc_server=server)
+
+if server.startswith('http://'):
+    ssl = False
+    server = server[7:]
+elif server.startswith('https://'):
+    ssl = True
+    server = server[8:]
+base = server.split('/')[0]
+path = '/'.join(server.split('/')[1:])
+gso = gecolib.GSO("json", name=server, base=base, path=path, ssl=ssl)
+
+
 try:
     gso.auth(user, passwd)
 except:

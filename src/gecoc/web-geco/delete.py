@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import web
 
-from utils import authenticated, templated, flash
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 session = web.ses
 
@@ -13,7 +12,7 @@ class delete:
         # TODO preguntar
         username = session.get('username', '')
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
 
         gso.del_password(name)
         flash("Contraseña '%s' borrada" % str(name))

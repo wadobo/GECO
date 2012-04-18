@@ -2,8 +2,7 @@
 import datetime
 import web
 
-from utils import authenticated, templated, flash
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 session = web.ses
 
@@ -17,7 +16,7 @@ class list:
     def GET(self):
         username = session.get('username', '')
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
 
         pwdlist = gso.get_all_passwords()
         def cmp(x, y):

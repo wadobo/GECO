@@ -11,9 +11,7 @@ This controller implements:
 import random
 import web
 from web import form
-from utils import authenticated, templated, flash
-
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 session = web.ses
 
@@ -66,9 +64,9 @@ class login:
         name = values['username']
         pwd = values['password']
 
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER)
+        gso = get_gso()
         gso.auth(name, pwd)
-        
+
         if gso.name:
             session.username = name
             session.gso = gso.cookie
@@ -84,7 +82,7 @@ class logout:
         username = session.get('username', '')
         session.username = ''
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         gso.logout()
         session.gso = ''
         flash("Usuario desautenticado")
@@ -102,7 +100,7 @@ class register:
         if not rform.validates():
             return self.render.login(form_reg=rform)
         else:
-            gso = gecolib.GSO(xmlrpc_server=web.SERVER)
+            gso = get_gso()
 
             values = web.input()
             name = values['rusername']

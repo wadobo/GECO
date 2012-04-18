@@ -2,8 +2,7 @@
 import web
 from web import form
 
-from utils import authenticated, templated, flash
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 vpass = form.regexp(r".{3,20}", 'Debe estar entre 3 y 20 caracteres')
 
@@ -24,7 +23,7 @@ class export:
     def GET(self):
         session = web.ses
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         web.header('Content-type','text/txt')
         return gso.export()
 
@@ -37,7 +36,7 @@ class options:
     def GET(self):
         session = web.ses
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         return self.render.options(web.ses.username, web.SERVER, change_pass(),
                 delete())
 
@@ -48,7 +47,7 @@ class options:
     def POST(self):
         session = web.ses
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         values = web.input()
 
         ####### CHANGE PASSWORD #######
@@ -91,9 +90,9 @@ class options:
         raise web.seeother('/options')
 
 def check_user_password(username, password):
-    gso = gecolib.GSO(xmlrpc_server=web.SERVER)
+    gso = get_gso()
     gso.auth(username, password)
-    
+
     if gso.name:
         return True
     else:

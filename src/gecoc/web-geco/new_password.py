@@ -2,8 +2,7 @@
 import web
 from web import form
 
-from utils import authenticated, templated, flash
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 vname = form.regexp("\w+$", 'Debe ser Alfanumerico, más de un carácter')
 vdesc = form.regexp(r".{0,255}", 'Debe estar entre 0 y 255 caracteres')
@@ -38,7 +37,7 @@ class new_password:
         nform = new_form()
         if not nform.validates():
             return self.render.new(web.ses.username, nform)
-        
+
         else:
             session = web.ses
             values = web.input()
@@ -51,7 +50,7 @@ class new_password:
             args['expiration'] = int(values['expiration'])
 
             cookie = session.get('gso', '')
-            gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+            gso = get_gso(cookie=cookie)
             gso.set_raw_password(name, password, args)
 
             flash("Contraseña '%s' añadida" % str(name))

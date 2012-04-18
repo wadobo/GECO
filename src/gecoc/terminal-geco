@@ -23,7 +23,7 @@ def get_gso(server):
         server = server[7:]
     elif server.startswith('https://'):
         ssl = True
-        server = server[7:]
+        server = server[8:]
     base = server.split('/')[0]
     path = '/'.join(server.split('/')[1:])
     gso = gecolib.GSO("json", name=server, base=base, path=path, ssl=ssl)

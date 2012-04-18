@@ -4,8 +4,7 @@ import datetime
 from gecod import backend
 
 
-backend.DATABASE = 'sqlite:////usr/share/gecod/database.sqlite'
-#backend.DATABASE = 'sqlite:////home/danigm/Projects/geco/src/gecod/database.sqlite'
+backend.DATABASE = web.DATABASE
 
 
 class CustomEncoder(json.JSONEncoder):

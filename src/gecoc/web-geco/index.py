@@ -5,14 +5,18 @@ import web
 from web import form
 from utils import authenticated, templated
 
+web.config.debug = False
+#web.SERVER = 'https://danigm.net:8080/api'
+web.SERVER = 'http://localhost:8080/api'
+
+#web.DATABASE = 'sqlite:////usr/share/gecod/database.sqlite'
+web.DATABASE = 'sqlite:////home/danigm/Projects/geco/src/gecod/database.sqlite'
+
 try:
     from api import api
 except:
     api = None
 
-web.config.debug = False
-#web.SERVER = 'https://danigm.net:8080'
-web.SERVER = 'https://localhost:4343'
 
 web.menu_user = (
         ('Listado', '/list'),

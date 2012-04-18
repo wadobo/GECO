@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import web
+import gecoc.gecolib as gecolib
 
 def authenticated(function):
     session = web.ses
@@ -83,3 +84,16 @@ def get_err():
     session = web.ses
     e = session.pop('errors', '')
     return map(dec, e)
+
+def get_gso(**params):
+    server = web.SERVER
+    if server.startswith('http://'):
+        ssl = False
+        server = server[7:]
+    elif server.startswith('https://'):
+        ssl = True
+        server = server[8:]
+    base = server.split('/')[0]
+    path = '/'.join(server.split('/')[1:])
+    gso = gecolib.GSO("json", name=server, base=base, path=path, ssl=ssl, **params)
+    return gso

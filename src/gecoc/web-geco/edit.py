@@ -3,8 +3,7 @@ import datetime
 import web
 from web import form
 
-from utils import authenticated, templated, flash
-import gecoc.gecolib as gecolib
+from utils import authenticated, templated, flash, get_gso
 
 vname = form.regexp("\w+$", 'Debe ser Alfanumerico, más de un carácter')
 vdesc = form.regexp(r".{0,255}", 'Debe estar entre 0 y 255 caracteres')
@@ -35,12 +34,12 @@ class edit:
     def GET(self, name):
         session = web.ses
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         password = gso.get_password(name)
         myedit_form = edit_form(password)
         return self.render.new(web.ses.username, myedit_form(),
                 title="Editar Contraseña")
-    
+
     @authenticated
     @templated(css='style',
             js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
@@ -49,12 +48,12 @@ class edit:
     def POST(self, name):
         session = web.ses
         cookie = session.get('gso', '')
-        gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+        gso = get_gso(cookie=cookie)
         password = gso.get_password(name)
         myedit_form = edit_form(password)
         if not myedit_form.validates():
             return self.render.new(web.ses.username, myedit_form())
-        
+
         else:
             session = web.ses
             values = web.input()
@@ -67,7 +66,7 @@ class edit:
 
             cookie = session.get('gso', '')
             try:
-                gso = gecolib.GSO(xmlrpc_server=web.SERVER, cookie=cookie)
+                gso = get_gso(cookie=cookie)
                 gso.del_password(name)
                 gso.set_raw_password(name, password, args)
                 flash("Contraseña <strong>'%s'</strong> modificada" % str(name))

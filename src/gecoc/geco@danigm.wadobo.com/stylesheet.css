@@ -1,0 +1,20 @@
+.geco-pwd-entry {
+    font-weight: bold;
+    min-width: 300px;
+    background-color: #ffffff;
+    color: rgba(10,10,10,0.7);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.geco-heading {
+    font-size: 30px;
+    text-decoration: underline;
+    font-weight: bold;
+    margin: 10px;
+    padding-bottom: 20px;
+}
+
+.helloworld-label {
+    background-color: rgba(10,10,10,0.7);
+}

@@ -98,7 +98,7 @@ const QuestionDialog = new Lang.Class({
                                     reactive: true });
         this.entry.clutter_text.set_password_char('\u25cf');
         let d = this;
-        this.entry.clutter_text.connect('key-release-event', function(o,e)
+        this.entry.clutter_text.connect('key-press-event', function(o,e)
         {
             let symbol = e.get_key_symbol();
             if (symbol == Clutter.Return) {

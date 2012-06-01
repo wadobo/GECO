@@ -1,31 +1,36 @@
 var mimasterpwd = "";
 var fun = "";
 
+function _ok() {
+    $('#pwdForm').modal('hide');
+
+    mimasterpwd = $("#masterpwd").attr("value");
+    $("#masterpwd").attr("value", "");
+
+    setTimeout(forget, 10 * 60 * 1000);
+    eval(fun);
+    return false;
+}
+
 $(document).ready(function() {
-    $("#rec").click(function(){
-        mimasterpwd = $("#masterpwd").attr("value");
-        $("#masterpwd").attr("value", "");
-        $(".input").fadeOut(300);
-        $("#overlay").fadeOut(300);
-        setTimeout(forget, 10 * 60 * 1000);
-        eval(fun);
+    $('#masterpwd').keypress(function(e){
+        if(e.which == 13) {
+            _ok();
+        }
     });
 
-    $(".close").click(function(){
-        $(".input").fadeOut(300);
-        $("#overlay").fadeOut(300);
+    $("#rec").click(function(){
+        _ok();
     });
 })
 
 function get_master(f){
     if(mimasterpwd == ""){
-        $(".input").fadeIn(300);
+        $('#pwdForm').modal('show');
         $("#masterpwd").select();
-        $("#overlay").fadeIn(300);
         fun = f;
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
@@ -35,4 +40,3 @@ function forget(){
     mimasterpwd = "";
     return false;
 }
-

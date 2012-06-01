@@ -9,8 +9,8 @@ session = web.ses
 class list:
     render = web.template.render('templates')
     @authenticated
-    @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs masterkey list',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min bootstrap aes md5 sha256 gecojs masterkey list',
             menu=web.menu_user,
             title='GECO Web Client')
     def GET(self):

@@ -40,8 +40,8 @@ def generate_reg_form(op1, op2):
 class login:
     render = web.template.render('templates')
 
-    @templated(css='style',
-            js='jquery-1.3.1.min login',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min login bootstrap',
             title='GECO Web Client')
     def GET(self):
         lform = form_login()
@@ -52,8 +52,8 @@ class login:
 
         return self.render.login(lform, rform)
 
-    @templated(css='style', 
-            js='jquery-1.3.1.min login',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min login bootstrap',
             title='GECO Web Client')
     def POST(self):
         lform = form_login()
@@ -91,7 +91,7 @@ class logout:
 class register:
     render = web.template.render('templates')
 
-    @templated(css='style', title='GECO Web Client')
+    @templated(css='style bootstrap', title='GECO Web Client')
     def POST(self):
         rform = generate_reg_form(*session.rform)
         if not rform:

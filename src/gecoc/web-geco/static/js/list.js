@@ -16,20 +16,24 @@ $(document).ready(function() {
         event.stopPropagation();
         pwd = $(this).parent().next().html();
         show_passwd();
+
+        return false;
     });
 
     $(".showdesc").click(function(){
         text = $(this).html();
-        if (text == "+")
-            $(this).html("-");
+        if (text == '<i class="icon-plus icon-white"></i>')
+            $(this).html('<i class="icon-minus icon-white"></i>');
         else
-            $(this).html("+");
-        desc = $(this).parent().next();
-        if (text == "+")
+            $(this).html('<i class="icon-plus icon-white"></i>');
+        desc = $(this).parent().parent().next();
+        if (text == '<i class="icon-plus icon-white"></i>')
             desc.fadeIn();
         else
             desc.fadeOut();
-            });
+
+        return false;
+    });
 
     $("#freeze").click(function(){
         if(timeout != 0){
@@ -44,7 +48,12 @@ $(document).ready(function() {
         }
         $("#clear").focus();
         $("#clear").select();
+
+        return false;
     });
+
+    $('#pwdForm').modal();
+    $('#pwdForm').modal('hide');
 });
 
 function link_to_forget(){
@@ -53,11 +62,15 @@ function link_to_forget(){
     else
         $("#forget").hide();
     setTimeout(link_to_forget, 2 * 1000);
+
+    return false;
 }
 
 function show_passwd(){
     if (get_master("really_show()"))
         really_show();
+
+    return false;
 }
 
 function pass_delete(n){
@@ -68,6 +81,8 @@ function pass_delete(n){
         $("#clear").attr("value", "");
         $("#counter").hide();
     }
+
+    return false;
 }
 
 function really_show(){
@@ -77,7 +92,9 @@ function really_show(){
     $("#clear").select();
     $("#counter").show();
     timeout = setTimeout('pass_delete(5)', 1 * 1000);
-    
+
     pass = "";
+
+    return false;
 }
 

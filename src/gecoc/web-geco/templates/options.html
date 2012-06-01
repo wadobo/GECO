@@ -1,37 +1,52 @@
 $def with (username="", server="", change=None, delete=None)
 
-<div id="main">
-        <p>
-        Cuenta de usuario $username en el servidor GECO $server
-        </p>
-        <div id="options">
+<div id="main" class="container">
+    <div class="alert alert-info">
+        <p>Cuenta de usuario $username en el servidor GECO $server</p>
+    </div>
+
+    <div class="row">
+        <div class="span4">
+            <div class="well">
             <fieldset>
                 <legend>Cambiar contraseña de usuario</legend>
                 <form action="" method="POST">
                     $:change.render()
-                    <button name="change" type="submit" class="imaged ok"></button>
+                    <button name="change" type="submit" class="btn btn-danger">Ok</button>
                 </form>
 
             </fieldset>
+            </div>
+        </div>
 
+        <div class="span4">
+            <div class="well">
             <fieldset>
                 <legend>Borrar cuenta de usuario</legend>
-                Se borrarán todas las contraseñas almacenadas, y esta acción es irrecuperable.
+                <div class="alert alert-danger">
+                <p>Se borrarán todas las contraseñas almacenadas, y esta acción es irrecuperable.</p>
+                </div>
                 <form action="" method="POST">
                     $:delete.render()
-                    <button name="delete" type="submit" class="imaged ok"></button>
+                    <button name="delete" type="submit" class="btn btn-inverse">Ok</button>
                 </form>
             </fieldset>
+            </div>
+        </div>
 
+        <div class="span4">
+            <div class="well">
             <fieldset>
-                <legend>Importación / Exportación</legend>
-                    <a href="/export">Exportar contraseñas</a>
+            <legend>Importación / Exportación</legend>
+                    <a href="/export" class="btn btn-info">Exportar contraseñas</a>
                 <form method="POST" enctype="multipart/form-data" action="">
                     <label for="myfile"> Importar</label>
-                        <input type="file" name="myfile" />
+                        <input type="file" name="myfile" class="input-file" />
                     <br/>
-                    <button name="restore" type="submit" class="imaged ok"></button>
+                    <button name="restore" type="submit" class="btn btn-success">Importar</button>
                 </form>
             </fieldset>
+            </div>
         </div>
+    </div>
 </div>

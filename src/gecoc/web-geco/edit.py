@@ -27,8 +27,8 @@ def edit_form(p):
 class edit:
     render = web.template.render('templates')
     @authenticated
-    @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min bootstrap aes md5 sha256 gecojs passwordStrengthMeter masterkey new',
             menu=web.menu_user,
             title='GECO Web Client - New')
     def GET(self, name):
@@ -41,8 +41,8 @@ class edit:
                 title="Editar Contraseña")
 
     @authenticated
-    @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min bootstrap aes md5 sha256 gecojs passwordStrengthMeter masterkey new',
             menu=web.menu_user,
             title='GECO Web Client - New')
     def POST(self, name):

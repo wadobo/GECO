@@ -1,9 +1,90 @@
+#header {
+    margin: 0 auto 0 auto;
+    background-image: url('/static/images/logo.png');
+    background-repeat: no-repeat;
+    background-position: left;
+    min-height: 200px;
+    margin-bottom: 2em;
+}
+
+.pwdpwd {
+    display: none;
+}
+
 body{
-    background-image: url("/static/images/red-bg.png");
-    background-repeat: repeat-x;
-    background-color: #620000;
+    /** background-image: url("/static/images/red-bg.png");**/
+    /** background-repeat: repeat-x; **/
+    /** background-color: #620000; **/
     padding: 2em;
 }
+
+#fotter {
+    min-height: 10px;
+    margin-top: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+.list-buttons {
+    margin-bottom: 20px;
+}
+
+.odd {
+    background-color: #f5f5f5;
+}
+.even {
+    background-color: #f9f9f9;
+}
+
+.pwdpwd {
+    display: none;
+}
+
+.pwdname {
+    color: blue;
+    cursor:pointer;
+}
+.pwddesc {
+    display: none;
+    border: 1px solid black;
+    color: white;
+    background-color: #444444;
+}
+.pwddesc > td, .pwddesc > td:hover {
+    background-color: #444444 !important;
+}
+.showdesc {
+    color: blue;
+    text-decoration: underline;
+    cursor:pointer;
+}
+
+#clear {
+    margin-top: 10px;
+}
+
+#masterpwd {
+    width: 100%;
+}
+
+#pwdgen label, #pwdgen label input {
+    display: inline;
+}
+
+#pwdgen input {
+    margin-top: 10px;
+}
+
+#show_pass {
+    display: block;
+}
+
+/**
 
 input, textarea, button {
     border: 1px solid #550000;
@@ -99,15 +180,6 @@ legend {
     background-image: url('/static/images/regbutton.png');
 }
 
-#header {
-    margin: 0 auto 0 auto;
-    background-image: url('/static/images/logo.png');
-    background-repeat: no-repeat;
-    background-position: left;
-    min-height: 200px;
-    margin-bottom: 2em;
-}
-
 #fotter {
     min-height: 10px;
     margin-top: 2em;
@@ -122,13 +194,6 @@ img {
 
 #quit {
     float: right;
-}
-
-.odd {
-    background-color: #dddddd;
-}
-.even {
-    background-color: white;
 }
 
 #list {
@@ -146,27 +211,6 @@ img {
     border: 1px solid gray;
     background-color: #550000;
     color: white;
-}
-
-.pwdpwd {
-    display: none;
-}
-
-.pwdname {
-    color: blue;
-    text-decoration: underline;
-    cursor:pointer;
-}
-.pwddesc {
-    display: none;
-    border: 1px solid black;
-    color: white;
-    background-color: #444444; 
-}
-.showdesc {
-    color: blue;
-    text-decoration: underline;
-    cursor:pointer;
 }
 
 a.selected, .selected {
@@ -221,3 +265,4 @@ a.selected, .selected {
     background-color: white;
     width: 600px;
 }
+*/

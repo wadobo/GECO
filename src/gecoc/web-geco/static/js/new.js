@@ -1,12 +1,15 @@
 jQuery(document).ready(function() {
-		$('#password').keyup(function(){
+        $('#password').keyup(function(){
             $('#result').html(passwordStrength($('#password').val(),$('#username').val()));
             $('#same').html(samepass($('#password').val(),$('#password2').val()));
-        })
-		$('#password2').keyup(function(){
+        });
+        $('#password2').keyup(function(){
             $('#same').html(samepass($('#password').val(),$('#password2').val()));
-        })
+        });
 
+
+    $('#pwdForm').modal();
+    $('#pwdForm').modal('hide');
 })
 
 function samepass(p1, p2){
@@ -18,10 +21,10 @@ function samepass(p1, p2){
 
 function generate_pass(){
     l = parseInt($("#length").val());
-    punct = $("#punct").attr('checked');
-    low = $("#low").attr('checked');
-    up = $("#up").attr('checked');
-    digits = $("#digits").attr('checked');
+    punct = $("#punct").attr('checked') != undefined;
+    low = $("#low").attr('checked') != undefined;
+    up = $("#up").attr('checked') != undefined;
+    digits = $("#digits").attr('checked') != undefined;
     new_pass = generate(l, low, up, digits, punct);
     $('#password').val(new_pass);
     $('#password2').val(new_pass);

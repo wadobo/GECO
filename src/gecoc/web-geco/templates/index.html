@@ -1,14 +1,20 @@
 $def with (username='', pwdlist=[])
 
-<div id="main">
-    <div id="quit">Hola: $username <a href="/logout">Salir</a></div>
-    <div id="forget"><a href="" onClick="return forget();">Olvidar contraseña maestra</a></div>
-    <a href="/new">Nueva contraseña</a>
+<div id="main" class="container">
+    <div class="well">
+
+    <div id="quit" class="pull-right"><i class="icon-user"></i> $username <a href="/logout" class="btn btn-info">Salir</a></div>
+
+    <div class="list-buttons">
+        <a class="btn btn-warning" href="#" onClick="return forget();"><i class="icon-lock icon-white"></i> Olvidar contraseña maestra</a>
+        <a class="btn btn-success" href="/new"><i class="icon-plus icon-white"></i> Nueva contraseña</a>
+    </div>
+
     <div id="list">
         <div id="passshow">
-            <input id="clear"/><button id="freeze">detener</button><span id="counter"></span>
+            <input id="clear"/><button id="freeze" class="btn btn-inverse"><i class="icon-time icon-white"></i> detener</button><span id="counter"></span>
         </div>
-        <table cellspacing="0px">
+        <table cellspacing="0px" class="table">
             <tr>
                 <th></th>
                 <th>name</th>
@@ -21,10 +27,10 @@ $def with (username='', pwdlist=[])
             $for password in pwdlist:
                 <tr class="$loop.parity pwd">
                     $if password['description'] != '':
-                        <td class="showdesc">+</td>
+                        <td><a href="#" class="showdesc btn btn-inverse"><i class="icon-plus icon-white"></i></a></td>
                     $else:
                         <td></td>
-                    <td><a href="#" class="pwdname">${password.get('name', 'NONAME')}</a></td>
+                    <td><a href="#" class="pwdname btn btn-success">${password.get('name', 'NONAME')}</a></td>
                     <td class="pwdpwd">${password['password']}</td>
                     <td class="pwdacc">${password.get('account', '--')}</td>
                     <td class="pwdtype">${password.get('type', '--')}</td>
@@ -37,15 +43,13 @@ $def with (username='', pwdlist=[])
                             <img src="/static/images/red.png"/>
                         (${password.get('days')} días)</td>
                     <td class="pwdedit">
-                        <a href="/edit/${password.get('name', 'NONAME')}">
-                            <img src="/static/images/edit.png"
-                            alt="edit" title="edit"/>
+                        <a href="/edit/${password.get('name', 'NONAME')}" class="btn btn-warning">
+                            <i class="icon-edit icon-white"></i>
                         </a>
                     </td>
                     <td class="pwddel">
-                        <a href="/delete/${password.get('name', 'NONAME')}">
-                            <img src="/static/images/trash.png"
-                            alt="delete" title="delete"/>
+                        <a href="/delete/${password.get('name', 'NONAME')}" class="btn btn-danger">
+                            <i class="icon-trash icon-white"></i>
                         </a>
                     </td>
                 </tr>
@@ -59,13 +63,18 @@ $def with (username='', pwdlist=[])
     </div>
 </div>
 
-<div class="input">
-    <img src="/static/images/error.png" class="close" alt="close"/>
-    <div id="master">
-        <label for="master">Master password:</label>
-        <input id="masterpwd" name="master" type="password"/>
-        <br/><button type="submit" id="rec" class="imaged"></button>
+<div class="modal" id="pwdForm">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal">×</button>
+        <h3>Master Password</h3>
+    </div>
+    <div class="modal-body">
+        <input type="password" id="masterpwd"/>
+    </div>
+    <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+        <a href="#" id="rec" class="btn btn-danger">Recordar 10'</a>
     </div>
 </div>
 
-<div id="overlay"></div>
+</div>

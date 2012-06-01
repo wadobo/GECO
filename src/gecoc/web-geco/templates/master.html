@@ -12,37 +12,41 @@ $def with (css, title, body, js=[], errors='', msgs='', menu=[])
     <body>
         <div id="header"></div>
         $if msgs:
-            <div id="messages">
-                <div class="floating">
-                    <img src="/static/images/alert.png"/>
-                </div>
+            <div id="messages" class="alert alert-success">
                 <ul>
                     $for msg in msgs:
                     <li>$:msg</li>
                 </ul>
             </div>
         $if errors:
-            <div id="error">
-                <div class="floating">
-                    <img src="/static/images/error.png"/>
-                </div>
+            <div id="error" class="alert alert-error">
                 <ul>
                     $for error in errors:
                     <li>$:error</li>
                 </ul>
             </div>
-        
+
         $if menu:
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+
+                        <ul class="nav">
+                        $for i in menu:
+                            <li><a href="${i[1]}">${i[0]}</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
             <div id="menu">
-                $for i in menu:
-                    <a href="${i[1]}">${i[0]}</a>
-                    $if not loop.last:
-                        | 
             </div>
 
         $:body
 
-        <div id="fotter">
+        <div id="fotter" class="container">
+            <div class="well">
             <p>
                 Powered by <a href="http://python.org">Python</a> and 
                 <a href="http://webpy.org">web.py</a>
@@ -54,7 +58,7 @@ $def with (css, title, body, js=[], errors='', msgs='', menu=[])
                 <img id="danigm" src="/static/images/poweredby.png"
                 alt="powered by danigm"/>
             </a>
+            </div>
         </div>
     </body>
 </html>
-

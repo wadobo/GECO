@@ -30,9 +30,10 @@ class export:
 class options:
     render = web.template.render('templates')
     @authenticated
-    @templated(css='style',
-            menu=web.menu_user,
-            title='GECO Web Client - Options')
+    @templated(css='style bootstrap',
+               js='jquery-1.7.2.min bootstrap',
+               menu=web.menu_user,
+               title='GECO Web Client - Options')
     def GET(self):
         session = web.ses
         cookie = session.get('gso', '')
@@ -41,9 +42,10 @@ class options:
                 delete())
 
     @authenticated
-    @templated(css='style',
-            menu=web.menu_user,
-            title='GECO Web Client - Options')
+    @templated(css='style bootstrap',
+               js='jquery-1.7.2.min bootstrap',
+               menu=web.menu_user,
+               title='GECO Web Client - Options')
     def POST(self):
         session = web.ses
         cookie = session.get('gso', '')

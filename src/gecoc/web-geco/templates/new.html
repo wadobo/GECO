@@ -1,57 +1,68 @@
 $def with (username="", form_new=None, title="Nueva Contraseña")
 
-<div id="main">
-        <div id="new">
+<div id="main" class="container">
+    <div class="row">
+        <div class="span6">
+            <div class="well">
             <fieldset>
                 <legend>$title</legend>
                 <form action="" method="POST">
                     $:form_new.render()
-                    <button type="submit" class="imaged ok"></button>
+                    <button type="submit" id="acc" class="btn btn-danger">Ok</button>
                 </form>
 
             </fieldset>
+            </div>
+        </div>
 
+        <div class="span6">
+            <div class="well">
             <fieldset>
                 <legend>Generación Manual</legend>
                 <table><tr>
-                    <td> <label for"password">Contraseña: <input type="password" id="password" name="password"/></label></td>
-                    <td><label for"password2">Confirmación: <input type="password" id="password2" name="password2"/></label></td>
+                    <td> <label for="password">Contraseña: <input type="password" id="password" name="password"/></label></td>
+                    <td><label for="password2">Confirmación: <input type="password" id="password2" name="password2"/></label></td>
                 </tr></table>
                 <br/>
                 <span style="color:green" id="result">--</span> 
                 <span style="color:red" id="same"></span> 
                 <br/>
-                <a href="" onClick="return set_pass();">cifrar</a>
+                <a class="btn btn-success" href="" onClick="return set_pass();">cifrar</a>
             </fieldset>
 
-            <fieldset>
+            <fieldset id="pwdgen">
                 <legend>Generación Automática</legend>
-                <label for"Lower">minúsculas <input type="checkbox" id="low" name="Lower" checked="checked"/></label>
-                <label for"Upper">mayúsculas <input type="checkbox" id="up" name="Upper" checked="checked"/></label>
-                <label for"Number">dígitos <input type="checkbox" id="digits" name="Number" checked="checked"/></label>
-                <label for"Punctuation">Otros signos <input type="checkbox" id="punct" name="Punctuation"/></label>
+                <label for="Lower">minúsculas <input type="checkbox" id="low" name="Lower" checked="checked"/></label>
+                <label for="Upper">mayúsculas <input type="checkbox" id="up" name="Upper" checked="checked"/></label>
+                <label for="Number">dígitos <input type="checkbox" id="digits" name="Number" checked="checked"/></label>
+                <label for="Punctuation">Otros signos <input type="checkbox" id="punct" name="Punctuation"/></label>
                 <br/>
-                <label for"length">Longitud <input type="text" id="length" name="length" value="11" size="3"/></label>
+                <label for="length">Longitud <input type="text" id="length" name="length" value="11" size="3"/></label>
                 <span id="show_pass" style="display:none;">
-                    <label for"gen">generada: <input type="text" id="gen" name="gen"/></label>
-                    <a href="" onclick="return hide()">ocultar</a>
+                    <label for="gen">generada: <input type="text" id="gen" name="gen"/></label>
+                    <a class="btn btn-info" href="" onclick="return hide()">ocultar</a>
                 </span>
-                <span id="noshow"> <a href="" onclick="return show()">mostrar</a> </span>
+                <span id="noshow"> <a class="btn btn-info" href="" onclick="return show()">mostrar</a> </span>
                 <br/>
-                <a href="" onClick="return generate_pass();">Generar</a>
+                <a class="btn btn-success" href="" onClick="return generate_pass();">Generar</a>
             </fieldset>
+            </div>
         </div>
-</div>
-
-<div class="input">
-    <img src="/static/images/error.png" class="close" alt="close"/>
-    <div id="master">
-        <label for="master">Master password:</label>
-        <input id="masterpwd" name="master" type="password"/>
-        <br/><button type="submit" id="rec" class="imaged"></button>
     </div>
 </div>
 
-<div id="overlay"></div>
+<div class="modal" id="pwdForm">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal">×</button>
+        <h3>Master Password</h3>
+    </div>
+    <div class="modal-body">
+        <input type="password" id="masterpwd"/>
+    </div>
+    <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+        <a href="#" id="rec" class="btn btn-danger">Recordar 10'</a>
+    </div>
+</div>
 
 <input style="display:none;" name="username" id="username" value="$username"/>

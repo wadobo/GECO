@@ -21,16 +21,16 @@ new_form = form.Form(
 class new_password:
     render = web.template.render('templates')
     @authenticated
-    @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min bootstrap aes md5 sha256 gecojs passwordStrengthMeter masterkey new',
             menu=web.menu_user,
             title='GECO Web Client - New')
     def GET(self):
         return self.render.new(web.ses.username, new_form())
 
     @authenticated
-    @templated(css='style',
-            js='aes jquery-1.3.1.min md5 sha256 gecojs passwordStrengthMeter masterkey new',
+    @templated(css='style bootstrap',
+            js='jquery-1.7.2.min bootstrap aes md5 sha256 gecojs passwordStrengthMeter masterkey new',
             menu=web.menu_user,
             title='GECO Web Client - New')
     def POST(self):

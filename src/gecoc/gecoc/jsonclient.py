@@ -41,7 +41,7 @@ class JsonClient(object):
         response = self.request('unregister', cookie=cookie)
 
     def change_password(self, cookie, new_password):
-        self.request('unregister', cookie=cookie, new_password=new_password)
+        self.request('change_password', cookie=cookie, new_password=new_password)
 
     def change_attr(self, cookie, name, args):
         args = json.dumps(args)

@@ -5,5 +5,9 @@
             <default><![CDATA[['<Super>g']]]></default>
             <summary>What key you want to make the GECO search to appear.</summary>
         </key>
+        <key type="as" name="refresh-geco">
+            <default><![CDATA[['<Super>r']]]></default>
+            <summary>What key you want to refresh GECO passwords.</summary>
+        </key>
     </schema>
 </schemalist>

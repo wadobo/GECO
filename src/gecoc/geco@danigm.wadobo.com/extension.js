@@ -44,6 +44,7 @@ let username = "username";
 let masterpwd = "";
 let base = 'http://localhost:8080';
 let indicator;
+let account_pressed = false;
 
 let mdata = "";
 let conffile= "";
@@ -55,6 +56,7 @@ let passwords;
 
 let dialog;
 
+// always call this function with ask_for_password_dialog
 function refresh() {
     indicator._refresh();
 }
@@ -64,7 +66,13 @@ const key_bindings = {
         indicator.menu.toggle();
         indicator.search.grab_key_focus();
     },
+    'refresh-geco': function() {
+        ask_for_password_dialog(function() {
+            refresh();
+        });
+    },
 };
+
 
 const QuestionDialog = new Lang.Class({
     Name: 'QuestionDialog',
@@ -279,12 +287,9 @@ function store_config() {
 }
 
 
-function GECO() {
-    this._init.apply(this, arguments);
-}
-
-GECO.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+const GECO = new Lang.Class({
+    Name: 'GecoIndicator',
+    Extends: PanelMenu.SystemStatusButton,
 
     _passwords: new Array(),
     _cookie: '',
@@ -299,12 +304,44 @@ GECO.prototype = {
         this.actor.add_actor(this.icon);
     },
 
+    _set_gnome_icon: function(icon) {
+        this.icon = new St.Icon({
+            icon_type: (St.IconType.SYMBOLIC)
+            ,icon_name: icon
+            ,style_class: 'system-status-icon'
+        });
+        this.actor.get_children().forEach(function(c) { c.destroy() });
+        this.actor.add_actor(this.icon);
+    },
+
     _init: function(){
-
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'geco');
-        this._set_icon("lock");
-
+        this.parent('geco-lock-symbolic', _("GECO"));
+        this._search_menu();
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this._update_menu();
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this._settings_menu();
+    },
+
+    _search_menu: function() {
+        this.searchsection = new PopupMenu.PopupMenuSection("Search");
+        let item = new PopupMenu.PopupMenuItem("");
+        this.search = new St.Entry(
+        {
+            name: "gecoSearch",
+            hint_text: _("search..."),
+            track_hover: true,
+            can_focus: true
+        });
+
+
+        let search_text = this.search.clutter_text;
+        search_text.connect('key-release-event', function(o,e) {
+            indicator.filter(o.get_text());
+        });
+
+        this.searchsection.actor.add_actor(this.search);
+        this.menu.addMenuItem(this.searchsection);
     },
 
     _update_menu: function() {
@@ -312,6 +349,7 @@ GECO.prototype = {
             this.pwsection.removeAll();
         } else {
             this.pwsection = new PopupMenu.PopupMenuSection("Passwords");
+            this.menu.addMenuItem(this.pwsection);
         }
 
         let filtered_list = new Array();
@@ -333,7 +371,7 @@ GECO.prototype = {
         }
 
         if (filtered_list.length >= 5) {
-            overflowItem = new PopupMenu.PopupSubMenuMenuItem(_("More..."))
+            let overflowItem = new PopupMenu.PopupSubMenuMenuItem("...");
             for (let i=5; i < filtered_list.length; i++) {
                 let pwd = filtered_list[i];
                 let item = this.create_item(pwd);
@@ -342,28 +380,60 @@ GECO.prototype = {
 
             this.pwsection.addMenuItem(overflowItem);
         }
-
-        this.menu.addMenuItem(this.pwsection);
     },
 
     create_item: function(pwd) {
-        let item = new PopupMenu.PopupMenuItem("");
-        label = new St.Label({ text: pwd.name, style_class: "pw-label" });
-        item.addActor(label);
-        item.connect('activate',function() {
-            let clipboard = St.Clipboard.get_default();
-            ask_for_password_dialog(function() {
-                clipboard.set_text(Gecojs.decrypt(masterpwd, pwd.password));
-            });
+        let ind = this;
+        let item = new PopupMenu.PopupMenuItem(pwd.name);
+
+        let actor = new Clutter.Box({ reactive: true });
+        actor.connect('button-press-event', function() {
+            ind._get_account(pwd);
+        });
+        ic = new St.Icon({ icon_name: 'avatar-default-symbolic', icon_size: '24'});
+        actor.add_actor(ic);
+        actor.show();
+        item.addActor(actor, { align: St.Align.END, expand: false });
+
+        item.connect('activate',function(item, event, position) {
+            debug(event.get_key_symbol() + " " + Clutter.KEY_space);
+            if ((event.type() == Clutter.EventType.BUTTON_RELEASE &&
+                event.get_button() == Clutter.BUTTON_SECONDARY) ||
+                (event.type() == Clutter.EventType.KEY_PRESS &&
+                event.get_key_symbol() == Clutter.KEY_space)) {
+                ind._get_account(pwd);
+            }
+
+            ind._get_password(pwd);
         });
 
         return item;
     },
 
+    _get_password: function(pwd) {
+        let clipboard = St.Clipboard.get_default();
+        if (account_pressed) {
+            account_pressed = false;
+        } else {
+            ask_for_password_dialog(function() {
+                clipboard.set_text(Gecojs.decrypt(masterpwd, pwd.password));
+            });
+        }
+    },
+
+    _get_account: function(pwd) {
+        let clipboard = St.Clipboard.get_default();
+        clipboard.set_text(pwd.account);
+        account_pressed = true;
+        return true;
+    },
+
+    // always call this function with ask_for_password_dialog
     _refresh: function() {
-        ask_for_password_dialog(function() { load_config(); });
+        load_config();
 
         let st = this;
+        st._set_gnome_icon('emblem-synchronizing-symbolic');
         Utils.make_query(base + "/api/auth", "user="+Utils.urlencode(username)+"&password="+Utils.urlencode(pwd), function(data) {
             st._cookie = data.data;
 
@@ -378,6 +448,7 @@ GECO.prototype = {
                         return 0;
                 });
                 st._update_menu();
+                st._set_icon('unlock');
             });
         });
     },
@@ -385,8 +456,7 @@ GECO.prototype = {
     _settings_menu: function() {
         this.cfgsection = new PopupMenu.PopupMenuSection("Setting");
 
-        let item = new PopupMenu.PopupMenuItem("");
-        item.addActor(new St.Label({ text: _("refresh") }));
+        let item = new PopupMenu.PopupMenuItem(_("refresh"));
         st = this;
         item.connect('activate', function() {
             ask_for_password_dialog(function() {
@@ -395,47 +465,22 @@ GECO.prototype = {
         });
         this.cfgsection.addMenuItem(item);
 
-        let item = new PopupMenu.PopupMenuItem("");
-        item.addActor(new St.Label({ text: _("forget master") }));
+        let item = new PopupMenu.PopupMenuItem(_("forget master"));
         item.connect('activate', function() { forget_master(); });
         this.cfgsection.addMenuItem(item);
 
-        let item = new PopupMenu.PopupMenuItem("");
-        item.addActor(new St.Label({ text: _("config") }));
+        let item = new PopupMenu.PopupMenuItem(_("config"));
         item.connect('activate', function() { config_dialog(); });
         this.cfgsection.addMenuItem(item);
 
-        let item = new PopupMenu.PopupMenuItem("");
-        this.search = new St.Entry(
-        {
-            name: "searchEntry",
-            hint_text: _("search..."),
-            track_hover: true,
-            can_focus: true
-        });
 
-
-        let search_text = this.search.clutter_text;
-        search_text.connect('key-release-event', function(o,e)
-        {
-            let symbol = e.get_key_symbol();
-            if (symbol == Clutter.Return) {
-                //debug(o.get_text());
-            }
-
-            indicator.filter(o.get_text());
-        });
-
-        this.cfgsection.actor.add_actor(this.search);
-
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this.cfgsection);
     },
 
     filter: function (text) {
         this._update_menu();
     },
-}
+});
 
 function debug(msg) {
     text = new St.Label({ style_class: 'helloworld-label', text: "Debug: " + msg });

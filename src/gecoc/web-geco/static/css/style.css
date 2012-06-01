@@ -84,6 +84,14 @@ body{
     display: block;
 }
 
+#clear_span {
+    font-size: x-large;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    display: inline !important;
+}
+
 /**
 
 input, textarea, button {

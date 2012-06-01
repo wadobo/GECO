@@ -79,6 +79,7 @@ function pass_delete(n){
         timeout = setTimeout('pass_delete('+(n-1)+')', 1 * 1000);
     else{
         $("#clear").attr("value", "");
+        $("#clear_span").html("");
         $("#counter").hide();
     }
 
@@ -88,6 +89,7 @@ function pass_delete(n){
 function really_show(){
     var pass = decrypt(mimasterpwd, pwd);
     $("#clear").attr("value", pass);
+    $("#clear_span").html(pass);
     $("#clear").focus();
     $("#clear").select();
     $("#counter").show();

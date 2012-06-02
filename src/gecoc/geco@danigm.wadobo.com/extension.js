@@ -396,7 +396,6 @@ const GECO = new Lang.Class({
         item.addActor(actor, { align: St.Align.END, expand: false });
 
         item.connect('activate',function(item, event, position) {
-            debug(event.get_key_symbol() + " " + Clutter.KEY_space);
             if ((event.type() == Clutter.EventType.BUTTON_RELEASE &&
                 event.get_button() == Clutter.BUTTON_SECONDARY) ||
                 (event.type() == Clutter.EventType.KEY_PRESS &&

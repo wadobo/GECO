@@ -1,0 +1,21 @@
+[Desktop Entry]
+Name=QML GECO
+Comment=GECO widget
+Icon=document-encrypt
+
+X-Plasma-API=declarativeappletscript
+X-Plasma-MainScript=ui/main.qml
+X-Plasma-DefaultSize=300,450
+
+X-KDE-PluginInfo-Author=Daniel Garcia
+X-KDE-PluginInfo-Email=danigm@wadobo.com
+X-KDE-PluginInfo-Website=http://github.com/wadobo/GECO
+X-KDE-PluginInfo-Category=Examples
+X-KDE-PluginInfo-Name=com.wadobo.geco
+X-KDE-PluginInfo-Version=0.1
+
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true
+X-KDE-ServiceTypes=Plasma/Applet
+Type=Service

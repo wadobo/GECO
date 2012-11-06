@@ -296,8 +296,7 @@ const GECO = new Lang.Class({
 
     _set_icon: function(stat) {
         this.icon = new St.Icon({
-            icon_type: (St.IconType.SYMBOLIC)
-            ,icon_name: 'geco-'+stat+'-symbilic'
+            icon_name: 'geco-'+stat+'-symbolic'
             ,style_class: 'system-status-icon'
         });
         this.actor.get_children().forEach(function(c) { c.destroy() });
@@ -306,8 +305,7 @@ const GECO = new Lang.Class({
 
     _set_gnome_icon: function(icon) {
         this.icon = new St.Icon({
-            icon_type: (St.IconType.SYMBOLIC)
-            ,icon_name: icon
+            icon_name: icon
             ,style_class: 'system-status-icon'
         });
         this.actor.get_children().forEach(function(c) { c.destroy() });
@@ -456,7 +454,7 @@ const GECO = new Lang.Class({
         this.cfgsection = new PopupMenu.PopupMenuSection("Setting");
 
         let item = new PopupMenu.PopupMenuItem(_("refresh"));
-        st = this;
+        let st = this;
         item.connect('activate', function() {
             ask_for_password_dialog(function() {
                 refresh();

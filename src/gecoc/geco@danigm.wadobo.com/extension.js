@@ -133,6 +133,10 @@ const QuestionDialog = new Lang.Class({
 
     _onOk: function () {
         text = this.entry.get_text();
+        if (!text) {
+            return;
+        }
+
         masterpwd = text;
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 300, forget_master);
         this.close(global.get_current_time());

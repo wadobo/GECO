@@ -417,14 +417,14 @@ const GECO = new Lang.Class({
             account_pressed = false;
         } else {
             ask_for_password_dialog(function() {
-                clipboard.set_text(Gecojs.decrypt(masterpwd, pwd.password));
+                clipboard.set_text(St.ClipboardType.CLIPBOARD, Gecojs.decrypt(masterpwd, pwd.password));
             });
         }
     },
 
     _get_account: function(pwd) {
         let clipboard = St.Clipboard.get_default();
-        clipboard.set_text(pwd.account);
+        clipboard.set_text(St.ClipboardType.CLIPBOARD, pwd.account);
         account_pressed = true;
         return true;
     },
@@ -498,9 +498,12 @@ function init(metadata) {
 
 function enable() {
     for(key in key_bindings) {
-        global.display.add_keybinding(key,
+        Main.wm.addKeybinding(key,
             mySettings,
             Meta.KeyBindingFlags.NONE,
+            Shell.KeyBindingMode.NORMAL |
+            Shell.KeyBindingMode.MESSAGE_TRAY |
+            Shell.KeyBindingMode.OVERVIEW,
             key_bindings[key]
         );
     }
@@ -511,10 +514,10 @@ function enable() {
 
 function disable() {
     for(key in key_bindings) {
-        global.display.remove_keybinding(key);
+        Main.wm.removeKeybinding(key);
     }
 
     indicator.destroy();
-    Mainloop.source_remove(event);
+    //Mainloop.source_remove(event);
     indicator = null;
 }

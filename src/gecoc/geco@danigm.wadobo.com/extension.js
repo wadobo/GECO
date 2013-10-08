@@ -293,7 +293,7 @@ function store_config() {
 
 const GECO = new Lang.Class({
     Name: 'GecoIndicator',
-    Extends: PanelMenu.SystemStatusButton,
+    Extends: PanelMenu.Button,
 
     _passwords: new Array(),
     _cookie: '',
@@ -301,6 +301,7 @@ const GECO = new Lang.Class({
     _set_icon: function(stat) {
         this.icon = new St.Icon({
             icon_name: 'geco-'+stat+'-symbolic'
+            //icon_name: 'dialog-error-symbolic'
             ,style_class: 'system-status-icon'
         });
         this.actor.get_children().forEach(function(c) { c.destroy() });
@@ -317,7 +318,7 @@ const GECO = new Lang.Class({
     },
 
     _init: function(){
-        this.parent('geco-lock-symbolic', _("GECO"));
+        this.parent(St.Align.START);
         this._search_menu();
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this._update_menu();
@@ -395,7 +396,7 @@ const GECO = new Lang.Class({
         ic = new St.Icon({ icon_name: 'avatar-default-symbolic', icon_size: '24'});
         actor.add_actor(ic);
         actor.show();
-        item.addActor(actor, { align: St.Align.END, expand: false });
+        item.actor.add_actor(actor, { align: St.Align.END, expand: false });
 
         item.connect('activate',function(item, event, position) {
             if ((event.type() == Clutter.EventType.BUTTON_RELEASE &&
@@ -497,6 +498,7 @@ function init(metadata) {
 }
 
 function enable() {
+    var key;
     for(key in key_bindings) {
         Main.wm.addKeybinding(key,
             mySettings,
@@ -509,6 +511,7 @@ function enable() {
     }
 
     indicator = new GECO();
+    indicator._set_icon("lock");
     Main.panel.addToStatusArea('geco', indicator);
 }
 

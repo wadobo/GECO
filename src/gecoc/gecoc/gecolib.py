@@ -149,7 +149,7 @@ def get_server_object(method='xmlrpc', **kwargs):
 
     if method == 'json':
         import jsonclient
-        server = jsonclient.JsonClient(kwargs['base'], kwargs.get('path', ''))
+        server = jsonclient.JsonClient(kwargs['base'], kwargs.get('path', ''), kwargs.get('ssl', False))
         return GecoClient(server, kwargs['name'], kwargs.get('cookie', ''))
 
 GSO = get_server_object

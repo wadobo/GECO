@@ -13,8 +13,8 @@ import sys
 from sqlalchemy import *
 
 import sqlalchemy
-InvalidRequestError = sqlalchemy.exceptions.InvalidRequestError
-IntegrityError = sqlalchemy.exceptions.IntegrityError
+InvalidRequestError = sqlalchemy.exc.InvalidRequestError
+IntegrityError = sqlalchemy.exc.IntegrityError
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey

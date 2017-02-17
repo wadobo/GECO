@@ -20,19 +20,23 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relation, backref, sessionmaker
 
-# python 2.6 compatible
-if sys.version_info[1] == 6:
-    from hashlib import sha1 as sha
-else:
+# python 2.5 compatible
+if sys.version_info[0] == 2 and sys.version_info[1] < 6:
     import sha
     sha = sha.new
+else:
+    from hashlib import sha1 as sha
 
 import datetime
 import random
 import string
 
 # 0123456789...ABC....abc
-CHARS = string.letters + string.digits + '.:;,!?{}[]<>=-_()+'
+if sys.version_info[0] >= 3:
+    letters = string.ascii_letters
+else:
+    letters = string.letters
+CHARS = letters + string.digits + '.:;,!?{}[]<>=-_()+'
 DEFAULT_EXPIRATION = 60 # password default expiration (in days)
 
 

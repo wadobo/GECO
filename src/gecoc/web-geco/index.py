@@ -7,7 +7,7 @@ from utils import authenticated, templated
 
 web.config.debug = False
 #web.SERVER = 'https://danigm.net:8080/api'
-web.SERVER = 'http://localhost:8080/api'
+web.SERVER = 'http://localhost:5000/api'
 
 #web.DATABASE = 'sqlite:////usr/share/gecod/database.sqlite'
 web.DATABASE = 'sqlite:////home/danigm/Projects/geco/src/gecod/database.sqlite'

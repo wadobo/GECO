@@ -1,29 +1,17 @@
 #!/usr/bin/env python
 
-import urllib
-import httplib
+import requests
 import json
 
 
 class JsonClient(object):
-    def __init__(self, base="localhost:8080", path="", ssl=False):
-        self.base = base
-        self.path = path
-        self.ssl = ssl
+    def __init__(self, url="http://localhost:5000"):
+        self.url = url
 
     def request(self, path, **params):
-        data = urllib.urlencode(params)
-
-        if not self.ssl:
-            h = httplib.HTTPConnection(self.base)
-        else:
-            h = httplib.HTTPSConnection(self.base)
-
-
-        h.request('POST', "/%s/%s" % (self.path, path), data)
-
-        r = h.getresponse()
-        return json.loads(r.read())
+        url = "%s/%s" % (self.url, path)
+        r = requests.post(url, params)
+        return r.json()
 
     def auth(self, user, password):
         response = self.request('auth', user=user, password=password)

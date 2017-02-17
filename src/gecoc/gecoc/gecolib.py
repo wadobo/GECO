@@ -5,8 +5,8 @@ import random
 import string
 
 
-LOWER, UPPER, DIGITS, PUNCT = (string.lowercase,
-                    string.uppercase,
+LOWER, UPPER, DIGITS, PUNCT = (string.ascii_lowercase,
+                    string.ascii_uppercase,
                     string.digits,
                     '.:;,!?{}[]<>=-_()+#@$%&')
 
@@ -136,7 +136,7 @@ def get_server_object(method='xmlrpc', **kwargs):
     # TODO implementar funcionalidad de ficheros de configuración
 
     if method == 'xmlrpc':
-        import xmlrpclib
+        from . import xmlrpclib
         # example xmlrpc server: 'https://localhost:443'
         server = xmlrpclib.Server(kwargs['xmlrpc_server'],
                 allow_none=1)
@@ -148,8 +148,8 @@ def get_server_object(method='xmlrpc', **kwargs):
             return GecoClient(server, name=kwargs['xmlrpc_server'])
 
     if method == 'json':
-        import jsonclient
-        server = jsonclient.JsonClient(kwargs['base'], kwargs.get('path', ''), kwargs.get('ssl', False))
+        from . import jsonclient
+        server = jsonclient.JsonClient(kwargs['url'])
         return GecoClient(server, kwargs['name'], kwargs.get('cookie', ''))
 
 GSO = get_server_object
@@ -163,13 +163,13 @@ def generate(size=11, lower=True, upper=True, digits=True,
 
     chars = ''
     selection = [lower, upper, digits, punctuation]
-    strings =(LOWER, UPPER, DIGITS, PUNCT)   
+    strings =(LOWER, UPPER, DIGITS, PUNCT)
 
     for opt, v in zip(selection, strings):
         if opt:
             chars += v
 
-    return ''.join([random.choice(chars) for _ in xrange(size)])
+    return ''.join([random.choice(chars) for _ in range(size)])
 
 def is_sorted(alist):
     '''
@@ -239,7 +239,7 @@ def strength(password):
 # Algoritmos para cifrar y descifrar contraseñas #
 ##################################################
 
-import slowaes
+from . import slowaes
 import base64
 
 import hashlib
@@ -266,7 +266,7 @@ class AES:
         return '#'.join(map(str, ciph))
 
     def decrypt(self, msg, key):
-        msg = map(int, msg.split('#'))
+        msg = list(map(int, msg.split('#')))
         ckey, iv = self.key_and_iv(key)
         decr = self.aes.decrypt(msg, 256, self.aes.modeOfOperation["CBC"], ckey,
                 self.aes.aes.keySize["SIZE_128"], iv)
@@ -276,8 +276,8 @@ class AES:
         '''
         Return a 32 size number key and a 16 size iv from a string key
         '''
-        hkey = map(ord, hashlib.sha256(key).digest())
-        iv = map(ord, hashlib.md5(key).digest())
+        hkey = hashlib.sha256(key.encode()).digest()
+        iv = hashlib.md5(key.encode()).digest()
 
         return hkey, iv
 

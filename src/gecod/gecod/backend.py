@@ -157,13 +157,13 @@ def auth_by_password(name, password, session=None):
     '''
 
     # python 2.6 compatible
-    if sys.version_info[1] == 6:
+    if sys.version_info[0] == 3 or sys.version_info[1] == 6:
         from hashlib import sha1 as sha
     else:
         import sha
         sha = sha.new
 
-    password_hash = sha(password).hexdigest()
+    password_hash = sha(password.encode()).hexdigest()
     try:
         db_user = session.query(db.User).\
                 filter(db.User.name == name).one()
@@ -292,7 +292,7 @@ def restore(cookie, data, session=None):
             user.passwords.append(new_password)
             session.commit()
             
-        except Exception, e:
+        except Exception as e:
             raise ImportError("can't import '%s': %s" % (p, e.message))
 
 @session_decorator

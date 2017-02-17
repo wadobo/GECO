@@ -589,11 +589,11 @@ if __name__ == "__main__":
     moo = AESModeOfOperation()
     cleartext = "This is a test!"
     cypherkey = [143,194,34,208,145,203,230,143,177,246,97,206,145,92,255,84]
-    print len(map(chr, cypherkey))
+    print(len(map(chr, cypherkey)))
     iv = [103,35,148,239,76,213,47,118,255,222,123,176,106,134,98,92]
     mode, orig_len, ciph = moo.encrypt(cleartext, moo.modeOfOperation["CBC"],
             cypherkey, moo.aes.keySize["SIZE_128"], iv)
-    print 'm=%s, ol=%s (%s), ciph=%s' % (mode, orig_len, len(cleartext), ciph)
+    print('m=%s, ol=%s (%s), ciph=%s' % (mode, orig_len, len(cleartext), ciph))
     decr = moo.decrypt(ciph, orig_len, mode, cypherkey,
             moo.aes.keySize["SIZE_128"], iv)
-    print decr
+    print(decr)

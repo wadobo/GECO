@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
-import web
+from flask import Flask
+from flask.views import MethodView
+from flask import jsonify
+from flask import request
+
 import json
 import datetime
 import backend
@@ -101,44 +105,44 @@ class Frontend:
         return allowed
 
 
-urls = ( '/(.*)', 'View', )
-app = web.application(urls, globals())
+app = Flask(__name__)
+app.json_encoder = CustomEncoder
 
 
-class View(Frontend):
+class API(MethodView, Frontend):
+    methods = ['GET', 'POST']
 
-    def GET(self, method):
+    def get(self, method=None):
         return self.view(method)
 
-    def POST(self, method):
+    def post(self, method=None):
         return self.view(method)
 
     def view(self, method):
-        web.header('Content-Type', 'application/json')
-
-        data = web.input()
+        data = request.form.to_dict()
         args = data.get('args', None)
         if args:
             data['args'] = json.loads(args)
         f = getattr(self, "m_%s" % method, None)
 
         if not f:
-            return json.dumps({'status': 'error',
-                               'msg': 'method not found',
-                               'allowed': self.allowed()})
+            return jsonify(status='error',
+                           msg='method not found',
+                           allowed=self.allowed())
 
         try:
             response = f(**data)
         except TypeError:
-            return json.dumps({'status': 'error',
-                               'msg': 'incorrect params',
-                               'allowed': self.allowed(method)})
-        except Exception, e:
-            return json.dumps({'status': 'error',
-                               'msg': e.message,
-                               })
+            return jsonify(status='error',
+                           msg='incorrect params',
+                           allowed=self.allowed(method))
+        except Exception as e:
+            return jsonify(status='error', msg=e.message)
 
-        return json.dumps({'status' : 'ok', 'data' : response}, cls=CustomEncoder)
+        return jsonify(status='ok', data=response)
+
+
+app.add_url_rule('/<path:method>', view_func=API.as_view('api'))
 
 
 if __name__ == "__main__":

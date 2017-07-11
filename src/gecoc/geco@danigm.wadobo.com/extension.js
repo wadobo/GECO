@@ -269,8 +269,8 @@ function load_config() {
             continue;
         }
 
-        key = opt[0].trim();
-        value = opt[1].trim();
+        let key = opt[0].trim();
+        let value = opt[1].trim();
 
         if (key == 'server') {
             base = value;
@@ -286,8 +286,9 @@ function store_config() {
     let f = Gio.file_new_for_path(conffile);
     let out = f.replace(null, false, Gio.FileCreateFlags.NONE, null);
     content = "server = " + base + "\nuser = " + username + "\npasswd = " + pwd;
-
-    Shell.write_string_to_stream (out, Gecojs.encrypt(masterpwd, content));
+    let stream = new Gio.DataOutputStream({ base_stream: out});
+    stream.put_string(Gecojs.encrypt(masterpwd, content), null);
+    stream.close(null);
 }
 
 
@@ -467,14 +468,13 @@ const GECO = new Lang.Class({
         });
         this.cfgsection.addMenuItem(item);
 
-        let item = new PopupMenu.PopupMenuItem(_("forget master"));
+        item = new PopupMenu.PopupMenuItem(_("forget master"));
         item.connect('activate', function() { forget_master(); });
         this.cfgsection.addMenuItem(item);
 
-        let item = new PopupMenu.PopupMenuItem(_("config"));
+        item = new PopupMenu.PopupMenuItem(_("config"));
         item.connect('activate', function() { config_dialog(); });
         this.cfgsection.addMenuItem(item);
-
 
         this.menu.addMenuItem(this.cfgsection);
     },
@@ -504,7 +504,6 @@ function enable() {
             mySettings,
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL |
-            Shell.ActionMode.MESSAGE_TRAY |
             Shell.ActionMode.OVERVIEW,
             key_bindings[key]
         );

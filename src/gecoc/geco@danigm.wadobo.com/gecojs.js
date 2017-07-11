@@ -29,7 +29,7 @@ function array_of_bytes2(key){
 function array_to_string(key){
     var retkey = '';
     for (var i=0; i<key.length; i++){
-        value = String.fromCharCode(key[i]);
+        let value = String.fromCharCode(key[i]);
         if(key[i] == 0)
             break;
         retkey += value;

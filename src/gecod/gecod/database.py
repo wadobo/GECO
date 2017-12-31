@@ -38,7 +38,7 @@ def password_hash(password, salt=None):
 
 def old_password_hash(password):
     from hashlib import sha1
-    return sha1.new(password.encode()).hexdigest()
+    return sha1(password.encode()).hexdigest()
 
 
 class User(Base):

@@ -119,10 +119,14 @@ class API(MethodView, Frontend):
         return self.view(method)
 
     def view(self, method):
-        data = request.form.to_dict()
+        data = request.json or request.form.to_dict()
         args = data.get('args', None)
         if args:
             data['args'] = json.loads(args)
+
+        if not data and request.data:
+            data = json.loads(request.data.decode("utf-8"))
+
         f = getattr(self, "m_%s" % method, None)
 
         if not f:
@@ -137,7 +141,7 @@ class API(MethodView, Frontend):
                            msg='incorrect params',
                            allowed=self.allowed(method))
         except Exception as e:
-            return jsonify(status='error', msg=e.message)
+            return jsonify(status='error', msg=str(e))
 
         return jsonify(status='ok', data=response)
 

@@ -1,19 +1,7 @@
-# -*- coding: utf-8 -*-
-
 '''
 Provides somes functions to interact with database withouth knowing
 it. Gecod-backend provides an abstraction layer over gecod-database.
 '''
-
-# ============================================================ #
-# TODO Funciones necesarias:                                   #
-#                                                              #
-# - Diferentes metodos de autenticación                        # 
-# - consultar ficheros de configuración                        # 
-# - almacenar ficheros de configuración                        #
-# - borrado de ficheros de configuración                       #
-#                                                              # 
-# ============================================================ #
 
 import sys
 import database as db
@@ -22,6 +10,7 @@ import time
 from functools import wraps
 
 DATABASE = 'sqlite:///database.sqlite'
+SECRET_KEY = 'v!r#8-@l!0e__nior8(nwst!s&s$51+qu+^^(04q3w!nd1v_u9'
 
 class NotImplementedError(Exception):
     pass
@@ -111,7 +100,7 @@ def user_by_cookie(cookie, session=None):
     close_it = False
     if not session:
         session = db.connect(DATABASE)
-    
+
     try:
         user = session.query(db.User).\
                 filter(db.User.id == db.Cookie.user_id).\
@@ -131,7 +120,7 @@ def auth(name, method, **kwargs):
     Authenticate an user and return a cookie to call others functions.
     name is the name of the user
     method is the authentication method (a string)
-    
+
     implemented methods:
         password: for example auth('myname', 'password', password='mypassword')
         ...
@@ -156,38 +145,31 @@ def auth_by_password(name, password, session=None):
     In other case return None
     '''
 
-    # python 2.6 compatible
-    if sys.version_info[0] == 3 or sys.version_info[1] == 6:
-        from hashlib import sha1 as sha
-    else:
-        import sha
-        sha = sha.new
-
-    password_hash = sha(password.encode()).hexdigest()
     try:
         db_user = session.query(db.User).\
                 filter(db.User.name == name).one()
     except db.InvalidRequestError:
         return None
 
-    if db_user.password == password_hash:
-        # si el usuario ya tiene una cookie, devolver esta
-        if db_user.cookie and\
-                db_user.cookie.expiration > datetime.datetime.now():
-            return db_user.cookie.id
-        cookie = db.Cookie()
-        db_user.cookie = cookie
-        session.commit()
-        return cookie.id
-    else:
+    if not db_user.check_password(password):
         return None
+
+    # Return the current cookie if it's valid yet
+    if db_user.cookie and\
+            db_user.cookie.expiration > datetime.datetime.now():
+        return db_user.cookie.id
+
+    cookie = db.Cookie()
+    db_user.cookie = cookie
+    session.commit()
+    return cookie.id
 
 @session_decorator
 def logout(cookie, session=None):
     '''
     def logout(cookie, session=None):
 
-    Deletes the cookie from database. 
+    Deletes the cookie from database.
     '''
     try:
         c = session.query(db.Cookie).filter(db.Cookie.id == cookie).one()
@@ -241,7 +223,7 @@ def get_all_passwords(cookie, session=None, from_db=False):
 
 def export(cookie):
     '''
-    Returns a string with all passwords 
+    Returns a string with all passwords
     '''
 
     return "\n".join([str(p).replace('\n', '\\n')\
@@ -270,7 +252,7 @@ def restore(cookie, data, session=None):
 
             kwargs = dict(type=type, description=description,
                     account=account, cypher_method=cypher_method)
-        
+
             exists = False
             oldp = None
             for ep in user.passwords:
@@ -278,7 +260,7 @@ def restore(cookie, data, session=None):
                     exists = True
                     oldp = ep
                     break
-            
+
             if exists:
                 if updated > oldp.updated:
                     session.delete(oldp)
@@ -291,7 +273,7 @@ def restore(cookie, data, session=None):
 
             user.passwords.append(new_password)
             session.commit()
-            
+
         except Exception as e:
             raise ImportError("can't import '%s': %s" % (p, e.message))
 
@@ -380,7 +362,7 @@ def register(name, password, session=None):
     def register(name, password, session=None):
 
     Register a new user in GECO
-    
+
     Can raise RegisteredUserError
     '''
 
@@ -453,4 +435,3 @@ def change_attr(cookie, name, session=None, **kwargs):
         setattr(password, key, value)
 
     session.commit()
-

@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# En principio pensaba hacerlo con sqlojbect, pero voy a
-# hacerlo con sqlalchemy que parece que es más potente y así aprendo
-# una cosa nueva.
-
-# De momento necesito las siguientes tablas:
-#  - usuario: (nombre, contraseña, email)
-#  - contraseña: (identificador, recurso, cadena, usuario, fecha de creación,
-#                   fecha de caducidad)
-
 import sys
 from sqlalchemy import *
 
@@ -20,12 +9,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relation, backref, sessionmaker
 
-# python 2.5 compatible
-if sys.version_info[0] == 2 and sys.version_info[1] < 6:
-    import sha
-    sha = sha.new
-else:
-    from hashlib import sha1 as sha
+import hashlib
+import binascii
 
 import datetime
 import random
@@ -43,15 +28,42 @@ DEFAULT_EXPIRATION = 60 # password default expiration (in days)
 Base = declarative_base()
 metadata = Base.metadata
 
+
+def password_hash(password, salt=None):
+    if not salt:
+        from backend import SECRET_KEY as salt
+    dk = hashlib.pbkdf2_hmac('sha512', password.encode('utf8'),
+                             salt.encode('utf8'), 100000)
+    return binascii.hexlify(dk)
+
+def old_password_hash(password):
+    from hashlib import sha1
+    return sha1.new(password.encode()).hexdigest()
+
+
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(20), unique=True)
-    password = Column(String(60))
+    password = Column(String(300))
 
     def set_password(self, password):
-        self.password = sha(password).hexdigest()
+        self.password = password_hash(password)
+
+    def check_password(self, password):
+        c = (self.password == password_hash(password))
+
+        if c:
+            return True
+
+        # rehashing old hashes sha1
+        old = old_password_hash(password)
+        if old == self.password:
+            self.set_password(password)
+            return True
+
+        return False
 
     def __init__(self, name, password):
         self.name = name
@@ -138,9 +150,8 @@ class Conffile(Base):
 class Cookie(Base):
     __tablename__ = 'cookies'
 
-    # El id es una especie de cookie que se va a envia desde el
-    # frontend al backend de gecod, nunca al cliente. Es una forma de
-    # no guardar la contraseña, ni siquiera el hash de esta
+    # this is a temporal random password used to authenticate after the use
+    # of username/password
     id = Column(String(80), primary_key=True)
     expiration = Column(DateTime())
     user_id = Column(Integer, ForeignKey('users.id'))

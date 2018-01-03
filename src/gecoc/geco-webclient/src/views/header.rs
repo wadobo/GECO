@@ -1,0 +1,19 @@
+use yew::html::Html;
+use updater::Msg;
+use model::Model;
+
+pub fn view(title: &str, model: &Model) -> Html<Msg> {
+    html! {
+        <div id="header", class="row", >
+            <div class="col",>
+                <h1>{ title }</h1>
+            </div>
+            <div class="col-1", >
+                <button class="btn", class="btn-light", class="right",
+                        onclick=|_| Msg::Logout,>
+                    { match model.login.token { Some(_) => "logout", None => "" } }
+                </button>
+            </div>
+        </div>
+    }
+}

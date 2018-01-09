@@ -8,4 +8,10 @@ pub enum Msg {
     LoginSetUserName(Option<String>),
     LoginSetPassword(Option<String>),
     LoginReady(Result<JsonValue, ()>),
+
+    Register,
+    RegisterUserName(Option<String>),
+    RegisterPassword(Option<String>),
+    RegisterRepeat(Option<String>),
+    RegisterReady(Result<JsonValue, ()>),
 }

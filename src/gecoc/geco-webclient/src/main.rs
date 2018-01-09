@@ -2,6 +2,8 @@
 extern crate yew;
 #[macro_use]
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
 mod model;
 mod updater;
@@ -10,11 +12,12 @@ mod views;
 use yew::html::App;
 use updater::update;
 use updater::Context;
-use model::Model;
 
 fn main() {
-    let model = Model::new();
+    yew::initialize();
     let mut app = App::new();
-    let context = Context::new(&mut app);
-    app.run(context, model, update, views::main);
+    let mut context = Context::new(&mut app);
+    let model = context.get_model();
+    app.mount(context, model, update, views::main);
+    yew::run_loop();
 }

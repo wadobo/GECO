@@ -7,7 +7,7 @@ use views::header;
 pub fn view(model: &Model) -> Html<Msg> {
     html! {
         <div class="container",>
-            { header::view("List", model) }
+            { header::view("GECO", model) }
             <h1>{ "HOLA" }</h1>
         </div>
     }

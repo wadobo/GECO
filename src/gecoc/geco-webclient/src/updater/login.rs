@@ -1,71 +1,64 @@
-use yew::services::fetch::Method;
-use yew::format::Json;
 use serde_json::Value as JsonValue;
 
 use updater::Msg;
 use updater::Context;
-use updater::msg::BASE;
-use model::LoginModel;
-use model::RegisterModel;
+use updater::list;
+use model::Model;
 
-pub fn login(context: &mut Context, model: &mut LoginModel) {
-    model.error = None;
-
-    context.console.log(&format!("Login {:?} {:?}", model.username, model.password));
-    let uname = model.username.clone().unwrap_or_default();
-    let pwd = model.password.clone().unwrap_or_default();
+fn do_login(context: &mut Context, model: &mut Model) {
     let data = json!({
-        "user": uname,
-        "password": pwd,
+        "user": model.login.username.clone().unwrap_or_default(),
+        "password": model.login.password.clone().unwrap_or_default(),
     });
 
-    model.password = None;
-
-    context.web.fetch(Method::Post,
-                  &format!("{}/auth", BASE),
-                  Json(&data),
-                  |Json(data)| Msg::LoginReady(data));
+    context.post("auth", data, |data| Msg::LoginReady(data));
 }
 
-pub fn login_ready(_: &mut Context, model: &mut LoginModel, st: Result<JsonValue, ()>) {
-    model.token = match st {
+pub fn login(context: &mut Context, model: &mut Model) {
+    model.login.error = None;
+    do_login(context, model);
+    model.login.password = None;
+}
+
+pub fn login_ready(context: &mut Context, model: &mut Model, st: Result<JsonValue, ()>) {
+    model.login.token = match st {
         Ok(json) => match json["data"].as_str() {
             Some(tk) => Some(String::from(tk)),
             None => {
-                model.error = Some(String::from("Login Error, try again"));
+                model.login.error = Some(String::from("Login Error, try again"));
                 None
             }
         },
         Err(_) => {
-            model.error = Some(format!("API Error"));
+            model.login.error = Some(format!("API Error"));
             None
         }
     };
+    list::get_all_pass(context, model);
 }
 
-pub fn logout(_: &mut Context, model: &mut LoginModel) {
-    model.username = None;
-    model.password = None;
-    model.token = None;
-    model.error = None;
+pub fn logout(_: &mut Context, model: &mut Model) {
+    model.login.username = None;
+    model.login.password = None;
+    model.login.token = None;
+    model.login.error = None;
 }
 
-pub fn register(context: &mut Context, model: &mut RegisterModel) {
-    model.error = None;
+pub fn register(context: &mut Context, model: &mut Model) {
+    let m = &mut model.register;
+    m.error = None;
 
-    context.console.log(&format!("Register {:?} {:?}", model.username, model.password));
-
-    let uname = model.username.clone().unwrap_or_default();
-    let pwd = model.password.clone().unwrap_or_default();
-    let repeat = model.repeat.clone().unwrap_or_default();
+    let uname = m.username.clone().unwrap_or_default();
+    let pwd = m.password.clone().unwrap_or_default();
+    let repeat = m.repeat.clone().unwrap_or_default();
 
     if pwd != repeat {
-        model.error = Some(format!("Passwords didn't match"));
+        m.error = Some(format!("Passwords didn't match"));
         return;
     }
 
     if pwd.is_empty() || repeat.is_empty() || uname.is_empty() {
-        model.error = Some(format!("All fields are required"));
+        m.error = Some(format!("All fields are required"));
         return;
     }
 
@@ -74,36 +67,29 @@ pub fn register(context: &mut Context, model: &mut RegisterModel) {
         "password": pwd,
     });
 
-    context.web.fetch(Method::Post,
-                  &format!("{}/register", BASE),
-                  Json(&data),
-                  |Json(data)| Msg::RegisterReady(data));
+    context.post("register", data, |d| Msg::RegisterReady(d));
 }
 
-pub fn register_ready(context: &mut Context, model: &mut RegisterModel, st: Result<JsonValue, ()>) {
+pub fn register_ready(context: &mut Context, model: &mut Model, st: Result<JsonValue, ()>) {
     match st {
         Ok(json) => match json["status"].as_str() {
             Some(s) if s == "ok" => {
-                let data = json!({
-                    "user": model.username.clone().unwrap_or_default(),
-                    "password": model.password.clone().unwrap_or_default(),
-                });
+                model.login.username = model.register.username.clone();
+                model.login.password = model.register.password.clone();
+                do_login(context, model);
 
-                model.username = None;
-                model.password = None;
-                model.repeat = None;
-
-                context.web.fetch(Method::Post,
-                              &format!("{}/auth", BASE),
-                              Json(&data),
-                              |Json(data)| Msg::LoginReady(data));
+                model.login.username = None;
+                model.login.password = None;
+                model.register.username = None;
+                model.register.password = None;
+                model.register.repeat = None;
             }
             _ => {
-                model.error = Some(String::from("Registration Error"));
+                model.register.error = Some(String::from("Registration Error"));
             }
         },
         Err(_) => {
-            model.error = Some(format!("API Error"));
+            model.register.error = Some(format!("API Error"));
         }
     };
 }

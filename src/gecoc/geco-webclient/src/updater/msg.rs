@@ -1,6 +1,6 @@
 use serde_json::Value as JsonValue;
 
-pub static BASE: &str = "/geco";
+pub static BASE: &str = "/api";
 
 pub enum Msg {
     Login,
@@ -14,4 +14,6 @@ pub enum Msg {
     RegisterPassword(Option<String>),
     RegisterRepeat(Option<String>),
     RegisterReady(Result<JsonValue, ()>),
+
+    AllPassReady(Result<JsonValue, ()>),
 }
